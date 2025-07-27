@@ -1,6 +1,6 @@
 import { AppRoutes } from './routes'
 import { BrowserRouter } from 'react-router-dom'
-import Layout from './components/layout'
+import Layout from './components/Layout'
 
 const App = () => {
   return (
