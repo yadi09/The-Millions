@@ -11,7 +11,7 @@ const featuredTestimonials = [
     name: "Yadamzer Terefe",
     role: "CEO & Founder",
     company: "Yadamzer Business Group",
-    image: "/placeholder.svg?height=60&width=60&text=SJ",
+    image: "/Yadamzer.jpg?height=60&width=60&text=SJ",
     rating: 5,
     category: "Property Accounting",
     content:
@@ -25,7 +25,7 @@ const featuredTestimonials = [
     name: "Mark Zuckerberg",
     role: "CEO & Founder",
     company: "Meta Platforms Inc.",
-    image: "/placeholder.svg?height=60&width=60&text=MC",
+    image: "/Mark.jpg?height=60&width=60&text=MC",
     rating: 5,
     category: "Business Advisory",
     content:
@@ -39,7 +39,7 @@ const featuredTestimonials = [
     name: "Elon Musk",
     role: "CEO & Founder",
     company: "Tesla Inc.",
-    image: "/placeholder.svg?height=60&width=60&text=EW",
+    image: "/Elon.png?height=60&width=60&text=EW",
     rating: 5,
     category: "Self Assessment",
     content:
@@ -53,7 +53,7 @@ const featuredTestimonials = [
     name: "Jack Ma",
     role: "CEO & Founder",
     company: "Alibaba Group",
-    image: "/placeholder.svg?height=60&width=60&text=DT",
+    image: "/Jack.jpeg?height=60&width=60&text=DT",
     rating: 5,
     category: "Payroll & Bookkeeping",
     content:
