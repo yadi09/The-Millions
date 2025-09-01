@@ -2,6 +2,7 @@ import { Button } from "../../components/ui/button"
 import { Card, CardContent } from "../../components/ui/card"
 import { Target, Eye, ArrowRight, Shield, Lightbulb, Handshake, Award, TrendingUp } from "lucide-react"
 
+// team members
 const teamMembers = [
   {
     name: "Sleshi Million",

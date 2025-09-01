@@ -5,6 +5,6 @@ import About from "../pages/about/page";
 export const AppRoutes = () => (
     <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
+        <Route path="/about" element={<About />} /> // about page
     </Routes>
 );
