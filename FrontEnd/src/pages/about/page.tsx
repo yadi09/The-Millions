@@ -165,7 +165,6 @@ export default function AboutPage() {
                       onClick={handleVideoClick}
                     >
                      <source src="/promo.mp4" type="video/mp4" />
-                     Your browser does not support the video tag.
                    </video>
                    
                                        {/* Play Button Overlay - Hidden when video is playing */}
@@ -174,14 +173,7 @@ export default function AboutPage() {
                         <div className="w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-xl cursor-pointer mx-auto mb-3">
                           <div className="w-0 h-0 border-l-[12px] border-l-blue-600 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1"></div>
                         </div>
-                        <p className="text-white text-sm font-medium">Click to unmute</p>
-                        <p className="text-white/80 text-xs">Video autoplays muted</p>
                       </div>
-                    </div>
-
-                    {/* Unmute Indicator */}
-                    <div className="unmute-indicator absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-medium hidden">
-                      🔊 Unmuted
                     </div>
                  </div>
                 
