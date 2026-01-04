@@ -26,45 +26,44 @@ The backend provides dynamic content (pages, sections) via REST APIs that the fr
 root/
 ├── frontend/
 ├── backend/
-|    ├── prisma/
-|    │   ├── schema.prisma
-|    │   └── seed.ts
-|    │
-|    ├── src/
-|    │   ├── app.ts
-|    │   ├── server.ts
-|    │
-|    │   ├── config/
-|    │   │   ├── env.ts
-|    │   │   └── db.ts
-|    │
-|    │   ├── modules/
-|    │   │   ├── pages/
-|    │   │   │   ├── pages.routes.ts
-|    │   │   │   ├── pages.controller.ts
-|    │   │   │   ├── pages.service.ts
-|    │   │   │   └── pages.types.ts
-|    │   │   │
-|    │   │   ├── admin/              👈 FUTURE (not now)
-|    │   │   │   ├── admin.routes.ts
-|    │   │   │   ├── admin.controller.ts
-|    │   │   │   └── admin.service.ts
-|    │   │   │
-|    │   │   └── health/
-|    │   │       └── health.routes.ts
-|    │
-|    │   ├── middlewares/
-|    │   │   ├── error.middleware.ts
-|    │   │   └── notFound.middleware.ts
-|    │
-|    │   ├── utils/
-|    │   │   └── apiResponse.ts
-|    │
-|    │   └── index.ts
-|    │
-|    ├── package.json
-|    ├── tsconfig.json
-|    └── .env
+│   ├── prisma/
+│   │   ├── schema.prisma
+│   │   └── seed.ts
+│   │
+│   ├── src/
+│   │   ├── app.ts
+│   │   ├── server.ts
+│   │   ├── index.ts
+│   │
+│   │   ├── config/
+│   │   │   ├── env.ts
+│   │   │   └── db.ts
+│   │
+│   │   ├── modules/
+│   │   │   ├── pages/
+│   │   │   │   ├── pages.routes.ts
+│   │   │   │   ├── pages.controller.ts
+│   │   │   │   ├── pages.service.ts
+│   │   │   │   └── pages.types.ts
+│   │   │   │
+│   │   │   ├── health/
+│   │   │   │   └── health.routes.ts
+│   │   │   │
+│   │   │   └── admin/
+│   │   │       ├── admin.routes.ts
+│   │   │       ├── admin.controller.ts
+│   │   │       └── admin.service.ts
+│   │
+│   │   ├── middlewares/
+│   │   │   ├── error.middleware.ts
+│   │   │   └── notFound.middleware.ts
+│   │
+│   │   └── utils/
+│   │       └── apiResponse.ts
+│
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── .env
 └── README.md
 ```
 
