@@ -1,8 +1,9 @@
-# The Millions – Web Application
+# The Millions – Backend API
 
-This repository contains the frontend and backend for **The Millions Chartered Certified Accountants** website.
+This folder contains the backend service for **The Millions Chartered Certified Accountants** website.
 
-The backend provides dynamic content (pages, sections) via REST APIs that the frontend consumes.
+The backend exposes REST APIs that provide dynamic page content (pages and sections) consumed by the frontend application.
+
 
 ---
 
@@ -15,56 +16,52 @@ The backend provides dynamic content (pages, sections) via REST APIs that the fr
 - Prisma ORM (v6)
 - PostgreSQL
 
-### Frontend
-- Frontend consumes backend APIs and handles UI, icons, and images.
 
 ---
 
-## 📁 Project Structure
+## 📁 Backend Structure
 
 ```txt
-root/
-├── frontend/
-├── backend/
-│   ├── prisma/
-│   │   ├── schema.prisma
-│   │   └── seed.ts
-│   │
-│   ├── src/
-│   │   ├── app.ts
-│   │   ├── server.ts
-│   │   ├── index.ts
-│   │
-│   │   ├── config/
-│   │   │   ├── env.ts
-│   │   │   └── db.ts
-│   │
-│   │   ├── modules/
-│   │   │   ├── pages/
-│   │   │   │   ├── pages.routes.ts
-│   │   │   │   ├── pages.controller.ts
-│   │   │   │   ├── pages.service.ts
-│   │   │   │   └── pages.types.ts
-│   │   │   │
-│   │   │   ├── health/
-│   │   │   │   └── health.routes.ts
-│   │   │   │
-│   │   │   └── admin/
-│   │   │       ├── admin.routes.ts
-│   │   │       ├── admin.controller.ts
-│   │   │       └── admin.service.ts
-│   │
-│   │   ├── middlewares/
-│   │   │   ├── error.middleware.ts
-│   │   │   └── notFound.middleware.ts
-│   │
-│   │   └── utils/
-│   │       └── apiResponse.ts
+backend/
+├── prisma/
+│   ├── schema.prisma
+│   └── seed.ts
 │
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── .env
-└── README.md
+├── src/
+│   ├── app.ts
+│   ├── server.ts
+│   ├── index.ts
+│
+│   ├── config/
+│   │   ├── env.ts
+│   │   └── db.ts
+│
+│   ├── modules/
+│   │   ├── pages/
+│   │   │   ├── pages.routes.ts
+│   │   │   ├── pages.controller.ts
+│   │   │   ├── pages.service.ts
+│   │   │   └── pages.types.ts
+│   │   │
+│   │   ├── health/
+│   │   │   └── health.routes.ts
+│   │   │
+│   │   └── admin/
+│   │       ├── admin.routes.ts
+│   │       ├── admin.controller.ts
+│   │       └── admin.service.ts
+│
+│   ├── middlewares/
+│   │   ├── error.middleware.ts
+│   │   └── notFound.middleware.ts
+│
+│   └── utils/
+│       └── apiResponse.ts
+│
+├── package.json
+├── tsconfig.json
+└── .env
+
 ```
 
 ---
