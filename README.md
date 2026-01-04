@@ -82,7 +82,7 @@ Create a `.env` file inside `backend/`:
 
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
-PORT=5000
+PORT=4000
 ```
 
 > ⚠️ `.env` is ignored by git.
