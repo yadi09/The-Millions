@@ -1,56 +1,58 @@
-import { Shield, Cloud, DollarSign, Heart, Check } from "lucide-react"
+import { Shield, Cloud, DollarSign, Heart, Check, type LucideIcon } from "lucide-react"
 
-const features = [
-  {
-    icon: Shield,
-    title: "Fully Qualified ACCA",
-    description: "Chartered Certified Accountants with proven expertise and professional standards you can trust.",
-  },
-  {
-    icon: Cloud,
-    title: "Cloud-Based Accounting",
-    description: "Real-time financial insights through cutting-edge cloud solutions for modern businesses.",
-  },
-  {
-    icon: DollarSign,
-    title: "Fixed Fees, No Surprises",
-    description: "Transparent, predictable pricing with clear advice and no hidden costs or surprise bills.",
-  },
-  {
-    icon: Heart,
-    title: "Friendly & Jargon-Free",
-    description: "Responsive service in plain English, making complex financial matters simple and accessible.",
-  },
-]
+export interface WhyChooseUsContent {
+  title: string
+  subtitle: string
+  reasons: {
+    icon: string
+    title: string
+    description: string
+  }[]
+}
 
-export function WhyChooseUs() {
+interface WhyChooseUsProps {
+  content?: WhyChooseUsContent
+}
+
+const iconMap: Record<string, LucideIcon> = {
+  acca: Shield,
+  cloud: Cloud,
+  fixed_fees: DollarSign,
+  friendly: Heart,
+}
+
+export function WhyChooseUs({ content }: WhyChooseUsProps) {
+  if (!content) return null
+
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose Millions?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{content.title}</h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            We combine professional expertise with personal service to deliver exceptional results.
+            {content.subtitle}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, index) => (
-            <div key={index} className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 transition-colors">
-                <feature.icon className="w-8 h-8 text-blue-600 group-hover:text-white transition-colors" />
+          {content.reasons.map((feature, index) => {
+            const Icon = iconMap[feature.icon] || Shield
+            return (
+              <div key={index} className="text-center">
+                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 transition-colors">
+                  <Icon className="w-8 h-8 text-blue-600 group-hover:text-white transition-colors" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
-              <p className="text-gray-600">{feature.description}</p>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         <div className="mt-16 bg-gray-50 rounded-2xl p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              "Support Across All Stages\
-              Start-up to Scale-up",
+              "Support Across All Stages Start-up to Scale-up",
               "Same-Day Response Guarantee",
               "Dedicated Account Manager",
               "Free Initial Consultation",

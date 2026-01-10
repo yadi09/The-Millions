@@ -1,53 +1,64 @@
 import { Button } from "../components/ui/button"
 import { Award, Users, Clock, ArrowRight } from "lucide-react"
 
-export function AboutSection() {
+export interface AboutContent {
+  title: string
+  description: string[]
+  action?: { label: string; link: string }
+}
+
+export interface StatItem {
+  label: string
+  value: string
+}
+
+interface AboutSectionProps {
+  content?: AboutContent
+  stats?: StatItem[]
+}
+
+export function AboutSection({ content, stats }: AboutSectionProps) {
+  if (!content) return null
+
   return (
     <section className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Who We Are</h2>
-            <p className="text-lg text-gray-600 mb-6">
-              The Millions Chartered Certified Accountants is a client-first, future-focused accountancy firm dedicated
-              to helping individuals and businesses navigate the complexities of finance with confidence. Based in the
-              UK, we serve a wide range of clients, from early-stage entrepreneurs to property investors and community
-              organisations.
-            </p>
-            <p className="text-lg text-gray-600 mb-8">
-              We blend the rigour of traditional accountancy with the efficiency of modern tools, delivering insights,
-              not just reports. Our mission is to deliver personalised, professional, and proactive accountancy services
-              that support long-term success and financial peace of mind.
-            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">{content.title}</h2>
 
-            <div className="grid grid-cols-3 gap-6 mb-8">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <Award className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="text-2xl font-bold text-gray-900">ACCA</div>
-                <div className="text-sm text-gray-600">Certified</div>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <Users className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="text-2xl font-bold text-gray-900">500+</div>
-                <div className="text-sm text-gray-600">Happy Clients</div>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-                  <Clock className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="text-2xl font-bold text-gray-900">10+</div>
-                <div className="text-sm text-gray-600">Years Experience</div>
-              </div>
-            </div>
+            {content.description.map((paragraph, index) => (
+              <p key={index} className="text-lg text-gray-600 mb-6">
+                {paragraph}
+              </p>
+            ))}
 
-            <Button size="lg">
-              Read More About Us
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
+            {stats && (
+              <div className="grid grid-cols-3 gap-6 mb-8">
+                {stats.map((stat, index) => {
+                  let Icon = Award
+                  if (stat.label.toLowerCase().includes("client")) Icon = Users
+                  if (stat.label.toLowerCase().includes("year")) Icon = Clock
+
+                  return (
+                    <div key={index} className="text-center">
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                        <Icon className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                      <div className="text-sm text-gray-600">{stat.label}</div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            {content.action && (
+              <Button size="lg">
+                {content.action.label}
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            )}
           </div>
 
           <div className="relative">
