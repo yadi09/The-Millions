@@ -1,13 +1,34 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { getToken } from '../../utils/authUtils';
+import type { Page, UpdatePageRequest } from '../../types';
 
 export const apiSlice = createApi({
-    reducerPath: 'api',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api' }),
-    endpoints: (builder) => ({
-        getPage: builder.query<any, string>({
-            query: (slug) => `/pages/${slug}`,
-        }),
+  reducerPath: 'api',
+  baseQuery: fetchBaseQuery({
+    baseUrl: import.meta.env.VITE_API_BASE_URL,
+    prepareHeaders: (headers) => {
+      // Get token from localStorage
+      const token = getToken();
+      // If token exists, attach Authorization header
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
+  }),
+  endpoints: (builder) => ({
+    getPage: builder.query<Page, string>({
+      query: (slug) => `/pages/${slug}`,
     }),
+
+    updatePage: builder.mutation<Page, UpdatePageRequest>({
+      query: ({ id, data }) => ({
+        url: `/admin/pages/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+    }),
+  }),
 });
 
-export const { useGetPageQuery } = apiSlice;
+export const { useGetPageQuery, useUpdatePageMutation } = apiSlice;
