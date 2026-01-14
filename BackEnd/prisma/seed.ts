@@ -115,10 +115,157 @@ async function seedAdminUser() {
 }
 
 /* -----------------------------
+   Seed About Page
+------------------------------*/
+async function seedAboutPage() {
+  await prisma.page.upsert({
+    where: { slug: "about" },
+    update: {},
+    create: {
+      slug: "about",
+      title: "About Us",
+      sections: {
+        create: [
+          // 1. Hero
+          {
+            type: "hero",
+            order: 1,
+            content: {
+              badge: "About The Millions",
+              headlineBlack: "Building Trust",
+              headlineBlue: "Through Excellence.",
+              description:
+                "A client-first, future-focused accountancy firm dedicated to helping individuals and businesses navigate the complexities of finance with confidence.",
+              ctas: [
+                { label: "Book Free Consultation", action: "book_consultation" },
+                { label: "View Our Services", action: "services" },
+              ],
+            },
+          },
+          // 2. Who We Are
+          {
+            type: "who_we_are",
+            order: 2,
+            content: {
+              title: "Who We Are",
+              description:
+                "The Millions Chartered Certified Accountants is the 2 brothers Mark and Sleshi Million who are dedicated to helping individuals and businesses navigate the complexities of finance with confidence. They are based in London, UK. and they are the founders of the company. They have been in the business for 10 years and they have a team of 10 people.\n\nThe company is dedicated to helping individuals and businesses navigate the complexities of finance with confidence. They have big dreams and they are working hard to achieve them. they are also working on a project to help people with their financial needs.",
+            },
+          },
+          // 3. Stats
+          {
+            type: "stats",
+            order: 3,
+            content: {
+              stats: [
+                { value: "2014", label: "Founded" },
+                { value: "500+", label: "Clients Served" },
+                { value: "15+", label: "Team Members" },
+              ],
+            },
+          },
+          // 4. Values (Vision, Mission, Values)
+          {
+            type: "values",
+            order: 4,
+            content: {
+              vision:
+                "To be recognised as a trusted financial partner that empowers our clients through clarity, compliance, and strategic advice.",
+              mission:
+                "To deliver personalised, professional, and proactive accountancy services that support long-term success and financial peace of mind.",
+              values: [
+                {
+                  title: "Integrity",
+                  description:
+                    "We act with honesty, transparency, and professionalism in everything we do.",
+                },
+                {
+                  title: "Clarity",
+                  description:
+                    "We simplify the complex and speak your language, making finance accessible to all.",
+                },
+                {
+                  title: "Proactivity",
+                  description:
+                    "We anticipate, advise, and act—before the deadline, keeping you ahead of the curve.",
+                },
+                {
+                  title: "Partnership",
+                  description:
+                    "We work with you, not just for you, building lasting relationships based on trust.",
+                },
+                {
+                  title: "Excellence",
+                  description:
+                    "We stay current, qualified, and committed to your growth and success.",
+                },
+              ],
+            },
+          },
+          // 5. Team
+          {
+            type: "team",
+            order: 5,
+            content: {
+              title: "Meet Our Team",
+              subtitle:
+                "Our experienced team of ACCA certified professionals combines expertise with a personal touch, showcasing both our credentials and our human side.",
+              members: [
+                {
+                  name: "Sleshi Million",
+                  role: "Accountant",
+                  qualifications: "ACCA, MBA",
+                  bio: "Sleshi is an Certified Accountant who helps clients with their financial needs. and also a tax expert.",
+                },
+                {
+                  name: "Mark Million",
+                  role: "Accountant",
+                  qualifications: "ACCA, MBA",
+                  bio: "Mark provides strategic business advice and growth planning, helping entrepreneurs and established businesses achieve their goals.",
+                },
+                {
+                  name: "Sarah Abera",
+                  role: "Social Media Manager",
+                  qualifications: "Certified Social Media Manager",
+                  bio: "Sarah is a Social Media Manager who helps the company with their social media presence. and also a graphic designer.",
+                },
+                {
+                  name: "Yadamzer Terefe",
+                  role: "Software Engineer",
+                  qualifications: "Certified Software Engineer",
+                  bio: "Yadamzer is a Software Engineer who helps the company with their software development needs.",
+                },
+              ],
+            },
+          },
+          // 6. CTA
+          {
+            type: "cta",
+            order: 6,
+            content: {
+              title: "Ready to Work Together?",
+              description:
+                "Let's discuss how our team can help you achieve your financial goals with confidence and clarity.",
+              actions: [
+                { label: "Book Free Consultation", action: "book_consultation" },
+                { label: "View Our Services", action: "services" },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  console.log("🌱 About page seeded");
+}
+
+/* -----------------------------
    Run All Seeds
 ------------------------------*/
 async function main() {
   await seedHomePage();
+  await seedAboutPage();
   await seedAdminUser();
 }
 
