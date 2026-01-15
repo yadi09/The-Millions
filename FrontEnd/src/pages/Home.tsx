@@ -4,17 +4,50 @@ import { AboutSection } from "../components/about-section"
 import { WhyChooseUs } from "../components/why-choose-us"
 import { TestimonialsPreview } from "../components/testimonials-preview"
 import { ContactSection } from "../components/contact-section"
+import { useGetPageQuery } from "../features/api/apiSlice"
+import { Loader2 } from "lucide-react"
 
 const Home = () => {
+  const { data, isLoading, error } = useGetPageQuery('home')
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-600">
+        Error loading page content. Please try again later.
+      </div>
+    )
+  }
+
+  const sections = data?.sections || []
+
+  const heroSection = sections.find((s: any) => s.type === 'hero')
+  const servicesSection = sections.find((s: any) => s.type === 'services')
+  const aboutSection = sections.find((s: any) => s.type === 'about')
+  const statsSection = sections.find((s: any) => s.type === 'stats')
+  const whySection = sections.find((s: any) => s.type === 'why-choose-us')
+  const ctaSection = sections.find((s: any) => s.type === 'cta')
+
   return (
-<main className="min-h-screen">
-      <HeroSection />
-      <ServicesGrid />
-      <AboutSection />
-      <WhyChooseUs />
+    <main className="min-h-screen">
+      <HeroSection content={heroSection?.content} />
+      <ServicesGrid content={servicesSection?.content} />
+      <AboutSection
+        content={aboutSection?.content}
+        stats={statsSection?.content?.items}
+      />
+      <WhyChooseUs content={whySection?.content} />
       <TestimonialsPreview />
-      <ContactSection />
-    </main>  )
+      <ContactSection content={ctaSection?.content} />
+    </main>
+  )
 }
 
 export default Home

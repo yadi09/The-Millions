@@ -2,6 +2,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Button } from "../../components/ui/button"
 import { Calculator, FileText, Building, TrendingUp, Users, ArrowRight, Check } from "lucide-react"
 
+
+const iconMap: any = {
+  FileText,
+  Calculator,
+  Building,
+  TrendingUp,
+  Users
+};
+
 const services = [
   {
     icon: FileText,
@@ -115,6 +124,9 @@ const specialistServices = [
 ]
 
 export default function ServicesPage() {
+  // Use static services data directly
+  const displayServices = services;
+
   return (
     <main className="min-h-screen py-20">
       <div className="container mx-auto px-4">
@@ -127,41 +139,46 @@ export default function ServicesPage() {
             We offer flexible, scalable accountancy and tax services built around your needs. Whether you're launching a
             business, optimising tax efficiency, or managing growth, we're here to support your goals.
           </p>
+
         </div>
 
         {/* Main Services Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-          {services.map((service, index) => (
-            <Card key={index} className="group hover:shadow-lg transition-all duration-300">
-              <CardHeader>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-                    <service.icon className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
+          {displayServices.map((service: any, index: number) => {
+            const IconComponent = iconMap[service.icon] || service.icon || FileText;
+
+            return (
+              <Card key={index} className="group hover:shadow-lg transition-all duration-300">
+                <CardHeader>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+                      <IconComponent className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl font-semibold text-slate-900 mb-2">{service.title}</CardTitle>
+                      <CardDescription className="text-slate-600">{service.description}</CardDescription>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <CardTitle className="text-xl font-semibold text-slate-900 mb-2">{service.title}</CardTitle>
-                    <CardDescription className="text-slate-600">{service.description}</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 mb-6">
-                  {service.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                      <span className="text-slate-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button className="w-full group" asChild>
-                  <a href={service.href}>
-                    Learn More
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 mb-6">
+                    {service.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
+                        <span className="text-slate-700">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button className="w-full group" asChild>
+                    <a href={service.href}>
+                      Learn More
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            )
+          })}
         </div>
 
         {/* Detailed Service Categories */}
