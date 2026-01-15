@@ -33,18 +33,18 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
     const [saveError, setSaveError] = useState<string | null>(null);
 
     /**
-     * Sync local state when page data is fetched from backend
-     * This ensures the form is populated with the latest data
+     * Sync local state when page data is initially fetched or when data changes
+     * But avoid overwriting localPageData if it already exists to preserve unsaved edits
      */
     useEffect(() => {
-        if (pageData) {
+        if (pageData && !localPageData) {
             setLocalPageData(pageData);
             // Only set default active section if none is selected yet
             if (pageData.sections?.length > 0 && !activeSectionId) {
                 setActiveSectionId(pageData.sections[0].id);
             }
         }
-    }, [pageData]);
+    }, [pageData, localPageData, activeSectionId]);
 
     // Handle success message visibility
     useEffect(() => {
@@ -70,13 +70,16 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
         }
 
         try {
-            await updatePage({
+            const result = await updatePage({
                 id: localPageData.id,
                 data: {
                     title: localPageData.title,
                     sections: localPageData.sections
                 }
             }).unwrap();
+
+            // Update local state with the saved data from server
+            setLocalPageData(result);
 
             // Note: Success state is handled by useEffect on isSuccess
         } catch (err: any) {

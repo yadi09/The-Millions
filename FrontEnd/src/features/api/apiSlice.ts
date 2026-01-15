@@ -4,6 +4,7 @@ import type { Page, UpdatePageRequest } from '../../types';
 
 export const apiSlice = createApi({
   reducerPath: 'api',
+  tagTypes: ['Page'],
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
     prepareHeaders: (headers) => {
@@ -19,6 +20,7 @@ export const apiSlice = createApi({
   endpoints: (builder) => ({
     getPage: builder.query<Page, string>({
       query: (slug) => `/pages/${slug}`,
+      providesTags: (_result, _error, slug) => [{ type: 'Page', id: slug }],
     }),
 
     updatePage: builder.mutation<Page, UpdatePageRequest>({
@@ -27,6 +29,9 @@ export const apiSlice = createApi({
         method: 'PUT',
         body: data,
       }),
+      invalidatesTags: (result) => result
+        ? [{ type: 'Page', id: result.slug }, { type: 'Page', id: 'home' }]
+        : ['Page'],
     }),
   }),
 });

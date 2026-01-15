@@ -1,9 +1,9 @@
-import { HeroSection } from "../components/HeroSection"
-import { ServicesGrid } from "../components/ServicesGrid"
-import { AboutSection } from "../components/about-section"
-import { WhyChooseUs } from "../components/why-choose-us"
+import { HeroSection, type HeroContent } from "../components/HeroSection"
+import { ServicesGrid, type ServicesContent } from "../components/ServicesGrid"
+import { AboutSection, type AboutContent } from "../components/about-section"
+import { WhyChooseUs, type WhyChooseUsContent } from "../components/why-choose-us"
 import { TestimonialsPreview } from "../components/testimonials-preview"
-import { ContactSection } from "../components/contact-section"
+import { ContactSection, type ContactContent } from "../components/contact-section"
 import { useGetPageQuery } from "../features/api/apiSlice"
 import { Loader2 } from "lucide-react"
 
@@ -37,15 +37,15 @@ const Home = () => {
 
   return (
     <main className="min-h-screen">
-      <HeroSection content={heroSection?.content} />
-      <ServicesGrid content={servicesSection?.content} />
+      <HeroSection content={heroSection?.content as HeroContent} />
+      <ServicesGrid content={servicesSection?.content as ServicesContent} />
       <AboutSection
-        content={aboutSection?.content}
+        content={aboutSection?.content as AboutContent}
         stats={statsSection?.content?.items}
       />
-      <WhyChooseUs content={whySection?.content} />
+      <WhyChooseUs content={whySection?.content as WhyChooseUsContent} />
       <TestimonialsPreview />
-      <ContactSection content={ctaSection?.content} />
+      <ContactSection content={ctaSection?.content as ContactContent} />
     </main>
   )
 }
