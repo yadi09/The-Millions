@@ -1,7 +1,7 @@
 import { Button } from "./ui/button"
 import { Calendar, MessageCircle, ArrowRight } from "lucide-react"
 
-interface HeroContent {
+export interface HeroContent {
   badge: string;
   headlineBlack: string;
   headlineBlue: string;

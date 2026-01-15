@@ -22,14 +22,14 @@ const iconMap: any = {
   Heart
 };
 
-interface ServiceCard {
+export interface ServiceCard {
   id: string;
   icon: string;
   title: string;
   description: string;
 }
 
-interface ServicesContent {
+export interface ServicesContent {
   title: string;
   subtitle: string;
   cards: ServiceCard[];
