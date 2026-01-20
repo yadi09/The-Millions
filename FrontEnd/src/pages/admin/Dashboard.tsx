@@ -57,7 +57,7 @@ const AdminDashboard = () => {
                 </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
                     <Card className="h-full">
                         <CardHeader>
@@ -71,7 +71,7 @@ const AdminDashboard = () => {
                                     { page: "About", action: "Metadata changed", time: "3 days ago" },
                                     { page: "Contact", action: "Form settings updated", time: "5 days ago" },
                                 ].map((item, i) => (
-                                    <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                                    <div key={i} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-slate-50 rounded-lg">
                                         <div className="flex items-center gap-4">
                                             <div className="w-8 h-8 bg-blue-100 rounded text-blue-600 flex items-center justify-center">
                                                 <FileText size={16} />
