@@ -133,8 +133,8 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
         <div className={`flex flex-col bg-slate-50 ${isModal ? 'h-[80vh]' : 'h-full'}`}>
             {/* Header with Save Button */}
             <div className={`
-                bg-white border-b border-slate-200 px-4 md:px-6 flex items-center justify-between shrink-0 z-20 sticky top-0
-                ${isModal ? 'py-4 rounded-t-xl' : 'h-16'}
+                bg-white border-b border-slate-200 px-4 md:px-6 flex items-center justify-between shrink-0 z-20 sticky
+                ${isModal ? 'top-0 py-4 rounded-t-xl' : 'top-[57px] lg:top-0 h-16'}
             `}>
                 <div className="flex items-center gap-3">
                     <div>
@@ -188,7 +188,7 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
 
             <div className="flex flex-1 relative flex-col md:flex-row md:overflow-hidden bg-slate-50">
                 {/* Sidebar - Section Navigator */}
-                <div className="sticky top-0 z-10 bg-white shadow-sm md:static md:shadow-none md:z-auto md:h-full">
+                <div className={`sticky z-10 bg-white shadow-sm md:static md:shadow-none md:z-auto md:h-full ${isModal ? 'top-0' : 'top-[121px] lg:top-16'}`}>
                     <EditorSidebar
                         sections={localPageData.sections || []}
                         activeSectionId={activeSectionId}
