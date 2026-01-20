@@ -4,6 +4,7 @@ import { Button } from "../../components/ui/button";
 import { Edit, X } from "lucide-react";
 import PageEditorContent from "./components/PageEditorContent";
 import { useGetPageQuery } from "../../features/api/apiSlice";
+import { useNavigate } from "react-router-dom";
 
 // Basic list card type for the grid
 interface PageItem {
@@ -25,6 +26,7 @@ const initialPages: PageItem[] = [
 ];
 
 const AdminPagesList = () => {
+  const navigate = useNavigate();
   // Grid state
   const [pages] = useState<PageItem[]>(initialPages);
 
@@ -73,7 +75,14 @@ const AdminPagesList = () => {
                 <Button
                   variant="secondary"
                   className="inline-flex items-center gap-2"
-                  onClick={() => openEditor(page.slug)}
+                  onClick={() => {
+                    const isMobile = window.innerWidth < 1024;
+                    if (isMobile) {
+                      navigate(`/admin/pages/${page.slug}`);
+                    } else {
+                      openEditor(page.slug);
+                    }
+                  }}
                 >
                   <Edit size={16} />
                   Edit
