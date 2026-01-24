@@ -270,32 +270,29 @@ export default function BlogPost() {
             <main className="py-12 sm:py-16">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="lg:grid lg:grid-cols-12 lg:gap-12">
-                        <div className="lg:col-span-3 lg:block hidden">
-                            {/* Placeholder for left sidebar or to create space */}
-                        </div>
-
                         {/* Main Content */}
-                        <div className="lg:col-span-6">
+                        <div className="lg:col-span-8">
                             {/* Article Header */}
-                            <div className="text-center mb-12">
+                            <div className="text-left mb-12">
                                 <Badge className="mb-6 bg-blue-100 text-blue-700">{blogPost.category}</Badge>
-                                <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6 leading-tight">
+                                <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6 leading-tight">
                                     {blogPost.title}
                                 </h1>
-                                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 text-slate-500">
+                                <div className="flex flex-wrap items-center gap-x-6 gap-y-4 text-slate-500">
                                     <div className="flex items-center gap-2">
-                                        <img
-                                            src="/placeholder.svg"
-                                            alt={blogPost.author}
-                                            className="w-8 h-8 rounded-full"
-                                        />
-                                        <span className="font-medium text-slate-800">{blogPost.author}</span>
+                                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold border border-blue-100 uppercase">
+                                            {blogPost.author.charAt(0)}
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="text-sm font-semibold text-slate-800 leading-none">{blogPost.author}</p>
+                                            <p className="text-xs text-slate-500 mt-1">Financial Expert</p>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 text-sm">
                                         <Calendar className="w-4 h-4" />
                                         <span>{blogPost.date}</span>
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 text-sm">
                                         <Clock className="w-4 h-4" />
                                         <span>{blogPost.readTime}</span>
                                     </div>
@@ -303,77 +300,76 @@ export default function BlogPost() {
                             </div>
 
                             {/* Featured Image */}
-                            <div className="rounded-2xl overflow-hidden shadow-2xl mb-12 aspect-video">
+                            <div className="rounded-2xl overflow-hidden shadow-2xl mb-12 aspect-video group">
                                 <img
                                     src={blogPost.image}
                                     alt={blogPost.title}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                 />
                             </div>
 
                             {/* Article Body */}
-                            <article className="prose prose-lg max-w-none text-slate-600 prose-h2:text-slate-900 prose-h2:font-bold prose-h2:text-3xl">
+                            <article className="prose prose-lg max-w-none text-slate-600 prose-h2:text-slate-900 prose-h2:font-bold prose-h2:text-3xl prose-p:leading-relaxed prose-li:leading-relaxed">
                                 <div dangerouslySetInnerHTML={{ __html: blogPost.content }} />
                             </article>
 
                             {/* Share Footer */}
                             <div className="mt-12 border-t pt-8 flex items-center justify-between flex-wrap gap-4">
                                 <p className="font-semibold text-slate-900 text-lg">Share this article</p>
-                                <div className="flex gap-2">
-                                    <Button variant="outline" size="icon" className="rounded-full hover:text-blue-600 hover:border-blue-600">
+                                <div className="flex gap-3">
+                                    <Button variant="outline" size="icon" className="rounded-full hover:text-blue-600 hover:border-blue-600 transition-colors">
                                         <Facebook className="w-5 h-5" />
                                     </Button>
-                                    <Button variant="outline" size="icon" className="rounded-full hover:text-sky-500 hover:border-sky-500">
+                                    <Button variant="outline" size="icon" className="rounded-full hover:text-sky-500 hover:border-sky-500 transition-colors">
                                         <Twitter className="w-5 h-5" />
                                     </Button>
-                                    <Button variant="outline" size="icon" className="rounded-full hover:text-blue-700 hover:border-blue-700">
+                                    <Button variant="outline" size="icon" className="rounded-full hover:text-blue-700 hover:border-blue-700 transition-colors">
                                         <Linkedin className="w-5 h-5" />
                                     </Button>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Right Sidebar (TOC) */}
-                        <div className="lg:col-span-3">
+                        {/* Right Sidebar */}
+                        <div className="lg:col-span-4 space-y-8">
                             <TableOfContents content={blogPost.content} isVisible={isTocVisible} onClose={() => setIsTocVisible(false)} />
-                        </div>
-                    </div>
-                </div>
 
-                {/* Related Posts Section */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24">
-                    <div className="border-t pt-16">
-                        <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">
-                            Related Articles
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                            {relatedPosts.map((post) => (
-                                <Card
-                                    key={post.id}
-                                    className="group overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm bg-white/80 border border-white/40 shadow-sm"
-                                >
-                                    <Link to={`/blog/${post.id}`} className="block overflow-hidden aspect-video">
-                                        <img
-                                            src={post.image}
-                                            alt={post.title}
-                                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                        />
-                                    </Link>
-                                    <div className="p-6">
-                                        <Badge variant="secondary" className="mb-3 w-fit bg-blue-100 text-blue-700">
-                                            {post.category}
-                                        </Badge>
-                                        <CardTitle className="leading-tight group-hover:text-blue-600 transition-colors mb-2 text-lg">
-                                            <Link to={`/blog/${post.id}`}>{post.title}</Link>
-                                        </CardTitle>
-                                        <p className="text-sm text-slate-500">{post.date}</p>
-                                    </div>
-                                </Card>
-                            ))}
+                            {/* Related Posts in Sidebar */}
+                            <Card className="rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm bg-white/100 border border-slate-200/60 shadow-sm overflow-hidden lg:sticky lg:top-80">
+                                <CardHeader>
+                                    <CardTitle className="text-xl font-bold">Related Articles</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-6">
+                                    {relatedPosts.map((post) => (
+                                        <Link key={post.id} to={`/blog/${post.id}`} className="flex gap-4 group items-center">
+                                            <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded-lg">
+                                                <img
+                                                    src={post.image}
+                                                    alt={post.title}
+                                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                                />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-semibold text-slate-800 group-hover:text-blue-600 line-clamp-2 text-sm leading-tight transition-colors">
+                                                    {post.title}
+                                                </h4>
+                                                <p className="text-[10px] text-slate-400 mt-1 flex items-center gap-1 uppercase tracking-wider font-bold">
+                                                    <Calendar className="w-3 h-3" />
+                                                    {post.date}
+                                                </p>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                    <Button variant="ghost" className="w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50 mt-4 group">
+                                        View All Posts
+                                        <ArrowLeft className="w-4 h-4 ml-2 rotate-180 transition-transform group-hover:translate-x-1" />
+                                    </Button>
+                                </CardContent>
+                            </Card>
                         </div>
                     </div>
                 </div>
-            </main>
-        </div>
+            </main >
+        </div >
     )
 }
