@@ -21,7 +21,7 @@ export default function AboutPage() {
 
   // Extract sections early for useEffect dependency
   const sections = data?.sections || []
-  const whoWeAreSection = sections.find((s: any) => s.type === 'who-we-are')
+  const whoWeAreSection = sections.find((s: any) => s.type === 'who_we_are')
 
   // Check if video is playing on mount and after data loads
   // This must be before any early returns to follow Rules of Hooks
@@ -33,22 +33,22 @@ export default function AboutPage() {
           setIsVideoPlaying(true)
         }
       }
-      
+
       const handlePlay = () => setIsVideoPlaying(true)
       const handlePause = () => setIsVideoPlaying(false)
       const handlePlaying = () => setIsVideoPlaying(true)
-      
+
       // Check immediately
       checkVideoState()
-      
+
       // Check after a short delay to catch autoplay
       const timeout = setTimeout(checkVideoState, 100)
-      
+
       // Listen for play/pause events
       video.addEventListener('play', handlePlay)
       video.addEventListener('pause', handlePause)
       video.addEventListener('playing', handlePlaying)
-      
+
       return () => {
         clearTimeout(timeout)
         video.removeEventListener('play', handlePlay)
@@ -75,7 +75,8 @@ export default function AboutPage() {
   }
 
   const heroSection = sections.find((s: any) => s.type === 'hero')
-  const missionVisionSection = sections.find((s: any) => s.type === 'mission-vision')
+  const statsSection = sections.find((s: any) => s.type === 'stats')
+  const missionVisionSection = sections.find((s: any) => s.type === 'values')
   const valuesSection = sections.find((s: any) => s.type === 'values')
   const teamSection = sections.find((s: any) => s.type === 'team')
   const ctaSection = sections.find((s: any) => s.type === 'cta')
@@ -121,42 +122,37 @@ export default function AboutPage() {
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                 {whoWeAreSection?.content?.title || "Who We Are"}
               </h2>
-              {whoWeAreSection?.content?.description && Array.isArray(whoWeAreSection.content.description) && whoWeAreSection.content.description.length > 0 ? (
-                whoWeAreSection.content.description.map((paragraph: string, index: number) => (
-                  <p key={index} className="text-lg text-gray-600 mb-6">
-                    {paragraph}
-                  </p>
-                ))
-              ) : (
-                <p className="text-lg text-gray-600 mb-6">
-                  The Millions Chartered Certified Accountants is a client-first, future-focused accountancy firm dedicated to helping individuals and businesses navigate the complexities of finance with confidence.
-                </p>
-              )}
-
-              {/* Stats Section */}
               {(() => {
-                const stats = whoWeAreSection?.content?.stats;
-                
-                // Debug: Check what we're getting
-                if (process.env.NODE_ENV === 'development') {
-                  console.log('🔍 Stats Debug:', {
-                    hasSection: !!whoWeAreSection,
-                    hasContent: !!whoWeAreSection?.content,
-                    stats: stats,
-                    statsType: typeof stats,
-                    isArray: Array.isArray(stats),
-                    statsLength: Array.isArray(stats) ? stats.length : 0
-                  });
+                const desc = whoWeAreSection?.content?.description;
+                if (desc) {
+                  // Handle both array and string formats
+                  const paragraphs = Array.isArray(desc) ? desc : desc.split('\n\n').filter((p: string) => p.trim());
+                  if (paragraphs.length > 0) {
+                    return paragraphs.map((paragraph: string, index: number) => (
+                      <p key={index} className="text-lg text-gray-600 mb-6">
+                        {paragraph}
+                      </p>
+                    ));
+                  }
                 }
-                
+                return (
+                  <p className="text-lg text-gray-600 mb-6">
+                    The Millions Chartered Certified Accountants is a client-first, future-focused accountancy firm dedicated to helping individuals and businesses navigate the complexities of finance with confidence.
+                  </p>
+                );
+              })()}
+
+              {/* Stats Section - from separate 'stats' section in backend */}
+              {(() => {
+                const stats = statsSection?.content?.stats;
+
                 if (stats && Array.isArray(stats) && stats.length > 0) {
                   return (
                     <div className="grid grid-cols-3 gap-6 mt-8">
                       {stats.map((stat: any, index: number) => {
-                        // Handle both camelCase and other possible formats
                         const value = stat?.value ?? stat?.Value ?? '';
                         const label = stat?.label ?? stat?.Label ?? '';
-                        
+
                         return (
                           <div key={index} className="text-center">
                             <div className="text-3xl font-bold text-blue-600">{value}</div>
@@ -167,7 +163,7 @@ export default function AboutPage() {
                     </div>
                   );
                 }
-                
+
                 return null;
               })()}
             </div>
@@ -176,7 +172,7 @@ export default function AboutPage() {
               {/* Video Container with Play Button Overlay */}
               <div className="relative overflow-hidden rounded-2xl shadow-2xl bg-gradient-to-br from-blue-900 to-gray-900 aspect-video">
                 {/* Actual Video Element */}
-                <video 
+                <video
                   ref={videoRef}
                   className="w-full h-full object-cover rounded-2xl cursor-pointer"
                   poster={whoWeAreSection?.content?.videoThumbnail || "/video-thumbnail.jpg"}
@@ -192,15 +188,14 @@ export default function AboutPage() {
                   <source src={whoWeAreSection?.content?.videoUrl || "/promo.mp4"} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
-                
+
                 {/* Play Button Overlay - Hidden when video is playing */}
-                <div 
-                  className={`absolute inset-0 flex items-center justify-center bg-black/20 video-overlay pointer-events-none transition-opacity duration-300 ${
-                    isVideoPlaying ? 'opacity-0' : 'opacity-100'
-                  }`}
+                <div
+                  className={`absolute inset-0 flex items-center justify-center bg-black/20 video-overlay pointer-events-none transition-opacity duration-300 ${isVideoPlaying ? 'opacity-0' : 'opacity-100'
+                    }`}
                 >
                   <div className="text-center pointer-events-auto">
-                    <div 
+                    <div
                       onClick={handlePlayButtonClick}
                       className="w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-xl cursor-pointer mx-auto mb-3"
                     >
@@ -208,7 +203,7 @@ export default function AboutPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Video Controls Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 pointer-events-none">
                   <div className="flex items-center justify-between text-white">
@@ -222,11 +217,11 @@ export default function AboutPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Hover Effects */}
                 <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/10 transition-all duration-300 rounded-2xl pointer-events-none"></div>
               </div>
-              
+
               {/* Floating Elements */}
               <div className="absolute -top-3 -right-3 w-6 h-6 bg-blue-500 rounded-full animate-pulse"></div>
               <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-green-400 rounded-full animate-bounce"></div>
@@ -243,10 +238,10 @@ export default function AboutPage() {
               <CardContent className="pt-6">
                 <Target className="w-12 h-12 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  {missionVisionSection?.content?.vision?.title || "Our Vision"}
+                  Our Vision
                 </h3>
                 <p className="text-gray-600">
-                  {missionVisionSection?.content?.vision?.description || "To be recognised as a trusted financial partner that empowers our clients through clarity, compliance, and strategic advice."}
+                  {missionVisionSection?.content?.vision || "To be recognised as a trusted financial partner that empowers our clients through clarity, compliance, and strategic advice."}
                 </p>
               </CardContent>
             </Card>
@@ -255,10 +250,10 @@ export default function AboutPage() {
               <CardContent className="pt-6">
                 <Eye className="w-12 h-12 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  {missionVisionSection?.content?.mission?.title || "Our Mission"}
+                  Our Mission
                 </h3>
                 <p className="text-gray-600">
-                  {missionVisionSection?.content?.mission?.description || "To deliver personalised, professional, and proactive accountancy services that support long-term success and financial peace of mind."}
+                  {missionVisionSection?.content?.mission || "To deliver personalised, professional, and proactive accountancy services that support long-term success and financial peace of mind."}
                 </p>
               </CardContent>
             </Card>
@@ -341,7 +336,7 @@ export default function AboutPage() {
               <Button
                 key={index}
                 size="lg"
-                className={index === 0 
+                className={index === 0
                   ? "bg-white text-blue-600 hover:bg-gray-100"
                   : "border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
                 }
@@ -351,20 +346,20 @@ export default function AboutPage() {
                 {index === 0 && <ArrowRight className="w-5 h-5 ml-2" />}
               </Button>
             )) || (
-              <>
-                <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
-                  Book Free Consultation
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
-                >
-                  View Our Services
-                </Button>
-              </>
-            )}
+                <>
+                  <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
+                    Book Free Consultation
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
+                  >
+                    View Our Services
+                  </Button>
+                </>
+              )}
           </div>
         </div>
       </section>
