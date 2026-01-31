@@ -1,7 +1,7 @@
-// upload.service.ts
+// backend/src/modules/upload/upload.service.ts
 import { v2 as cloudinary } from 'cloudinary';
-import { Readable } from 'stream';
 
+// Configure Cloudinary
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -9,27 +9,27 @@ cloudinary.config({
 });
 
 export async function saveImage(file: Express.Multer.File): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
+    try {
+        // Convert buffer to base64 string
+        const base64Image = file.buffer.toString('base64');
+        const mimeType = file.mimetype;
+
+        // Upload to Cloudinary
+        const result = await cloudinary.uploader.upload(
+            `${mimeType};base64,${base64Image}`,
             {
                 folder: 'blog-covers',
                 resource_type: 'auto',
-            },
-            // Fixed: error can be undefined, not null
-            (error: any, result: any) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result.secure_url);
-                }
+                public_id: file.originalname.split('.')[0], // Optional: use original filename
+                overwrite: false,
             }
         );
 
-        // Create stream from buffer without streamifier
-        const bufferStream = new Readable();
-        bufferStream.push(file.buffer);
-        bufferStream.push(null); // End the stream
+        // Return the secure CDN URL
+        return result.secure_url;
 
-        bufferStream.pipe(uploadStream);
-    });
+    } catch (error) {
+        console.error('Cloudinary upload error:', error);
+        throw new Error('Failed to upload image to Cloudinary');
+    }
 }

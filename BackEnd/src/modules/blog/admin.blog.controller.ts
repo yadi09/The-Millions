@@ -43,7 +43,8 @@ export async function updateBlogController(req: Request, res: Response) {
     }
 
     try {
-        const blog = await updateBlogPost(id, validation.data);
+        // FIX: Cast id to string
+        const blog = await updateBlogPost(id as string, validation.data);
         if (!blog) {
             return res.status(404).json({ message: "Blog post not found" });
         }
@@ -62,7 +63,8 @@ export async function deleteBlogController(req: Request, res: Response) {
     const { id } = req.params;
 
     try {
-        await deleteBlogPost(id);
+        // FIX: Cast id to string
+        await deleteBlogPost(id as string);
         res.json({ message: "Blog post deleted successfully" });
     } catch (error: any) {
         if (error.code === "P2025") {
@@ -88,7 +90,8 @@ export async function getBlogByIdController(req: Request, res: Response) {
     const { id } = req.params;
 
     try {
-        const blog = await getBlogPostById(id);
+        // FIX: Cast id to string
+        const blog = await getBlogPostById(id as string);
         if (!blog) {
             return res.status(404).json({ message: "Blog post not found" });
         }
