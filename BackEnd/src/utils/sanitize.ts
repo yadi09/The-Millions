@@ -1,8 +1,8 @@
-// Modern approach: Use DOMPurify instead of sanitize-html (better TypeScript support)
-import { sanitize } from 'isomorphic-dompurify';
+// backend/src/utils/sanitize.ts
+import DOMPurify from 'isomorphic-dompurify';
 
 export function sanitizeHtmlContent(html: string): string {
-    return sanitize(html, {
+    return DOMPurify.sanitize(html, {
         ALLOWED_TAGS: [
             'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul',
             'ol', 'li', 'b', 'i', 'strong', 'em', 'strike', 'br', 'img', 'span',
