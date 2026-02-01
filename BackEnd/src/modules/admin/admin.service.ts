@@ -33,7 +33,7 @@ export async function updatePage(
 ) {
     const { slug, title, sections } = data;
 
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx) => {  // ✅ Remove manual type annotation
         // Update Page details
         const page = await tx.page.update({
             where: { id },
@@ -58,7 +58,7 @@ export async function updatePage(
             where: { id },
             include: {
                 sections: {
-                    orderBy: { order: "asc" },
+                    orderBy: { order: "asc" },  // ✅ Prisma will infer correct type
                 },
             },
         });

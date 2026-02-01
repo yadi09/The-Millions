@@ -42,5 +42,5 @@ export async function getBlogCategories() {
         _count: true,
     });
 
-    return categories.map(c => c.category);
+    return categories.map((c: { category: any; }) => c.category);
 }
