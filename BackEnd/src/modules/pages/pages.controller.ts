@@ -6,6 +6,8 @@ export async function getPage(req: Request, res: Response) {
   const { slug } = req.params;
 
   // FIX: Cast slug to string
+
+  //check it
   const page = await getPageBySlug(slug as string);
 
   if (!page) {
