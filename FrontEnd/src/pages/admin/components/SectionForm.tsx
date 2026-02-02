@@ -33,8 +33,8 @@ function HeroForm({ content, onChange }: { content: Record<string, any>; onChang
   const removeFeature = (idx: number) => update("features", features.filter((_: any, i: number) => i !== idx));
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         <div className="space-y-2">
           <label className="text-sm font-medium text-slate-700">Badge</label>
           <Input value={c.badge || ""} onChange={(e) => update("badge", e.target.value)} />
@@ -60,17 +60,17 @@ function HeroForm({ content, onChange }: { content: Record<string, any>; onChang
         </div>
         <div className="space-y-3">
           {ctas.map((cta: any, idx: number) => (
-            <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 border rounded-lg bg-white">
+            <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-2.5 sm:p-3 border rounded-lg bg-white">
               <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-600">Label</label>
-                <Input value={cta.label || ""} onChange={(e) => updateCta(idx, "label", e.target.value)} />
+                <label className="text-[11px] font-medium text-slate-600">Label</label>
+                <Input value={cta.label || ""} onChange={(e) => updateCta(idx, "label", e.target.value)} className="h-8 md:h-9 text-xs sm:text-sm" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-600">Action</label>
-                <Input value={cta.action || ""} onChange={(e) => updateCta(idx, "action", e.target.value)} placeholder="e.g. book_consultation" />
+                <label className="text-[11px] font-medium text-slate-600">Action</label>
+                <Input value={cta.action || ""} onChange={(e) => updateCta(idx, "action", e.target.value)} placeholder="e.g. book_consultation" className="h-8 md:h-9 text-xs sm:text-sm" />
               </div>
               <div className="flex items-end justify-end md:justify-start">
-                <Button variant="ghost" size="icon" onClick={() => removeCta(idx)} className="text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={18} /></Button>
+                <Button variant="ghost" size="icon" onClick={() => removeCta(idx)} className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={16} /></Button>
               </div>
             </div>
           ))}
@@ -84,9 +84,9 @@ function HeroForm({ content, onChange }: { content: Record<string, any>; onChang
         </div>
         <div className="space-y-3">
           {features.map((f: string, idx: number) => (
-            <div key={idx} className="grid grid-cols-[1fr_auto] gap-3 p-3 border rounded-lg bg-white">
-              <Input value={f || ""} onChange={(e) => updateFeature(idx, e.target.value)} />
-              <Button variant="ghost" size="icon" onClick={() => removeFeature(idx)} className="text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={18} /></Button>
+            <div key={idx} className="grid grid-cols-[1fr_auto] gap-2 p-2 sm:p-3 border rounded-lg bg-white">
+              <Input value={f || ""} onChange={(e) => updateFeature(idx, e.target.value)} className="h-8 md:h-9 text-xs sm:text-sm" />
+              <Button variant="ghost" size="icon" onClick={() => removeFeature(idx)} className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={16} /></Button>
             </div>
           ))}
         </div>
@@ -109,7 +109,7 @@ function ServicesForm({ content, onChange }: { content: Record<string, any>; onC
   const removeCard = (idx: number) => update("cards", cards.filter((_: any, i: number) => i !== idx));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="space-y-2">
         <label className="text-sm font-medium text-slate-700">Section Title</label>
         <Input value={c.title || ""} onChange={(e) => update("title", e.target.value)} />
@@ -126,27 +126,27 @@ function ServicesForm({ content, onChange }: { content: Record<string, any>; onC
         </div>
         <div className="space-y-3">
           {cards.map((item: any, idx: number) => (
-            <div key={idx} className="p-4 border rounded-lg bg-white space-y-3">
+            <div key={idx} className="p-2.5 sm:p-4 border rounded-lg bg-white space-y-3">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-slate-600">ID</label>
-                  <Input value={item.id || ""} onChange={(e) => updateCard(idx, "id", e.target.value)} placeholder="unique_id" />
+                  <label className="text-[11px] font-medium text-slate-600">ID</label>
+                  <Input value={item.id || ""} onChange={(e) => updateCard(idx, "id", e.target.value)} placeholder="unique_id" className="h-8 md:h-9 text-xs sm:text-sm" />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-slate-600">Icon</label>
-                  <Input value={item.icon || ""} onChange={(e) => updateCard(idx, "icon", e.target.value)} placeholder="e.g. tax" />
+                  <label className="text-[11px] font-medium text-slate-600">Icon</label>
+                  <Input value={item.icon || ""} onChange={(e) => updateCard(idx, "icon", e.target.value)} placeholder="e.g. tax" className="h-8 md:h-9 text-xs sm:text-sm" />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-slate-600">Title</label>
-                  <Input value={item.title || ""} onChange={(e) => updateCard(idx, "title", e.target.value)} />
+                  <label className="text-[11px] font-medium text-slate-600">Title</label>
+                  <Input value={item.title || ""} onChange={(e) => updateCard(idx, "title", e.target.value)} className="h-8 md:h-9 text-xs sm:text-sm" />
                 </div>
                 <div className="flex items-end justify-end md:justify-start">
-                  <Button variant="ghost" size="icon" onClick={() => removeCard(idx)} className="text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={18} /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => removeCard(idx)} className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={16} /></Button>
                 </div>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-600">Description</label>
-                <Textarea value={item.description || ""} onChange={(e) => updateCard(idx, "description", e.target.value)} rows={2} />
+                <label className="text-[11px] font-medium text-slate-600">Description</label>
+                <Textarea value={item.description || ""} onChange={(e) => updateCard(idx, "description", e.target.value)} rows={2} className="text-xs sm:text-sm" />
               </div>
             </div>
           ))}
@@ -178,7 +178,7 @@ function AboutForm({ content, onChange }: { content: Record<string, any>; onChan
   const updateAction = (key: string, value: string) => update("action", { ...action, [key]: value });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="space-y-2">
         <label className="text-sm font-medium text-slate-700">Title</label>
         <Input value={c.title || ""} onChange={(e) => update("title", e.target.value)} />
@@ -191,9 +191,9 @@ function AboutForm({ content, onChange }: { content: Record<string, any>; onChan
         </div>
         <div className="space-y-3">
           {description.map((line: string, idx: number) => (
-            <div key={idx} className="grid grid-cols-[1fr_auto] gap-3 p-3 border rounded-lg bg-white">
-              <Textarea rows={2} value={line || ""} onChange={(e) => updateLine(idx, e.target.value)} />
-              <Button variant="ghost" size="icon" onClick={() => removeLine(idx)} className="text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={18} /></Button>
+            <div key={idx} className="grid grid-cols-[1fr_auto] gap-2 p-2 sm:p-3 border rounded-lg bg-white">
+              <Textarea rows={2} value={line || ""} onChange={(e) => updateLine(idx, e.target.value)} className="text-xs sm:text-sm" />
+              <Button variant="ghost" size="icon" onClick={() => removeLine(idx)} className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={16} /></Button>
             </div>
           ))}
         </div>
@@ -227,24 +227,24 @@ function StatsForm({ content, onChange }: { content: Record<string, any>; onChan
   const removeItem = (idx: number) => update("items", items.filter((_: any, i: number) => i !== idx));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-slate-900">Stats Items ({items.length})</h3>
         <Button size="sm" className="gap-2" onClick={addItem}><Plus size={16} /> Add Item</Button>
       </div>
       <div className="space-y-3">
         {items.map((item: any, idx: number) => (
-          <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 border rounded-lg bg-white">
+          <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-2.5 sm:p-3 border rounded-lg bg-white">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-600">Label</label>
-              <Input value={item.label || ""} onChange={(e) => updateItem(idx, "label", e.target.value)} />
+              <label className="text-[11px] font-medium text-slate-600">Label</label>
+              <Input value={item.label || ""} onChange={(e) => updateItem(idx, "label", e.target.value)} className="h-8 md:h-9 text-xs sm:text-sm" />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-600">Value</label>
-              <Input value={item.value || ""} onChange={(e) => updateItem(idx, "value", e.target.value)} />
+              <label className="text-[11px] font-medium text-slate-600">Value</label>
+              <Input value={item.value || ""} onChange={(e) => updateItem(idx, "value", e.target.value)} className="h-8 md:h-9 text-xs sm:text-sm" />
             </div>
             <div className="flex items-end justify-end md:justify-start">
-              <Button variant="ghost" size="icon" onClick={() => removeItem(idx)} className="text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={18} /></Button>
+              <Button variant="ghost" size="icon" onClick={() => removeItem(idx)} className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={16} /></Button>
             </div>
           </div>
         ))}
@@ -267,7 +267,7 @@ function WhyChooseUsForm({ content, onChange }: { content: Record<string, any>; 
   const removeReason = (idx: number) => update("reasons", reasons.filter((_: any, i: number) => i !== idx));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="space-y-2">
         <label className="text-sm font-medium text-slate-700">Title</label>
         <Input value={c.title || ""} onChange={(e) => update("title", e.target.value)} />
@@ -283,23 +283,23 @@ function WhyChooseUsForm({ content, onChange }: { content: Record<string, any>; 
       </div>
       <div className="space-y-3">
         {reasons.map((reason: any, idx: number) => (
-          <div key={idx} className="p-4 border rounded-lg bg-white space-y-3">
+          <div key={idx} className="p-2.5 sm:p-4 border rounded-lg bg-white space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-600">Icon</label>
-                <Input value={reason.icon || ""} onChange={(e) => updateReason(idx, "icon", e.target.value)} placeholder="e.g. acca" />
+                <label className="text-[11px] font-medium text-slate-600">Icon</label>
+                <Input value={reason.icon || ""} onChange={(e) => updateReason(idx, "icon", e.target.value)} placeholder="e.g. acca" className="h-8 md:h-9 text-xs sm:text-sm" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-600">Title</label>
-                <Input value={reason.title || ""} onChange={(e) => updateReason(idx, "title", e.target.value)} />
+                <label className="text-[11px] font-medium text-slate-600">Title</label>
+                <Input value={reason.title || ""} onChange={(e) => updateReason(idx, "title", e.target.value)} className="h-8 md:h-9 text-xs sm:text-sm" />
               </div>
               <div className="flex items-end justify-end md:justify-start">
-                <Button variant="ghost" size="icon" onClick={() => removeReason(idx)} className="text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={18} /></Button>
+                <Button variant="ghost" size="icon" onClick={() => removeReason(idx)} className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={16} /></Button>
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-600">Description</label>
-              <Textarea value={reason.description || ""} onChange={(e) => updateReason(idx, "description", e.target.value)} rows={2} />
+              <label className="text-[11px] font-medium text-slate-600">Description</label>
+              <Textarea value={reason.description || ""} onChange={(e) => updateReason(idx, "description", e.target.value)} rows={2} className="text-xs sm:text-sm" />
             </div>
           </div>
         ))}
@@ -322,7 +322,7 @@ function CTAForm({ content, onChange }: { content: Record<string, any>; onChange
   const removeAction = (idx: number) => update("actions", actions.filter((_: any, i: number) => i !== idx));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="space-y-2">
         <label className="text-sm font-medium text-slate-700">Title</label>
         <Input value={c.title || ""} onChange={(e) => update("title", e.target.value)} />
@@ -338,20 +338,100 @@ function CTAForm({ content, onChange }: { content: Record<string, any>; onChange
       </div>
       <div className="space-y-3">
         {actions.map((a: any, idx: number) => (
-          <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 border rounded-lg bg-white">
+          <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-2.5 sm:p-3 border rounded-lg bg-white">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-600">Label</label>
-              <Input value={a.label || ""} onChange={(e) => updateAction(idx, "label", e.target.value)} />
+              <label className="text-[11px] font-medium text-slate-600">Label</label>
+              <Input value={a.label || ""} onChange={(e) => updateAction(idx, "label", e.target.value)} className="h-8 md:h-9 text-xs sm:text-sm" />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-slate-600">Action</label>
-              <Input value={a.action || ""} onChange={(e) => updateAction(idx, "action", e.target.value)} placeholder="e.g. whatsapp" />
+              <label className="text-[11px] font-medium text-slate-600">Action</label>
+              <Input value={a.action || ""} onChange={(e) => updateAction(idx, "action", e.target.value)} placeholder="e.g. whatsapp" className="h-8 md:h-9 text-xs sm:text-sm" />
             </div>
             <div className="flex items-end justify-end md:justify-start">
-              <Button variant="ghost" size="icon" onClick={() => removeAction(idx)} className="text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={18} /></Button>
+              <Button variant="ghost" size="icon" onClick={() => removeAction(idx)} className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={16} /></Button>
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// 7) FEATURED POSTS (Blog)
+function FeaturedPostsForm({ content, onChange }: { content: Record<string, any>; onChange: (c: Record<string, any>) => void }) {
+  const c = content || {};
+  const update = (key: string, value: any) => onChange({ ...c, [key]: value });
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">Section Title</label>
+        <Input value={c.title || ""} onChange={(e) => update("title", e.target.value)} placeholder="e.g. Editor's Pick" />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">Featured Post ID/Slug</label>
+        <Input value={c.featuredPostId || ""} onChange={(e) => update("featuredPostId", e.target.value)} placeholder="Post ID or Slug" />
+        <p className="text-xs text-muted-foreground">Enter the exact ID or Slug of the post to feature at the top.</p>
+      </div>
+    </div>
+  );
+}
+
+// 8) POPULAR POSTS (Blog)
+function PopularPostsForm({ content, onChange }: { content: Record<string, any>; onChange: (c: Record<string, any>) => void }) {
+  const c = content || {};
+  const update = (key: string, value: any) => onChange({ ...c, [key]: value });
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          id="showPopular"
+          checked={c.show !== false} // Default to true
+          onChange={(e) => update("show", e.target.checked)}
+          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        />
+        <label htmlFor="showPopular" className="text-sm font-medium text-slate-700">Show "Popular This Month" Section</label>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">Section Title</label>
+        <Input value={c.title || ""} onChange={(e) => update("title", e.target.value)} placeholder="e.g. Popular This Month" />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">Mode</label>
+        <select
+          value={c.mode || "auto"}
+          onChange={(e) => update("mode", e.target.value)}
+          className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        >
+          <option value="auto">Automatic (Most Viewed)</option>
+          <option value="manual">Manual Selection</option>
+        </select>
+      </div>
+    </div>
+  );
+}
+
+// 9) PAGE SETTINGS (General)
+function PageSettingsForm({ content, onChange }: { content: Record<string, any>; onChange: (c: Record<string, any>) => void }) {
+  const c = content || {};
+  const update = (key: string, value: any) => onChange({ ...c, [key]: value });
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">Posts Per Page</label>
+        <Input
+          type="number"
+          value={c.postsPerPage || 9}
+          onChange={(e) => update("postsPerPage", parseInt(e.target.value))}
+          min={1}
+          max={50}
+        />
+        <p className="text-xs text-muted-foreground">Number of posts to show before "Load More" button appears.</p>
       </div>
     </div>
   );
@@ -371,6 +451,12 @@ const SectionForm = ({ type, content, onChange }: SectionFormProps) => {
       return <WhyChooseUsForm content={content} onChange={onChange} />;
     case "cta":
       return <CTAForm content={content} onChange={onChange} />;
+    case "featured-posts":
+      return <FeaturedPostsForm content={content} onChange={onChange} />;
+    case "popular-posts":
+      return <PopularPostsForm content={content} onChange={onChange} />;
+    case "page-settings":
+      return <PageSettingsForm content={content} onChange={onChange} />;
     default:
       return (
         <div className="p-4 bg-yellow-50 text-yellow-800 rounded-lg">

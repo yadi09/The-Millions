@@ -15,12 +15,12 @@ const AdminDashboard = () => {
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">
+                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
                         {greeting}, <span className="text-blue-600">Admin!</span>
                     </h1>
-                    <p className="text-slate-500 mt-2 flex items-center gap-2">
+                    <p className="text-sm md:text-base text-slate-500 mt-2 flex items-center gap-2">
                         <TrendingUp size={16} className="text-green-500" />
-                        Here's an overview of your site architecture and activity
+                        Here's an overview of your site activity
                     </p>
                 </div>
             </div>
