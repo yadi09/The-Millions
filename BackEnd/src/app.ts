@@ -23,6 +23,6 @@ app.use("/api/services", servicesRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/admin/blogs", adminBlogRoutes);
-app.use("/api/upload", uploadRoutes);
+app.use("/api/admin/upload", uploadRoutes);
 
 export default app;
