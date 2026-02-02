@@ -2,9 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Button } from "../../components/ui/button"
 import { Badge } from "../../components/ui/badge"
 import { Input } from "../../components/ui/input"
-import { Calendar, User, ArrowRight, Search, TrendingUp, FileText, Building } from "lucide-react"
+import { Calendar, User, ArrowRight, Search, TrendingUp, FileText, Building, Loader2 } from "lucide-react"
 import { Link } from "react-router-dom"
+import { useGetPageQuery } from "../../features/api/apiSlice"
 
+// Mock Data (In real app, this would be useGetBlogPostsQuery)
 const blogPosts = [
   {
     id: "2024-tax-changes",
@@ -16,7 +18,7 @@ const blogPosts = [
     date: "March 15, 2024",
     readTime: "5 min read",
     image: "https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=2070&auto=format&fit=crop",
-    featured: true,
+    featured: true, // Legacy flag, will be overridden by Admin config
   },
   {
     id: "cloud-accounting-future",
@@ -80,28 +82,60 @@ const blogPosts = [
   },
 ]
 
-const categories = [
-  { name: "Tax Tips", count: 12, icon: FileText },
-  { name: "Business Growth", count: 8, icon: TrendingUp },
-  { name: "Property", count: 6, icon: Building },
-  { name: "Technology", count: 4, icon: TrendingUp },
-]
+// Dynamically generate categories from posts
+const generateCategories = (posts: typeof blogPosts) => {
+  const map = new Map<string, number>();
+  posts.forEach(post => {
+    const count = map.get(post.category) || 0;
+    map.set(post.category, count + 1);
+  });
+
+  return Array.from(map.entries()).map(([name, count]) => ({
+    name,
+    count,
+    icon: TrendingUp // Default icon for now
+  }));
+};
 
 export default function BlogPage() {
-  const featuredPost = blogPosts.find((post) => post.featured)
-  const regularPosts = blogPosts.filter((post) => !post.featured)
+  const { data: pageConfig, isLoading: isConfigLoading } = useGetPageQuery('blog');
+
+  // --- Configuration Extraction ---
+  const heroSection = pageConfig?.sections?.find((s: any) => s.type === 'hero');
+  const featuredSection = pageConfig?.sections?.find((s: any) => s.type === 'featured-posts');
+  const popularSection = pageConfig?.sections?.find((s: any) => s.type === 'popular-posts');
+  //   const settingsSection = pageConfig?.sections?.find((s: any) => s.type === 'page-settings');
+
+  // --- Data Logic (Dynamic) ---
+  const categories = generateCategories(blogPosts);
+
+  // Determine Featured Post (Config > Hardcoded)
+  const featuredPostId = featuredSection?.content?.featuredPostId;
+  const featuredPost = featuredPostId
+    ? blogPosts.find(p => p.id === featuredPostId)
+    : blogPosts.find(p => p.featured) || blogPosts[0];
+
+  // Regular posts (everything except featured)
+  const regularPosts = blogPosts.filter(p => p.id !== featuredPost?.id);
+
+  if (isConfigLoading) {
+    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>;
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 text-slate-800">
-      {/* Hero Section */}
+      {/* Hero Section (Controlled by Admin) */}
       <section className="bg-gradient-to-br from-blue-100 to-slate-50 py-24 sm:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl sm:text-6xl font-bold text-slate-900 mb-6 leading-tight">
-              Financial Insights & Tips
+            {heroSection?.content?.badge && (
+              <Badge variant="outline" className="mb-4">{heroSection.content.badge}</Badge>
+            )}
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight px-2">
+              {heroSection?.content?.headlineBlack || "Financial Insights"} <span className="text-blue-600">{heroSection?.content?.headlineBlue || "& Tips"}</span>
             </h1>
-            <p className="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto mb-10 leading-relaxed">
-              Stay informed with the latest tax updates, business advice, and financial strategies from our expert team.
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-3xl mx-auto mb-10 leading-relaxed px-4">
+              {heroSection?.content?.description || "Stay informed with the latest updates and strategies from our expert team."}
             </p>
 
             {/* Search Bar */}
@@ -120,10 +154,12 @@ export default function BlogPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3">
-            {/* Featured Post */}
+            {/* Featured Post (Controlled by Admin) */}
             {featuredPost && (
               <div className="mb-12 group">
-                <Badge className="mb-4 bg-blue-600 text-white">Featured Article</Badge>
+                <Badge className="mb-4 bg-blue-600 text-white">
+                  {featuredSection?.content?.title || "Featured Article"}
+                </Badge>
                 <Card className="overflow-hidden bg-slate-900 text-white rounded-2xl shadow-2xl transition-all duration-300 hover:-translate-y-1">
                   <div className="md:flex">
                     <div className="md:w-1/2 overflow-hidden">
@@ -136,13 +172,15 @@ export default function BlogPage() {
                       </Link>
                     </div>
                     <div className="md:w-1/2 p-8 sm:p-10 flex flex-col justify-center">
-                      <Badge variant="secondary" className="mb-3 w-fit bg-white/10 text-blue-300">
+                      <Badge variant="secondary" className="mb-3 w-fit bg-white/10 text-blue-300 text-xs">
                         {featuredPost.category}
                       </Badge>
-                      <h2 className="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
+                      <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-4 leading-tight">
                         {featuredPost.title}
                       </h2>
-                      <p className="text-slate-300 mb-6 leading-relaxed">{featuredPost.excerpt}</p>
+                      <p className="text-sm md:text-base text-slate-300 mb-6 leading-relaxed line-clamp-3 md:line-clamp-none">
+                        {featuredPost.excerpt}
+                      </p>
 
                       <div className="flex items-center gap-4 text-sm text-slate-400 mb-6">
                         <div className="flex items-center gap-2">
@@ -220,7 +258,8 @@ export default function BlogPage() {
 
           {/* Sidebar */}
           <aside className="space-y-8 lg:sticky lg:top-24">
-            {/* Categories */}
+
+            {/* Dynamic Categories */}
             <Card className="rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm bg-white/80 border border-white/40 shadow-sm">
               <CardHeader>
                 <CardTitle className="text-xl font-bold">Categories</CardTitle>
@@ -266,33 +305,36 @@ export default function BlogPage() {
               </CardContent>
             </Card>
 
-            {/* Popular Posts */}
-            <Card className="rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm bg-white/80 border border-white/40 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold">Popular This Month</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {blogPosts.slice(0, 3).map((post) => (
-                    <Link key={post.id} to={`/blog/${post.id}`} className="flex gap-4 group cursor-pointer items-center">
-                      <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded-lg">
-                        <img
-                          src={post.image || "/placeholder.svg"}
-                          alt={post.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-slate-800 group-hover:text-blue-600 line-clamp-2 text-sm leading-tight">
-                          {post.title}
-                        </h4>
-                        <p className="text-xs text-slate-500 mt-1">{post.date}</p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            {/* Popular Posts (Controlled by Admin) */}
+            {popularSection?.content?.show !== false && (
+              <Card className="rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm bg-white/80 border border-white/40 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-xl font-bold">{popularSection?.content?.title || "Popular This Month"}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Mock popular logic - take first 3 for now */}
+                    {blogPosts.slice(0, 3).map((post) => (
+                      <Link key={post.id} to={`/blog/${post.id}`} className="flex gap-4 group cursor-pointer items-center">
+                        <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded-lg">
+                          <img
+                            src={post.image || "/placeholder.svg"}
+                            alt={post.title}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-slate-800 group-hover:text-blue-600 line-clamp-2 text-sm leading-tight">
+                            {post.title}
+                          </h4>
+                          <p className="text-xs text-slate-500 mt-1">{post.date}</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </aside>
         </div>
       </div>
