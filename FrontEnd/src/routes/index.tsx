@@ -12,6 +12,8 @@ import AdminPageEditor from "../pages/admin/PageEditor";
 import AdminPagesList from "../pages/admin/PagesList";
 import AdminSettings from "../pages/admin/Settings";
 import AdminLogin from "../pages/admin/Login";
+import BlogManagement from "../pages/admin/BlogManagement";
+import BlogEditor from "../pages/admin/BlogEditor";
 import ProtectedRoute from "../components/ProtectedRoute";
 
 const PublicLayout = () => (
@@ -46,6 +48,9 @@ export const AppRoutes = () => (
             <Route index element={<AdminDashboard />} />
             <Route path="pages" element={<AdminPagesList />} />
             <Route path="pages/:slug" element={<AdminPageEditor />} />
+            <Route path="blog" element={<BlogManagement />} />
+            <Route path="blog/new" element={<BlogEditor />} />
+            <Route path="blog/edit/:id" element={<BlogEditor />} />
             <Route path="settings" element={<AdminSettings />} />
         </Route>
     </Routes>
