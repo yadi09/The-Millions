@@ -11,6 +11,7 @@ export const MobileHeader = ({ onMenuClick }: MobileHeaderProps) => {
     const getPageTitle = () => {
         const path = location.pathname;
         if (path === '/admin') return 'Dashboard';
+        if (path.startsWith('/admin/blog')) return 'Blog Posts';
         if (path.startsWith('/admin/pages')) return 'Pages';
         if (path.startsWith('/admin/settings')) return 'Settings';
         return 'Admin';

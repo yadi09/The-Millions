@@ -34,21 +34,20 @@ export function Header() {
             </Link>
           </div>
 
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden lg:flex space-x-8">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className={`transition-colors ${
-                  isActive(item.href) ? "text-blue-600 font-medium" : "text-gray-600 hover:text-blue-600"
-                }`}
+                className={`transition-colors ${isActive(item.href) ? "text-blue-600 font-medium" : "text-gray-600 hover:text-blue-600"
+                  }`}
               >
                 {item.name}
               </Link>
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-4">
             <Button variant="outline" size="sm">
               <Phone className="w-4 h-4 mr-2" />
               Call Now
@@ -59,13 +58,13 @@ export function Header() {
             </Button>
           </div>
 
-          <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t">
+          <div className="lg:hidden py-4 border-t">
             <div className="flex flex-col space-y-4">
               {navigation.map((item) => (
                 <Link
