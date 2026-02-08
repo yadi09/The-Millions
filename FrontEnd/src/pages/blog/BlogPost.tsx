@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "../../components/ui/button"
 import { Badge } from "../../components/ui/badge"
 import {
@@ -87,8 +87,19 @@ const ScrollProgressBar = () => {
     return <div className="fixed top-0 left-0 z-50 h-1 bg-blue-600" style={{ width: `${width}%` }} />
 }
 
-const TableOfContents = ({ content, isVisible, onClose }) => {
-    const [headings, setHeadings] = useState([])
+interface HeadingItem {
+    id: string;
+    text: string | null;
+}
+
+interface TOCProps {
+    content: string;
+    isVisible: boolean;
+    onClose: () => void;
+}
+
+const TableOfContents = ({ content, isVisible, onClose }: TOCProps) => {
+    const [headings, setHeadings] = useState<HeadingItem[]>([])
     const [activeId, setActiveId] = useState("")
 
     useEffect(() => {
