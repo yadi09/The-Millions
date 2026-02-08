@@ -27,3 +27,31 @@ model Section {
 
   createdAt DateTime @default(now())
 }
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Service {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages  ContactMessage[]
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  fullName  String
+  email     String
+  phone     String?
+  message   String
+  serviceId String
+
+  service   Service  @relation(fields: [serviceId], references: [id])
+  
+  createdAt DateTime @default(now())
+}

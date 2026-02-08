@@ -1,23 +1,32 @@
+/// <reference types="node" />
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import "dotenv/config";
 
-const prisma = new PrismaClient();
+/* -----------------------------
+   Prisma Client
+   ✅ Use DATABASE_URL explicitly so it connects to Neon
+------------------------------*/
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+    },
+  },
+});
 
+/* -----------------------------
+   Seed Home Page
+------------------------------*/
 async function seedHomePage() {
-  // 1️⃣ Optional: remove old home page to avoid conflicts
-  await prisma.page.deleteMany({
-    where: { slug: "home" }
-  });
-
-  // 2️⃣ Upsert ensures the page is always created
-  const home = await prisma.page.upsert({
+  await prisma.page.upsert({
     where: { slug: "home" },
     update: {},
     create: {
-      slug: "home", // ✅ always lowercase, no spaces
+      slug: "home",
       title: "Home",
       sections: {
         create: [
-          // HERO
           {
             type: "hero",
             order: 1,
@@ -29,18 +38,16 @@ async function seedHomePage() {
                 "At The Millions Chartered Certified Accountants, we go beyond compliance. Trusted financial partner helping you stay on top of numbers, minimize tax, improve cash flow, and make confident decisions.",
               ctas: [
                 { label: "Book Free Consultation", action: "book_consultation" },
-                { label: "WhatsApp Us Instantly", action: "whatsapp" }
+                { label: "WhatsApp Us Instantly", action: "whatsapp" },
               ],
               features: [
                 "Fixed Fees",
                 "Cloud Accounting Experts",
                 "Jargon-Free Service",
-                "Support across all stages"
-              ]
-            }
+                "Support across all stages",
+              ],
+            },
           },
-
-          // SERVICES
           {
             type: "services",
             order: 2,
@@ -48,83 +55,222 @@ async function seedHomePage() {
               title: "Our Services at a Glance",
               subtitle: "Comprehensive financial services tailored to your needs.",
               cards: [
-                { id: "year_end_accounts", icon: "tax", title: "Year-End Accounts & Tax Returns", description: "Annual statutory accounts, corporation tax returns (CT600), and self-assessment tax returns." },
-                { id: "payroll", icon: "payroll", title: "Payroll & Bookkeeping", description: "RTI-compliant payroll processing, auto-enrolment pension support, and cloud software setup." },
-                { id: "vat", icon: "vat", title: "VAT & Making Tax Digital", description: "VAT returns and MTD compliance to keep your business fully compliant with HMRC requirements." },
-                { id: "startup", icon: "startup", title: "Business Start-Up Support", description: "Company formation, HMRC registration (PAYE, VAT), business structure advice, and funding guidance." }
+                {
+                  id: "year_end_accounts",
+                  icon: "tax",
+                  title: "Year-End Accounts & Tax Returns",
+                  description:
+                    "Annual statutory accounts, corporation tax returns (CT600), and self-assessment tax returns.",
+                },
+                {
+                  id: "payroll",
+                  icon: "payroll",
+                  title: "Payroll & Bookkeeping",
+                  description:
+                    "RTI-compliant payroll processing, auto-enrolment pension support, and cloud software setup.",
+                },
+                {
+                  id: "vat",
+                  icon: "vat",
+                  title: "VAT & Making Tax Digital",
+                  description:
+                    "VAT returns and MTD compliance to keep your business fully compliant.",
+                },
+                {
+                  id: "startup",
+                  icon: "startup",
+                  title: "Business Start-Up Support",
+                  description: "Company formation, HMRC registration, business structure advice.",
+                },
               ],
-              viewAllAction: "services_page"
-            }
+            },
           },
+        ],
+      },
+    },
+  });
 
-          // ABOUT
+  console.log("🌱 Home page seeded");
+}
+
+/* -----------------------------
+   Seed Admin User
+------------------------------*/
+async function seedAdminUser() {
+  const email = "admin@themillions.com";
+  const password = "adminpassword123";
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await prisma.user.upsert({
+    where: { email },
+    update: {},
+    create: {
+      email,
+      password: hashedPassword,
+    },
+  });
+
+  console.log("👤 Admin user seeded");
+}
+
+/* -----------------------------
+   Seed About Page
+------------------------------*/
+async function seedAboutPage() {
+  await prisma.page.upsert({
+    where: { slug: "about" },
+    update: {},
+    create: {
+      slug: "about",
+      title: "About Us",
+      sections: {
+        create: [
+          // 1. Hero
           {
-            type: "about",
-            order: 3,
+            type: "hero",
+            order: 1,
+            content: {
+              badge: "About The Millions",
+              headlineBlack: "Building Trust",
+              headlineBlue: "Through Excellence.",
+              description:
+                "A client-first, future-focused accountancy firm dedicated to helping individuals and businesses navigate the complexities of finance with confidence.",
+              ctas: [
+                { label: "Book Free Consultation", action: "book_consultation" },
+                { label: "View Our Services", action: "services" },
+              ],
+            },
+          },
+          // 2. Who We Are
+          {
+            type: "who_we_are",
+            order: 2,
             content: {
               title: "Who We Are",
-              description: [
-                "The Millions Chartered Certified Accountants is client-first, future-focused, helping individuals and businesses navigate finance with confidence.",
-                "We blend traditional accountancy with modern tools, delivering insights — not just reports."
-              ],
-              action: { label: "Read More About Us", link: "/about" }
-            }
+              description:
+                "The Millions Chartered Certified Accountants is the 2 brothers Mark and Sleshi Million who are dedicated to helping individuals and businesses navigate the complexities of finance with confidence. They are based in London, UK. and they are the founders of the company. They have been in the business for 10 years and they have a team of 10 people.\n\nThe company is dedicated to helping individuals and businesses navigate the complexities of finance with confidence. They have big dreams and they are working hard to achieve them. they are also working on a project to help people with their financial needs.",
+            },
           },
-
-          // STATS
+          // 3. Stats
           {
             type: "stats",
+            order: 3,
+            content: {
+              stats: [
+                { value: "2014", label: "Founded" },
+                { value: "500+", label: "Clients Served" },
+                { value: "15+", label: "Team Members" },
+              ],
+            },
+          },
+          // 4. Values (Vision, Mission, Values)
+          {
+            type: "values",
             order: 4,
             content: {
-              items: [
-                { label: "ACCA Certified", value: "ACCA" },
-                { label: "Happy Clients", value: "500+" },
-                { label: "Years Experience", value: "10+" }
-              ]
-            }
+              vision:
+                "To be recognised as a trusted financial partner that empowers our clients through clarity, compliance, and strategic advice.",
+              mission:
+                "To deliver personalised, professional, and proactive accountancy services that support long-term success and financial peace of mind.",
+              values: [
+                {
+                  title: "Integrity",
+                  description:
+                    "We act with honesty, transparency, and professionalism in everything we do.",
+                },
+                {
+                  title: "Clarity",
+                  description:
+                    "We simplify the complex and speak your language, making finance accessible to all.",
+                },
+                {
+                  title: "Proactivity",
+                  description:
+                    "We anticipate, advise, and act—before the deadline, keeping you ahead of the curve.",
+                },
+                {
+                  title: "Partnership",
+                  description:
+                    "We work with you, not just for you, building lasting relationships based on trust.",
+                },
+                {
+                  title: "Excellence",
+                  description:
+                    "We stay current, qualified, and committed to your growth and success.",
+                },
+              ],
+            },
           },
-
-          // WHY CHOOSE US
+          // 5. Team
           {
-            type: "why-choose-us",
+            type: "team",
             order: 5,
             content: {
-              title: "Why Choose Millions?",
-              subtitle: "Professional expertise with personal service to deliver exceptional results.",
-              reasons: [
-                { icon: "acca", title: "Fully Qualified ACCA", description: "Chartered Certified Accountants you can trust." },
-                { icon: "cloud", title: "Cloud-Based Accounting", description: "Real-time financial insights through modern cloud solutions." },
-                { icon: "fixed_fees", title: "Fixed Fees, No Surprises", description: "Transparent pricing with no hidden costs." },
-                { icon: "friendly", title: "Friendly & Jargon-Free", description: "Plain-English advice for complex financial matters." }
-              ]
-            }
+              title: "Meet Our Team",
+              subtitle:
+                "Our experienced team of ACCA certified professionals combines expertise with a personal touch, showcasing both our credentials and our human side.",
+              members: [
+                {
+                  name: "Sleshi Million",
+                  role: "Accountant",
+                  qualifications: "ACCA, MBA",
+                  bio: "Sleshi is an Certified Accountant who helps clients with their financial needs. and also a tax expert.",
+                },
+                {
+                  name: "Mark Million",
+                  role: "Accountant",
+                  qualifications: "ACCA, MBA",
+                  bio: "Mark provides strategic business advice and growth planning, helping entrepreneurs and established businesses achieve their goals.",
+                },
+                {
+                  name: "Sarah Abera",
+                  role: "Social Media Manager",
+                  qualifications: "Certified Social Media Manager",
+                  bio: "Sarah is a Social Media Manager who helps the company with their social media presence. and also a graphic designer.",
+                },
+                {
+                  name: "Yadamzer Terefe",
+                  role: "Software Engineer",
+                  qualifications: "Certified Software Engineer",
+                  bio: "Yadamzer is a Software Engineer who helps the company with their software development needs.",
+                },
+              ],
+            },
           },
-
-          // CTA
+          // 6. CTA
           {
             type: "cta",
             order: 6,
             content: {
-              title: "Ready to Take Your Finances to the Next Level?",
-              subtitle: "Get expert advice from our certified accountants today.",
+              title: "Ready to Work Together?",
+              description:
+                "Let's discuss how our team can help you achieve your financial goals with confidence and clarity.",
               actions: [
-                { label: "Book a Free Consultation", action: "book_consultation" },
-                { label: "WhatsApp Us Instantly", action: "whatsapp" }
-              ]
-            }
-          }
-        ]
-      }
-    }
+                { label: "Book Free Consultation", action: "book_consultation" },
+                { label: "View Our Services", action: "services" },
+              ],
+            },
+          },
+        ],
+      },
+    },
   });
 
-  console.log("🌱 Homepage seeded:", home.slug);
+  console.log("🌱 About page seeded");
 }
 
+/* -----------------------------
+   Run All Seeds
+------------------------------*/
 async function main() {
   await seedHomePage();
+  await seedAboutPage();
+  await seedAdminUser();
 }
 
 main()
   .catch(console.error)
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

@@ -213,41 +213,194 @@ function AboutForm({ content, onChange }: { content: Record<string, any>; onChan
   );
 }
 
-// 4) STATS
+// 4) STATS - uses 'stats' array per backend seed
 function StatsForm({ content, onChange }: { content: Record<string, any>; onChange: (c: Record<string, any>) => void }) {
   const c = content || {};
-  const items = Array.isArray(c.items) ? c.items : [];
+  const stats = Array.isArray(c.stats) ? c.stats : [];
   const update = (key: string, value: any) => onChange({ ...c, [key]: value });
 
-  const addItem = () => update("items", [...items, { label: "", value: "" }]);
-  const updateItem = (idx: number, key: string, value: string) => {
-    const next = items.map((item: any, i: number) => (i === idx ? { ...item, [key]: value } : item));
-    update("items", next);
+  const addStat = () => update("stats", [...stats, { label: "", value: "" }]);
+  const updateStat = (idx: number, key: string, value: string) => {
+    const next = stats.map((item: any, i: number) => (i === idx ? { ...item, [key]: value } : item));
+    update("stats", next);
   };
-  const removeItem = (idx: number) => update("items", items.filter((_: any, i: number) => i !== idx));
+  const removeStat = (idx: number) => update("stats", stats.filter((_: any, i: number) => i !== idx));
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-slate-900">Stats Items ({items.length})</h3>
-        <Button size="sm" className="gap-2" onClick={addItem}><Plus size={16} /> Add Item</Button>
+        <h3 className="font-semibold text-slate-900">Stats ({stats.length})</h3>
+        <Button size="sm" className="gap-2" onClick={addStat}><Plus size={16} /> Add Stat</Button>
       </div>
       <div className="space-y-3">
-        {items.map((item: any, idx: number) => (
-          <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-2.5 sm:p-3 border rounded-lg bg-white">
+        {stats.map((stat: any, idx: number) => (
+          <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 border rounded-lg bg-white">
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-slate-600">Label</label>
-              <Input value={item.label || ""} onChange={(e) => updateItem(idx, "label", e.target.value)} className="h-8 md:h-9 text-xs sm:text-sm" />
+              <label className="text-xs font-medium text-slate-600">Value</label>
+              <Input value={stat.value || ""} onChange={(e) => updateStat(idx, "value", e.target.value)} placeholder="e.g. 500+" />
             </div>
             <div className="space-y-1">
-              <label className="text-[11px] font-medium text-slate-600">Value</label>
-              <Input value={item.value || ""} onChange={(e) => updateItem(idx, "value", e.target.value)} className="h-8 md:h-9 text-xs sm:text-sm" />
+              <label className="text-xs font-medium text-slate-600">Label</label>
+              <Input value={stat.label || ""} onChange={(e) => updateStat(idx, "label", e.target.value)} placeholder="e.g. Clients Served" />
             </div>
             <div className="flex items-end justify-end md:justify-start">
-              <Button variant="ghost" size="icon" onClick={() => removeItem(idx)} className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={16} /></Button>
+              <Button variant="ghost" size="icon" onClick={() => removeStat(idx)} className="text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={18} /></Button>
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// 4b) WHO WE ARE - for About page
+function WhoWeAreForm({ content, onChange }: { content: Record<string, any>; onChange: (c: Record<string, any>) => void }) {
+  const c = content || {};
+  const update = (key: string, value: any) => onChange({ ...c, [key]: value });
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">Title</label>
+        <Input value={c.title || ""} onChange={(e) => update("title", e.target.value)} placeholder="Who We Are" />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">Description</label>
+        <Textarea
+          value={c.description || ""}
+          onChange={(e) => update("description", e.target.value)}
+          rows={6}
+          placeholder="Use double line breaks (press Enter twice) to separate paragraphs..."
+        />
+        <p className="text-xs text-slate-500">Tip: Use double line breaks to create separate paragraphs</p>
+      </div>
+    </div>
+  );
+}
+
+// 4c) VALUES - vision, mission, and values array for About page
+function ValuesForm({ content, onChange }: { content: Record<string, any>; onChange: (c: Record<string, any>) => void }) {
+  const c = content || {};
+  const values = Array.isArray(c.values) ? c.values : [];
+  const update = (key: string, value: any) => onChange({ ...c, [key]: value });
+
+  const addValue = () => update("values", [...values, { title: "", description: "" }]);
+  const updateValue = (idx: number, key: string, value: string) => {
+    const next = values.map((v: any, i: number) => (i === idx ? { ...v, [key]: value } : v));
+    update("values", next);
+  };
+  const removeValue = (idx: number) => update("values", values.filter((_: any, i: number) => i !== idx));
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">Vision</label>
+        <Textarea
+          value={c.vision || ""}
+          onChange={(e) => update("vision", e.target.value)}
+          rows={3}
+          placeholder="Our vision statement..."
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">Mission</label>
+        <Textarea
+          value={c.mission || ""}
+          onChange={(e) => update("mission", e.target.value)}
+          rows={3}
+          placeholder="Our mission statement..."
+        />
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-slate-900">Core Values ({values.length})</h3>
+          <Button size="sm" className="gap-2" onClick={addValue}><Plus size={16} /> Add Value</Button>
+        </div>
+        <div className="space-y-3">
+          {values.map((v: any, idx: number) => (
+            <div key={idx} className="p-4 border rounded-lg bg-white space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-600">Title</label>
+                  <Input value={v.title || ""} onChange={(e) => updateValue(idx, "title", e.target.value)} placeholder="e.g. Integrity" />
+                </div>
+                <div className="flex items-end">
+                  <Button variant="ghost" size="icon" onClick={() => removeValue(idx)} className="text-slate-400 hover:text-red-600 hover:bg-red-50"><Trash2 size={18} /></Button>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-600">Description</label>
+                <Textarea value={v.description || ""} onChange={(e) => updateValue(idx, "description", e.target.value)} rows={2} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 4d) TEAM - for About page
+function TeamForm({ content, onChange }: { content: Record<string, any>; onChange: (c: Record<string, any>) => void }) {
+  const c = content || {};
+  const members = Array.isArray(c.members) ? c.members : [];
+  const update = (key: string, value: any) => onChange({ ...c, [key]: value });
+
+  const addMember = () => update("members", [...members, { name: "", role: "", qualifications: "", bio: "", image: "" }]);
+  const updateMember = (idx: number, key: string, value: string) => {
+    const next = members.map((m: any, i: number) => (i === idx ? { ...m, [key]: value } : m));
+    update("members", next);
+  };
+  const removeMember = (idx: number) => update("members", members.filter((_: any, i: number) => i !== idx));
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">Section Title</label>
+        <Input value={c.title || ""} onChange={(e) => update("title", e.target.value)} placeholder="Meet Our Team" />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">Section Subtitle</label>
+        <Textarea value={c.subtitle || ""} onChange={(e) => update("subtitle", e.target.value)} rows={2} />
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-slate-900">Team Members ({members.length})</h3>
+          <Button size="sm" className="gap-2" onClick={addMember}><Plus size={16} /> Add Member</Button>
+        </div>
+        <div className="space-y-4">
+          {members.map((member: any, idx: number) => (
+            <div key={idx} className="p-4 border rounded-lg bg-white space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-600">Name</label>
+                  <Input value={member.name || ""} onChange={(e) => updateMember(idx, "name", e.target.value)} />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-600">Role</label>
+                  <Input value={member.role || ""} onChange={(e) => updateMember(idx, "role", e.target.value)} placeholder="e.g. Accountant" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-slate-600">Qualifications</label>
+                  <Input value={member.qualifications || ""} onChange={(e) => updateMember(idx, "qualifications", e.target.value)} placeholder="e.g. ACCA, MBA" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-600">Image URL</label>
+                <Input value={member.image || ""} onChange={(e) => updateMember(idx, "image", e.target.value)} placeholder="/team/member.jpg or https://..." />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-600">Bio</label>
+                <Textarea value={member.bio || ""} onChange={(e) => updateMember(idx, "bio", e.target.value)} rows={2} />
+              </div>
+              <div className="flex justify-end">
+                <Button variant="ghost" size="sm" onClick={() => removeMember(idx)} className="text-slate-400 hover:text-red-600 hover:bg-red-50 gap-1"><Trash2 size={16} /> Remove</Button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -439,14 +592,13 @@ function PageSettingsForm({ content, onChange }: { content: Record<string, any>;
 
 const SectionForm = ({ type, content, onChange }: SectionFormProps) => {
   switch (type) {
+    // Home page sections
     case "hero":
       return <HeroForm content={content} onChange={onChange} />;
     case "services":
       return <ServicesForm content={content} onChange={onChange} />;
     case "about":
       return <AboutForm content={content} onChange={onChange} />;
-    case "stats":
-      return <StatsForm content={content} onChange={onChange} />;
     case "why-choose-us":
       return <WhyChooseUsForm content={content} onChange={onChange} />;
     case "cta":
@@ -457,6 +609,17 @@ const SectionForm = ({ type, content, onChange }: SectionFormProps) => {
       return <PopularPostsForm content={content} onChange={onChange} />;
     case "page-settings":
       return <PageSettingsForm content={content} onChange={onChange} />;
+
+    // About page sections
+    case "who_we_are":
+      return <WhoWeAreForm content={content} onChange={onChange} />;
+    case "stats":
+      return <StatsForm content={content} onChange={onChange} />;
+    case "values":
+      return <ValuesForm content={content} onChange={onChange} />;
+    case "team":
+      return <TeamForm content={content} onChange={onChange} />;
+
     default:
       return (
         <div className="p-4 bg-yellow-50 text-yellow-800 rounded-lg">
