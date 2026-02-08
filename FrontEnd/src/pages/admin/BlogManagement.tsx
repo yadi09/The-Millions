@@ -11,18 +11,6 @@ import { Loader2 } from 'lucide-react';
 import { useGetBlogPostsQuery, useDeleteBlogPostMutation } from '../../features/api/apiSlice';
 
 
-// Type definition (matching our proposed schema)
-interface BlogPost {
-    id: string;
-    title: string;
-    category: string;
-    status: 'published' | 'draft';
-    author?: string;
-    date?: string;
-    createdAt: string;
-    views?: number;
-}
-
 
 export default function BlogManagement() {
     const navigate = useNavigate();
