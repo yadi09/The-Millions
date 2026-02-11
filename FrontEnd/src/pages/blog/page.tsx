@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Button } from "../../components/ui/button"
 import { Badge } from "../../components/ui/badge"
 import { Input } from "../../components/ui/input"
-import { Calendar, User, ArrowRight, Search, TrendingUp, FileText, Building, Loader2 } from "lucide-react"
+import { Calendar, User, ArrowRight, Search, TrendingUp, Loader2 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useGetPageQuery } from "../../features/api/apiSlice"
 
