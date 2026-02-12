@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { createPage, updatePage, deletePage } from "./admin.service.js";
-
 import { createPageSchema, updatePageSchema } from "./admin.validation.js";
 
 export async function createPageController(req: Request, res: Response) {
@@ -25,7 +24,6 @@ export async function createPageController(req: Request, res: Response) {
 
 export async function updatePageController(req: Request, res: Response) {
     const { id } = req.params;
-
     const validation = updatePageSchema.safeParse(req.body);
 
     if (!validation.success) {
@@ -33,7 +31,8 @@ export async function updatePageController(req: Request, res: Response) {
     }
 
     try {
-        const page = await updatePage(id, validation.data);
+        // FIX: Cast id to string
+        const page = await updatePage(id as string, validation.data);
         if (!page) {
             res.status(404).json({ message: "Page not found" });
         } else {
@@ -52,7 +51,8 @@ export async function updatePageController(req: Request, res: Response) {
 export async function deletePageController(req: Request, res: Response) {
     const { id } = req.params;
     try {
-        await deletePage(id);
+        // FIX: Cast id to string
+        await deletePage(id as string);
         res.json({ message: "Page deleted successfully" });
     } catch (error: any) {
         if (error.code === "P2025") {
