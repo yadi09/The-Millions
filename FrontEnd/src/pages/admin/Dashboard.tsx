@@ -1,9 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { FileText, Clock, Activity, ArrowRight, TrendingUp } from "lucide-react";
+import { FileText, Clock, Activity, ArrowRight, TrendingUp, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useMemo } from "react";
+import { useTestimonials } from "../../context/TestimonialContext";
 
 const AdminDashboard = () => {
+    const { testimonials } = useTestimonials();
+    const pendingCount = testimonials.filter((t) => t.status === 'pending').length;
+
     const greeting = useMemo(() => {
         const hour = new Date().getHours();
         if (hour < 12) return "Good Morning";
@@ -68,6 +72,21 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                         <p className="text-xs text-slate-500 mt-4">Updates in last 30 days</p>
+                    </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-md hover:scale-[1.02] transition-all duration-300">
+                    <CardContent className="pt-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-slate-500">Pending Reviews</p>
+                                <h3 className="text-3xl font-bold text-slate-900 mt-2">{pendingCount}</h3>
+                            </div>
+                            <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center text-white shadow-amber-200 shadow-md">
+                                <MessageSquare size={22} />
+                            </div>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-4">Testimonials awaiting review</p>
                     </CardContent>
                 </Card>
             </div>
@@ -136,6 +155,20 @@ const AdminDashboard = () => {
                                     </div>
                                 </div>
                                 <ArrowRight size={18} className="text-slate-300 group-hover:text-indigo-500 transform group-hover:translate-x-1 transition-all" />
+                            </div>
+                        </Link>
+                        <Link to="/admin/testimonials" className="group block p-4 bg-white rounded-xl shadow-sm border hover:border-amber-200 hover:shadow-md transition-all duration-300">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                                        <MessageSquare size={20} />
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-slate-900">Manage Testimonials</p>
+                                        <p className="text-sm text-slate-500">Review & approve submissions</p>
+                                    </div>
+                                </div>
+                                <ArrowRight size={18} className="text-slate-300 group-hover:text-amber-500 transform group-hover:translate-x-1 transition-all" />
                             </div>
                         </Link>
                     </div>

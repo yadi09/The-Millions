@@ -1,11 +1,14 @@
 import { AppRoutes } from './routes'
 import { BrowserRouter } from 'react-router-dom'
+import { TestimonialProvider } from './context/TestimonialContext'
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <TestimonialProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </TestimonialProvider>
   )
 }
 

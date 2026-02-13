@@ -1,9 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileText, Settings, LogOut, MessageSquare } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import type { RootState } from '../app/store';
 import { useNavigate } from 'react-router-dom';
+import { useTestimonials } from '../context/TestimonialContext';
 
 type AdminSidebarProps = {
     isOpen: boolean;
@@ -15,6 +16,8 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const user = useSelector((state: RootState) => state.auth.user);
+    const { testimonials } = useTestimonials();
+    const pendingCount = testimonials.filter((t) => t.status === 'pending').length;
 
     const isActive = (path: string) => {
         return location.pathname === path || location.pathname.startsWith(`${path}/`);
@@ -76,6 +79,23 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                 >
                     <FileText size={20} />
                     Pages
+                </Link>
+
+                <Link
+                    to="/admin/testimonials"
+                    onClick={handleNavigation}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/admin/testimonials')
+                        ? 'bg-blue-600 text-white'
+                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                        }`}
+                >
+                    <MessageSquare size={20} />
+                    Testimonials
+                    {pendingCount > 0 && (
+                        <span className="ml-auto px-2 py-0.5 bg-amber-500 text-white text-xs rounded-full font-semibold">
+                            {pendingCount}
+                        </span>
+                    )}
                 </Link>
 
                 <Link
