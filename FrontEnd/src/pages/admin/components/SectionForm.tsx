@@ -1,7 +1,8 @@
 import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button } from "../../../components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Loader2 } from "lucide-react";
+import { useGetBlogPostsQuery } from "../../../features/api/apiSlice";
 
 type SectionFormProps = {
   type: string;
@@ -511,7 +512,7 @@ function CTAForm({ content, onChange }: { content: Record<string, any>; onChange
 }
 
 // 7) FEATURED POSTS (Blog)
-function FeaturedPostsForm({ content, onChange }: { content: Record<string, any>; onChange: (c: Record<string, any>) => void }) {
+function FeaturedPostsForm({ content, onChange, blogPosts, isLoading }: { content: Record<string, any>; onChange: (c: Record<string, any>) => void; blogPosts: any[]; isLoading: boolean }) {
   const c = content || {};
   const update = (key: string, value: any) => onChange({ ...c, [key]: value });
 
@@ -522,18 +523,44 @@ function FeaturedPostsForm({ content, onChange }: { content: Record<string, any>
         <Input value={c.title || ""} onChange={(e) => update("title", e.target.value)} placeholder="e.g. Editor's Pick" />
       </div>
       <div className="space-y-2">
-        <label className="text-sm font-medium text-slate-700">Featured Post ID/Slug</label>
-        <Input value={c.featuredPostId || ""} onChange={(e) => update("featuredPostId", e.target.value)} placeholder="Post ID or Slug" />
-        <p className="text-xs text-muted-foreground">Enter the exact ID or Slug of the post to feature at the top.</p>
+        <label className="text-sm font-medium text-slate-700">Select Featured Post</label>
+        {isLoading ? (
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Loading posts...
+          </div>
+        ) : (
+          <select
+            value={c.featuredPostId || ""}
+            onChange={(e) => update("featuredPostId", e.target.value)}
+            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          >
+            <option value="">Select a post...</option>
+            {blogPosts.map((post: any) => (
+              <option key={post.id} value={post.id}>
+                {post.title} ({post.status})
+              </option>
+            ))}
+          </select>
+        )}
+        <p className="text-xs text-muted-foreground">The selected post will be highlighted at the top of the blog page.</p>
       </div>
     </div>
   );
 }
 
 // 8) POPULAR POSTS (Blog)
-function PopularPostsForm({ content, onChange }: { content: Record<string, any>; onChange: (c: Record<string, any>) => void }) {
+function PopularPostsForm({ content, onChange, blogPosts, isLoading }: { content: Record<string, any>; onChange: (c: Record<string, any>) => void; blogPosts: any[]; isLoading: boolean }) {
   const c = content || {};
+  const selectedPosts = Array.isArray(c.selectedPosts) ? c.selectedPosts : [];
   const update = (key: string, value: any) => onChange({ ...c, [key]: value });
+
+  const addPost = () => update("selectedPosts", [...selectedPosts, ""]);
+  const updatePost = (idx: number, value: string) => {
+    const next = selectedPosts.map((id: string, i: number) => (i === idx ? value : id));
+    update("selectedPosts", next);
+  };
+  const removePost = (idx: number) => update("selectedPosts", selectedPosts.filter((_: any, i: number) => i !== idx));
 
   return (
     <div className="space-y-4">
@@ -564,6 +591,47 @@ function PopularPostsForm({ content, onChange }: { content: Record<string, any>;
           <option value="manual">Manual Selection</option>
         </select>
       </div>
+
+      {c.mode === "manual" && (
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-900">Selected Posts ({selectedPosts.length})</h3>
+            <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={addPost}>
+              <Plus size={14} /> Add Post
+            </Button>
+          </div>
+          <div className="space-y-2">
+            {selectedPosts.map((postId: string, idx: number) => (
+              <div key={idx} className="flex gap-2 items-center">
+                {isLoading ? (
+                  <div className="flex-1 h-9 bg-slate-100 animate-pulse rounded-md" />
+                ) : (
+                  <select
+                    value={postId}
+                    onChange={(e) => updatePost(idx, e.target.value)}
+                    className="flex-1 h-9 rounded-md border border-input bg-background px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="">Select a post...</option>
+                    {blogPosts.map((post: any) => (
+                      <option key={post.id} value={post.id}>
+                        {post.title}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <Button variant="ghost" size="icon" onClick={() => removePost(idx)} className="h-8 w-8 text-slate-400 hover:text-red-600">
+                  <Trash2 size={16} />
+                </Button>
+              </div>
+            ))}
+            {selectedPosts.length === 0 && (
+              <p className="text-xs text-slate-500 text-center py-2 bg-slate-50 rounded-lg border border-dashed">
+                No posts selected. Add one to start manual selection.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -591,6 +659,8 @@ function PageSettingsForm({ content, onChange }: { content: Record<string, any>;
 }
 
 const SectionForm = ({ type, content, onChange }: SectionFormProps) => {
+  const { data: blogPosts = [], isLoading: isBlogLoading } = useGetBlogPostsQuery();
+
   switch (type) {
     // Home page sections
     case "hero":
@@ -604,9 +674,9 @@ const SectionForm = ({ type, content, onChange }: SectionFormProps) => {
     case "cta":
       return <CTAForm content={content} onChange={onChange} />;
     case "featured-posts":
-      return <FeaturedPostsForm content={content} onChange={onChange} />;
+      return <FeaturedPostsForm content={content} onChange={onChange} blogPosts={blogPosts} isLoading={isBlogLoading} />;
     case "popular-posts":
-      return <PopularPostsForm content={content} onChange={onChange} />;
+      return <PopularPostsForm content={content} onChange={onChange} blogPosts={blogPosts} isLoading={isBlogLoading} />;
     case "page-settings":
       return <PageSettingsForm content={content} onChange={onChange} />;
 
