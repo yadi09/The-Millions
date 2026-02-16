@@ -1,126 +1,58 @@
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Button } from "../../components/ui/button"
 import { Badge } from "../../components/ui/badge"
 import { Input } from "../../components/ui/input"
 import { Calendar, User, ArrowRight, Search, TrendingUp, Loader2 } from "lucide-react"
 import { Link } from "react-router-dom"
-import { useGetPageQuery } from "../../features/api/apiSlice"
-
-// Mock Data (In real app, this would be useGetBlogPostsQuery)
-const blogPosts = [
-  {
-    id: "2024-tax-changes",
-    title: "2024 Tax Changes: What You Need to Know",
-    excerpt:
-      "Stay ahead of the latest tax changes affecting individuals and businesses in 2024. Our comprehensive guide covers key updates and planning strategies.",
-    category: "Tax Tips",
-    author: "Sarah Mitchell",
-    date: "March 15, 2024",
-    readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=2070&auto=format&fit=crop",
-    featured: true, // Legacy flag, will be overridden by Admin config
-  },
-  {
-    id: "cloud-accounting-future",
-    title: "Cloud Accounting: The Future is Now",
-    excerpt:
-      "Discover how cloud accounting can transform your business operations, improve efficiency, and provide real-time financial insights.",
-    category: "Technology",
-    author: "Emily Chen",
-    date: "March 10, 2024",
-    readTime: "7 min read",
-    image: "https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?q=80&w=2070&auto=format&fit=crop",
-    featured: false,
-  },
-  {
-    id: "property-investment-strategies",
-    title: "Property Investment Tax Strategies",
-    excerpt:
-      "Maximize your property investment returns with these proven tax strategies and planning techniques for landlords and investors.",
-    category: "Property",
-    author: "James Thompson",
-    date: "March 5, 2024",
-    readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1576643632849-032a2373c2ce?q=80&w=1974&auto=format&fit=crop",
-    featured: false,
-  },
-  {
-    id: "small-business-growth-planning",
-    title: "Small Business Growth: Financial Planning Essentials",
-    excerpt:
-      "Essential financial planning strategies to fuel your small business growth, from cash flow management to investment planning.",
-    category: "Business Growth",
-    author: "Michael Roberts",
-    date: "February 28, 2024",
-    readTime: "8 min read",
-    image: "https://images.unsplash.com/photo-1560518883-ce09059ee353?q=80&w=1974&auto=format&fit=crop",
-    featured: false,
-  },
-  {
-    id: "vat-registration-guide",
-    title: "VAT Registration: When and How",
-    excerpt:
-      "Everything you need to know about VAT registration, including thresholds, benefits, and the registration process.",
-    category: "Tax Tips",
-    author: "Sarah Mitchell",
-    date: "February 20, 2024",
-    readTime: "4 min read",
-    image: "https://images.unsplash.com/photo-1599582784863-fad474514759?q=80&w=1974&auto=format&fit=crop",
-    featured: false,
-  },
-  {
-    id: "year-end-accounts-checklist",
-    title: "Year-End Accounts: Preparation Checklist",
-    excerpt:
-      "Ensure your year-end accounts preparation goes smoothly with our comprehensive checklist and expert tips.",
-    category: "Business Growth",
-    author: "Emily Chen",
-    date: "February 15, 2024",
-    readTime: "6 min read",
-    image: "https://images.unsplash.com/photo-1605719058145-7833c949d2e0?q=80&w=2070&auto=format&fit=crop",
-    featured: false,
-  },
-]
-
-// Dynamically generate categories from posts
-const generateCategories = (posts: typeof blogPosts) => {
-  const map = new Map<string, number>();
-  posts.forEach(post => {
-    const count = map.get(post.category) || 0;
-    map.set(post.category, count + 1);
-  });
-
-  return Array.from(map.entries()).map(([name, count]) => ({
-    name,
-    count,
-    icon: TrendingUp // Default icon for now
-  }));
-};
+import { useGetPageQuery, useGetPublicBlogPostsQuery } from "../../features/api/apiSlice"
 
 export default function BlogPage() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 6;
+
   const { data: pageConfig, isLoading: isConfigLoading } = useGetPageQuery('blog');
+  const { data: blogData, isLoading: isPostsLoading } = useGetPublicBlogPostsQuery({
+    page: currentPage,
+    limit: postsPerPage
+  });
+
+  if (isConfigLoading || isPostsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  const blogPosts = blogData?.blogs || [];
+  const pagination = blogData?.pagination;
 
   // --- Configuration Extraction ---
   const heroSection = pageConfig?.sections?.find((s: any) => s.type === 'hero');
   const featuredSection = pageConfig?.sections?.find((s: any) => s.type === 'featured-posts');
   const popularSection = pageConfig?.sections?.find((s: any) => s.type === 'popular-posts');
-  //   const settingsSection = pageConfig?.sections?.find((s: any) => s.type === 'page-settings');
 
-  // --- Data Logic (Dynamic) ---
-  const categories = generateCategories(blogPosts);
+  // --- Category Logic (Dynamic) ---
+  const counts = blogPosts.reduce((acc: any, post: any) => {
+    acc[post.category] = (acc[post.category] || 0) + 1;
+    return acc;
+  }, {});
 
-  // Determine Featured Post (Config > Hardcoded)
+  const categories = Object.entries(counts).map(([name, count]) => ({
+    name,
+    count: count as number,
+    icon: TrendingUp
+  }));
+
+  // Determine Featured Post (Config ID > Most Recent)
   const featuredPostId = featuredSection?.content?.featuredPostId;
   const featuredPost = featuredPostId
-    ? blogPosts.find(p => p.id === featuredPostId)
-    : blogPosts.find(p => p.featured) || blogPosts[0];
+    ? blogPosts.find((p: any) => p.id === featuredPostId) || blogPosts[0]
+    : blogPosts[0];
 
   // Regular posts (everything except featured)
-  const regularPosts = blogPosts.filter(p => p.id !== featuredPost?.id);
-
-  if (isConfigLoading) {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-600" /></div>;
-  }
+  const regularPosts = blogPosts.filter((p: any) => p.id !== featuredPost?.id);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 text-slate-800">
@@ -163,16 +95,16 @@ export default function BlogPage() {
                 <Card className="overflow-hidden bg-slate-900 text-white rounded-2xl shadow-2xl transition-all duration-300 hover:-translate-y-1">
                   <div className="md:flex">
                     <div className="md:w-1/2 overflow-hidden">
-                      <Link to={`/blog/${featuredPost.id}`}>
+                      <Link to={`/blog/${featuredPost.slug}`}>
                         <img
-                          src={featuredPost.image || "/placeholder.svg"}
+                          src={featuredPost.coverImage || "/placeholder.svg"}
                           alt={featuredPost.title}
                           className="w-full h-64 md:h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         />
                       </Link>
                     </div>
                     <div className="md:w-1/2 p-8 sm:p-10 flex flex-col justify-center">
-                      <Badge variant="secondary" className="mb-3 w-fit bg-white/10 text-blue-300 text-xs">
+                      <Badge variant="secondary" className="mb-3 w-fit bg-white/10 text-blue-300 text-xs uppercase tracking-wider font-bold">
                         {featuredPost.category}
                       </Badge>
                       <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-4 leading-tight">
@@ -185,16 +117,16 @@ export default function BlogPage() {
                       <div className="flex items-center gap-4 text-sm text-slate-400 mb-6">
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4" />
-                          {featuredPost.author}
+                          {featuredPost.author || "Admin"}
                         </div>
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4" />
-                          {featuredPost.date}
+                          {new Date(featuredPost.publishedAt || featuredPost.createdAt).toLocaleDateString()}
                         </div>
-                        <span className="hidden sm:inline">{featuredPost.readTime}</span>
+                        <span className="hidden sm:inline">5 min read</span>
                       </div>
 
-                      <Link to={`/blog/${featuredPost.id}`} className="self-start">
+                      <Link to={`/blog/${featuredPost.slug}`} className="self-start">
                         <Button
                           variant="outline"
                           className="bg-transparent border-blue-400 text-blue-300 hover:bg-blue-400 hover:text-white group/button"
@@ -216,30 +148,30 @@ export default function BlogPage() {
                   key={post.id}
                   className="group overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm bg-white/80 border border-white/40 shadow-sm"
                 >
-                  <Link to={`/blog/${post.id}`} className="block overflow-hidden aspect-video">
+                  <Link to={`/blog/${post.slug}`} className="block overflow-hidden aspect-video">
                     <img
-                      src={post.image || "/placeholder.svg"}
+                      src={post.coverImage || "/placeholder.svg"}
                       alt={post.title}
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   </Link>
                   <div className="p-6">
-                    <Badge variant="secondary" className="mb-3 w-fit">
+                    <Badge variant="secondary" className="mb-3 w-fit bg-blue-50 text-blue-600 border-blue-100 uppercase tracking-wider text-[10px] font-bold">
                       {post.category}
                     </Badge>
-                    <CardTitle className="leading-tight group-hover:text-blue-600 transition-colors mb-3">
-                      <Link to={`/blog/${post.id}`}>{post.title}</Link>
+                    <CardTitle className="leading-tight group-hover:text-blue-600 transition-colors mb-3 text-xl">
+                      <Link to={`/blog/${post.slug}`}>{post.title}</Link>
                     </CardTitle>
-                    <p className="text-slate-600 mb-4 leading-relaxed line-clamp-3">{post.excerpt}</p>
+                    <p className="text-slate-600 mb-4 leading-relaxed line-clamp-3 text-sm">{post.excerpt}</p>
 
-                    <div className="flex items-center gap-4 text-sm text-slate-500 mt-auto pt-4 border-t border-slate-200/80">
+                    <div className="flex items-center gap-4 text-xs text-slate-500 mt-auto pt-4 border-t border-slate-100">
                       <div className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        {post.author}
+                        <User className="w-4 h-4 text-blue-500" />
+                        {post.author || "Admin"}
                       </div>
                       <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        {post.date}
+                        <Calendar className="w-4 h-4 text-blue-500" />
+                        {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
                       </div>
                     </div>
                   </div>
@@ -247,13 +179,47 @@ export default function BlogPage() {
               ))}
             </div>
 
-            {/* Load More */}
-            <div className="text-center mt-16">
-              <Button size="lg" variant="outline" className="group/button">
-                Load More Articles
-                <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover/button:translate-x-1" />
-              </Button>
-            </div>
+            {/* Pagination Controls */}
+            {pagination && pagination.totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-16 pt-8 border-t border-slate-100">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  className="rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  Previous
+                </Button>
+
+                <div className="flex items-center gap-1">
+                  {[...Array(pagination.totalPages)].map((_, i) => (
+                    <Button
+                      key={i + 1}
+                      variant={currentPage === i + 1 ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={`w-10 h-10 rounded-xl font-bold ${currentPage === i + 1
+                        ? "bg-blue-600 shadow-md shadow-blue-200"
+                        : "text-slate-500 hover:bg-blue-50 hover:text-blue-600"
+                        }`}
+                    >
+                      {i + 1}
+                    </Button>
+                  ))}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage === pagination.totalPages}
+                  onClick={() => setCurrentPage(prev => Math.min(pagination.totalPages, prev + 1))}
+                  className="rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -307,30 +273,55 @@ export default function BlogPage() {
 
             {/* Popular Posts (Controlled by Admin) */}
             {popularSection?.content?.show !== false && (
-              <Card className="rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm bg-white/80 border border-white/40 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-xl font-bold">{popularSection?.content?.title || "Popular This Month"}</CardTitle>
+              <Card className="rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm bg-white/80 border border-white/40 shadow-sm overflow-hidden">
+                <CardHeader className="border-b border-slate-100 bg-slate-50/50">
+                  <CardTitle className="text-xl font-bold text-slate-900">{popularSection?.content?.title || "Popular This Month"}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Mock popular logic - take first 3 for now */}
-                    {blogPosts.slice(0, 3).map((post) => (
-                      <Link key={post.id} to={`/blog/${post.id}`} className="flex gap-4 group cursor-pointer items-center">
-                        <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded-lg">
-                          <img
-                            src={post.image || "/placeholder.svg"}
-                            alt={post.title}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-slate-800 group-hover:text-blue-600 line-clamp-2 text-sm leading-tight">
-                            {post.title}
-                          </h4>
-                          <p className="text-xs text-slate-500 mt-1">{post.date}</p>
-                        </div>
-                      </Link>
-                    ))}
+                <CardContent className="pt-6">
+                  <div className="space-y-6">
+                    {/* Popular logic: Manual Selection or First 3 (Auto) */}
+                    {(popularSection?.content?.mode === "manual" && Array.isArray(popularSection.content.selectedPosts))
+                      ? popularSection.content.selectedPosts
+                        .map((id: string) => blogPosts.find((p: any) => p.id === id))
+                        .filter((p: any) => p !== undefined)
+                        .map((post: any) => (
+                          <Link key={post.id} to={`/blog/${post.slug}`} className="flex gap-4 group cursor-pointer items-center">
+                            <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl border border-slate-200 shadow-sm">
+                              <img
+                                src={post.coverImage || "/placeholder.svg"}
+                                alt={post.title}
+                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-bold text-slate-800 group-hover:text-blue-600 line-clamp-2 text-sm leading-tight transition-colors">
+                                {post.title}
+                              </h4>
+                              <p className="text-[10px] text-slate-400 mt-1.5 font-bold uppercase tracking-wider">
+                                {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </Link>
+                        ))
+                      : blogPosts.slice(0, 3).map((post: any) => (
+                        <Link key={post.id} to={`/blog/${post.slug}`} className="flex gap-4 group cursor-pointer items-center">
+                          <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded-xl border border-slate-200 shadow-sm">
+                            <img
+                              src={post.coverImage || "/placeholder.svg"}
+                              alt={post.title}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-bold text-slate-800 group-hover:text-blue-600 line-clamp-2 text-sm leading-tight transition-colors">
+                              {post.title}
+                            </h4>
+                            <p className="text-[10px] text-slate-400 mt-1.5 font-bold uppercase tracking-wider">
+                              {new Date(post.publishedAt || post.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
                   </div>
                 </CardContent>
               </Card>
