@@ -16,56 +16,7 @@ import {
 import { Link, useParams } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { cn } from "../../components/lib/utils"
-
-// --- DUMMY DATA ---
-const blogPost = {
-    id: "2024-tax-changes",
-    title: "2024 Tax Changes: What You Need to Know",
-    excerpt:
-        "Stay ahead of the latest tax changes affecting individuals and businesses in 2024. Our comprehensive guide covers key updates and planning strategies.",
-    category: "Tax Tips",
-    author: "Sarah Mitchell",
-    date: "March 15, 2024",
-    readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=2070&auto=format&fit=crop",
-    featured: true,
-    content: `
-    <p class="mb-6 text-lg leading-relaxed">The fiscal landscape in 2024 brings significant changes that every taxpayer needs to be aware of. From adjustments in tax brackets to new deductions available for small businesses, understanding these shifts is crucial for effective financial planning.</p>
-    
-    <h2 id="key-changes-for-individuals" class="text-3xl font-bold text-slate-900 mb-4 mt-12 scroll-mt-24">Key Changes for Individuals</h2>
-    <p class="mb-6 text-lg leading-relaxed">One of the most notable updates this year involves the adjustment of standard deductions. Inflation has driven these numbers higher, potentially lowering the taxable income for millions of households. Additionally, there are new credits available for energy-efficient home improvements, which can provide substantial savings.</p>
-    
-    <h2 id="business-tax-updates" class="text-3xl font-bold text-slate-900 mb-4 mt-12 scroll-mt-24">Business Tax Updates</h2>
-    <p class="mb-6 text-lg leading-relaxed">For business owners, the focus shifts towards equipment expensing and digital service taxes. The limits for Section 179 expensing have been increased, allowing businesses to deduct the full purchase price of qualifying equipment immediately. This is a major boon for those looking to invest in new technology or machinery.</p>
-    
-    <div class="bg-blue-100/50 p-6 rounded-lg border-l-4 border-blue-500 my-8">
-      <h3 class="text-lg font-semibold text-blue-900 mb-2">Pro Tip</h3>
-      <p class="text-blue-800 leading-relaxed">Consult with a certified tax professional to ensure you are maximizing all available deductions specific to your industry. Early planning can save significant amounts come tax season.</p>
-    </div>
-
-    <h2 id="retirement-planning" class="text-3xl font-bold text-slate-900 mb-4 mt-12 scroll-mt-24">Retirement Planning</h2>
-    <p class="mb-6 text-lg leading-relaxed">Contribution limits for 401(k) and IRA accounts have also seen an uptick. Increasing your contributions not only secures your future but can also reduce your current taxable income. It's a win-win strategy that should not be overlooked.</p>
-
-    <p class="text-lg leading-relaxed">In conclusion, while tax laws can be complex, staying informed is the first step towards financial empowerment. Review your current financial strategy in light of these changes and make adjustments as necessary to optimize your tax position for 2024.</p>
-  `,
-}
-
-const relatedPosts = [
-    {
-        id: "vat-registration-guide",
-        title: "VAT Registration: When and How",
-        date: "February 20, 2024",
-        category: "Tax Tips",
-        image: "https://images.unsplash.com/photo-1599582784863-fad474514759?q=80&w=1974&auto=format&fit=crop",
-    },
-    {
-        id: "small-business-growth-planning",
-        title: "Small Business Growth: Financial Planning Essentials",
-        date: "February 28, 2024",
-        category: "Business Growth",
-        image: "https://images.unsplash.com/photo-1560518883-ce09059ee353?q=80&w=1974&auto=format&fit=crop",
-    },
-]
+import { useGetPublicBlogPostQuery } from "../../features/api/apiSlice"
 
 // --- COMPONENTS ---
 
@@ -236,11 +187,30 @@ export default function BlogPost() {
     const { slug } = useParams()
     const [isTocVisible, setIsTocVisible] = useState(false)
 
-    // In a real app, we would fetch the post based on the slug here
-    console.log("Rendering post for slug:", slug)
+    const { data: blogPost, isLoading, isError } = useGetPublicBlogPostQuery(slug as string)
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+            </div>
+        )
+    }
+
+    if (isError || !blogPost) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen text-center p-4">
+                <h2 className="text-2xl font-bold text-slate-900 mb-4">Post Not Found</h2>
+                <p className="text-slate-600 mb-8">The article you are looking for doesn't exist or has been removed.</p>
+                <Link to="/blog">
+                    <Button variant="default">Back to Blog</Button>
+                </Link>
+            </div>
+        )
+    }
 
     return (
-        <div className="bg-gradient-to-br from-slate-50 to-blue-50/30 text-slate-800">
+        <div className="bg-gradient-to-br from-slate-50 to-blue-50/30 text-slate-800 font-outfit">
             <ScrollProgressBar />
             <ClapButton />
 
@@ -285,96 +255,114 @@ export default function BlogPost() {
                         <div className="lg:col-span-8">
                             {/* Article Header */}
                             <div className="text-left mb-12">
-                                <Badge className="mb-6 bg-blue-100 text-blue-700">{blogPost.category}</Badge>
-                                <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6 leading-tight">
+                                <Badge className="mb-6 bg-blue-100/80 text-blue-700 border-none px-4 py-1.5 text-xs font-bold tracking-wider uppercase">
+                                    {blogPost.category}
+                                </Badge>
+                                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6 leading-tight tracking-tight">
                                     {blogPost.title}
                                 </h1>
-                                <div className="flex flex-wrap items-center gap-x-6 gap-y-4 text-slate-500">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold border border-blue-100 uppercase">
-                                            {blogPost.author.charAt(0)}
+                                <div className="flex flex-wrap items-center gap-x-8 gap-y-4 text-slate-500">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold border-2 border-white shadow-md uppercase">
+                                            {blogPost.author?.charAt(0) || 'A'}
                                         </div>
                                         <div className="text-left">
-                                            <p className="text-sm font-semibold text-slate-800 leading-none">{blogPost.author}</p>
-                                            <p className="text-xs text-slate-500 mt-1">Financial Expert</p>
+                                            <p className="text-sm font-bold text-slate-900 leading-none">{blogPost.author || 'Team Member'}</p>
+                                            <p className="text-xs text-slate-500 mt-1.5 font-medium uppercase tracking-widest">Article Author</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <Calendar className="w-4 h-4" />
-                                        <span>{blogPost.date}</span>
+                                    <div className="flex items-center gap-2.5 text-sm font-medium">
+                                        <div className="p-2 rounded-lg bg-blue-100/50 text-blue-600">
+                                            <Calendar className="w-4 h-4" />
+                                        </div>
+                                        <span>{new Date(blogPost.publishedAt || blogPost.createdAt).toLocaleDateString("en-US", {
+                                            month: "long",
+                                            day: "numeric",
+                                            year: "numeric"
+                                        })}</span>
                                     </div>
-                                    <div className="flex items-center gap-2 text-sm">
-                                        <Clock className="w-4 h-4" />
-                                        <span>{blogPost.readTime}</span>
+                                    <div className="flex items-center gap-2.5 text-sm font-medium">
+                                        <div className="p-2 rounded-lg bg-indigo-100/50 text-indigo-600">
+                                            <Clock className="w-4 h-4" />
+                                        </div>
+                                        <span>5 min read</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Featured Image */}
-                            <div className="rounded-2xl overflow-hidden shadow-2xl mb-12 aspect-video group">
-                                <img
-                                    src={blogPost.image}
-                                    alt={blogPost.title}
-                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                />
-                            </div>
+                            {blogPost.coverImage && (
+                                <div className="rounded-[2rem] overflow-hidden shadow-2xl mb-12 aspect-video group relative">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <img
+                                        src={blogPost.coverImage}
+                                        alt={blogPost.title}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                </div>
+                            )}
 
                             {/* Article Body */}
-                            <article className="prose prose-lg max-w-none text-slate-600 prose-h2:text-slate-900 prose-h2:font-bold prose-h2:text-3xl prose-p:leading-relaxed prose-li:leading-relaxed">
+                            <article className="prose prose-lg max-w-none text-slate-600 
+                                prose-headings:text-slate-900 prose-headings:font-bold prose-headings:tracking-tight
+                                prose-h2:text-3xl prose-h2:mb-6 prose-h2:mt-12 prose-h2:scroll-mt-24
+                                prose-p:leading-relaxed prose-p:mb-8 prose-p:text-lg
+                                prose-li:leading-relaxed prose-li:mb-2
+                                prose-img:rounded-2xl prose-img:shadow-xl
+                                prose-strong:text-slate-900 prose-strong:font-bold
+                                prose-blockquote:border-l-4 prose-blockquote:border-blue-600 prose-blockquote:bg-blue-50/50 prose-blockquote:p-6 prose-blockquote:rounded-r-2xl prose-blockquote:italic
+                                ">
                                 <div dangerouslySetInnerHTML={{ __html: blogPost.content }} />
                             </article>
 
                             {/* Share Footer */}
-                            <div className="mt-12 border-t pt-8 flex items-center justify-between flex-wrap gap-4">
-                                <p className="font-semibold text-slate-900 text-lg">Share this article</p>
-                                <div className="flex gap-3">
-                                    <Button variant="outline" size="icon" className="rounded-full hover:text-blue-600 hover:border-blue-600 transition-colors">
-                                        <Facebook className="w-5 h-5" />
+                            <div className="mt-16 border-t border-slate-200/60 pt-10 flex items-center justify-between flex-wrap gap-6 bg-white/40 backdrop-blur-sm p-8 rounded-3xl border border-white/40">
+                                <div className="space-y-1">
+                                    <p className="font-bold text-slate-900 text-xl tracking-tight">Spread the knowledge</p>
+                                    <p className="text-slate-500 text-sm font-medium">Share this article with your network</p>
+                                </div>
+                                <div className="flex gap-4">
+                                    <Button variant="outline" size="lg" className="rounded-2xl hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-300 shadow-sm border-slate-200">
+                                        <Facebook className="w-5 h-5 mr-2" />
+                                        Post
                                     </Button>
-                                    <Button variant="outline" size="icon" className="rounded-full hover:text-sky-500 hover:border-sky-500 transition-colors">
-                                        <Twitter className="w-5 h-5" />
+                                    <Button variant="outline" size="lg" className="rounded-2xl hover:bg-sky-500 hover:text-white hover:border-sky-500 transition-all duration-300 shadow-sm border-slate-200">
+                                        <Twitter className="w-5 h-5 mr-2" />
+                                        Tweet
                                     </Button>
-                                    <Button variant="outline" size="icon" className="rounded-full hover:text-blue-700 hover:border-blue-700 transition-colors">
-                                        <Linkedin className="w-5 h-5" />
+                                    <Button variant="outline" size="lg" className="rounded-2xl hover:bg-blue-700 hover:text-white hover:border-blue-700 transition-all duration-300 shadow-sm border-slate-200">
+                                        <Linkedin className="w-5 h-5 mr-2" />
+                                        Share
                                     </Button>
                                 </div>
                             </div>
                         </div>
 
                         {/* Right Sidebar */}
-                        <div className="lg:col-span-4 space-y-8">
+                        <div className="lg:col-span-4 space-y-10">
                             <TableOfContents content={blogPost.content} isVisible={isTocVisible} onClose={() => setIsTocVisible(false)} />
 
-                            {/* Related Posts in Sidebar */}
-                            <Card className="rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm bg-white/100 border border-slate-200/60 shadow-sm overflow-hidden lg:sticky lg:top-80">
-                                <CardHeader>
-                                    <CardTitle className="text-xl font-bold">Related Articles</CardTitle>
+                            {/* Newsletter / CTA Placeholder */}
+                            <Card className="rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white border-none shadow-xl shadow-blue-200/50 overflow-hidden relative group">
+                                <div className="absolute top-0 right-0 -m-8 w-32 h-32 bg-white/10 rounded-full blur-3xl transition-transform duration-500 group-hover:scale-150"></div>
+                                <CardHeader className="relative z-10">
+                                    <CardTitle className="text-2xl font-bold">Stay Updated</CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-6">
-                                    {relatedPosts.map((post) => (
-                                        <Link key={post.id} to={`/blog/${post.id}`} className="flex gap-4 group items-center">
-                                            <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded-lg">
-                                                <img
-                                                    src={post.image}
-                                                    alt={post.title}
-                                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                                />
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h4 className="font-semibold text-slate-800 group-hover:text-blue-600 line-clamp-2 text-sm leading-tight transition-colors">
-                                                    {post.title}
-                                                </h4>
-                                                <p className="text-[10px] text-slate-400 mt-1 flex items-center gap-1 uppercase tracking-wider font-bold">
-                                                    <Calendar className="w-3 h-3" />
-                                                    {post.date}
-                                                </p>
-                                            </div>
-                                        </Link>
-                                    ))}
-                                    <Button variant="ghost" className="w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50 mt-4 group">
-                                        View All Posts
-                                        <ArrowLeft className="w-4 h-4 ml-2 rotate-180 transition-transform group-hover:translate-x-1" />
-                                    </Button>
+                                <CardContent className="space-y-4 relative z-10">
+                                    <p className="text-blue-50 text-sm leading-relaxed opacity-90">
+                                        Get the latest tax tips and business growth strategies delivered to your inbox every week.
+                                    </p>
+                                    <div className="space-y-3">
+                                        <input
+                                            type="email"
+                                            placeholder="Your email address"
+                                            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder:text-blue-100 focus:outline-none focus:ring-2 focus:ring-white/40 transition-all"
+                                        />
+                                        <Button className="w-full bg-white text-blue-600 hover:bg-blue-50 rounded-xl font-bold py-6 transition-all shadow-md active:scale-95">
+                                            Join Newsletter
+                                        </Button>
+                                    </div>
+                                    <p className="text-[10px] text-blue-200 text-center font-medium uppercase tracking-wider">No spam, unsubscribe anytime.</p>
                                 </CardContent>
                             </Card>
                         </div>
