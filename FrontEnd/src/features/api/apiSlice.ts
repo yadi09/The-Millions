@@ -99,6 +99,23 @@ export const apiSlice = createApi({
         body: formData,
       }),
     }),
+
+    // --- PUBLIC BLOG ENDPOINTS ---
+    getPublicBlogPosts: builder.query<{ blogs: any[]; pagination: any }, { page?: number; limit?: number }>({
+      query: ({ page = 1, limit = 10 } = {}) => `/blogs?page=${page}&limit=${limit}`,
+      providesTags: (result) =>
+        result
+          ? [
+            ...result.blogs.map(({ id }: any) => ({ type: 'BlogPost' as const, id })),
+            { type: 'BlogPost', id: 'LIST' },
+          ]
+          : [{ type: 'BlogPost', id: 'LIST' }],
+    }),
+
+    getPublicBlogPost: builder.query<any, string>({
+      query: (slug) => `/blogs/${slug}`,
+      providesTags: (_result, _error, slug) => [{ type: 'BlogPost', id: slug }],
+    }),
   }),
 });
 
@@ -112,4 +129,6 @@ export const {
   useDeleteBlogPostMutation,
   useGetBlogCategoriesQuery,
   useUploadImageMutation,
+  useGetPublicBlogPostsQuery,
+  useGetPublicBlogPostQuery,
 } = apiSlice;
