@@ -1,7 +1,6 @@
 // backend/src/modules/upload/upload.service.ts
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary'; // ✅ Must be imported
 
-// Configure Cloudinary (only once at module level)
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -10,19 +9,19 @@ cloudinary.config({
 
 export async function saveImage(
   file: Express.Multer.File, 
-  folder: string = 'uploads' // Default folder
+  folder: string = 'uploads'
 ): Promise<string> {
   try {
     const base64Image = file.buffer.toString('base64');
     const mimeType = file.mimetype;
 
-    // FIX: Add 'data:' prefix for proper base64 format
+    // ✅ Critical: Add 'data:' prefix for Cloudinary
     const base64DataUri = `data:${mimeType};base64,${base64Image}`;
 
     const result = await cloudinary.uploader.upload(
       base64DataUri,
       {
-        folder: folder, // ← Dynamic folder
+        folder: folder,
         resource_type: 'auto',
         public_id: file.originalname.split('.')[0],
         overwrite: false,

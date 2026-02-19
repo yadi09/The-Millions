@@ -2,21 +2,19 @@
 import { Request, Response } from 'express';
 import { saveImage } from './upload.service.js';
 
-// Extend Request type to include multer's file property
-interface MulterRequest extends Request {
-  file: Express.Multer.File;
-}
-
-export async function uploadImage(req: MulterRequest, res: Response) {
+export async function uploadImage(req: Request, res: Response) {
+  // Safe type assertion: multer adds req.file BEFORE this controller runs
+  const file = req.file as Express.Multer.File | undefined;
+  
   try {
-    if (!req.file) {
+    if (!file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
     // Get folder from query params (e.g., ?folder=pages/home/team)
     const folder = (req.query.folder as string) || 'uploads';
     
-    const url = await saveImage(req.file, folder);
+    const url = await saveImage(file, folder);
     res.json({ url });
   } catch (error) {
     console.error('Upload error:', error);
