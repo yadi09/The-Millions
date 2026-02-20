@@ -1,5 +1,6 @@
 export interface BlogPost {
     id: string;
+    slug: string;
     title: string;
     category: string;
     status: 'published' | 'draft';
@@ -86,6 +87,17 @@ export function BlogCard({ post, onEdit, onDelete }: BlogCardProps) {
                         <Button
                             variant="ghost"
                             size="sm"
+                            asChild
+                            className="h-9 text-xs px-3 hover:bg-slate-100"
+                        >
+                            <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
+                                <Eye className="w-4 h-4 mr-2" />
+                                View
+                            </a>
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => onEdit(post.id)}
                             className="h-9 text-xs px-3 hover:bg-slate-100"
                         >
@@ -113,6 +125,12 @@ export function BlogCard({ post, onEdit, onDelete }: BlogCardProps) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
+                                <DropdownMenuItem asChild>
+                                    <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center w-full">
+                                        <Eye className="mr-2 h-4 w-4" />
+                                        View Post
+                                    </a>
+                                </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => onEdit(post.id)}>
                                     <Edit className="mr-2 h-4 w-4" />
                                     Edit

@@ -55,3 +55,25 @@ model ContactMessage {
   
   createdAt DateTime @default(now())
 }
+
+model BlogPost {
+  id           String   @id @default(uuid())
+  title        String
+  slug         String   @unique
+  category     String
+  coverImage   String?
+  excerpt      String
+  content      String   // HTML from TipTap
+  status       BlogStatus @default(DRAFT)
+  author       String
+  publishedAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("blog_posts")
+}
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+}
