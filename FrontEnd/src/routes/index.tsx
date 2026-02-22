@@ -6,6 +6,7 @@ import ContactPage from "../pages/contact/page";
 import Layout from "../components/Layout";
 import BlogPage from "../pages/blog/page";
 import BlogPost from "../pages/blog/BlogPost";
+import ComingSoonPage from "../pages/comingSoon/page";
 import AdminLayout from "../components/AdminLayout";
 import AdminDashboard from "../pages/admin/Dashboard";
 import AdminPageEditor from "../pages/admin/PageEditor";
@@ -29,9 +30,11 @@ export const AppRoutes = () => (
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services/:slug" element={<ComingSoonPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="*" element={<ComingSoonPage />} />
         </Route>
 
         {/* Admin Login Route (Public) */}
