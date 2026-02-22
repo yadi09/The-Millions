@@ -16,13 +16,13 @@ interface PageItem {
 
 const initialPages: PageItem[] = [
   { name: "Home", slug: "home", description: "Landing page and hero section", lastEdited: "—" },
-  { name: "Services", slug: "services", description: "Service offerings and features", lastEdited: "—" },
+  // { name: "Services", slug: "services", description: "Service offerings and features", lastEdited: "—" },
   { name: "About", slug: "about", description: "Company information and team", lastEdited: "—" },
-  { name: "Contact", slug: "contact", description: "Contact form and support", lastEdited: "—" },
-  { name: "Blog", slug: "blog", description: "Blog posts and articles", lastEdited: "—" },
-  { name: "FAQ", slug: "faq", description: "Frequently asked questions", lastEdited: "—" },
-  { name: "Privacy Policy", slug: "privacy-policy", description: "Privacy policy and legal terms", lastEdited: "—" },
-  { name: "Terms of Service", slug: "terms", description: "Terms of service agreement", lastEdited: "—" },
+  // { name: "Contract", slug: "contact", description: "Contact form and support", lastEdited: "—" },
+  // { name: "Blog", slug: "blog", description: "Blog posts and articles", lastEdited: "—" },
+  // { name: "FAQ", slug: "faq", description: "Frequently asked questions", lastEdited: "—" },
+  // { name: "Privacy Policy", slug: "privacy-policy", description: "Privacy policy and legal terms", lastEdited: "—" },
+  // { name: "Terms of Service", slug: "terms", description: "Terms of service agreement", lastEdited: "—" },
 ];
 
 const AdminPagesList = () => {
