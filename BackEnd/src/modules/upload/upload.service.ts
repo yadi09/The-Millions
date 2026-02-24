@@ -1,5 +1,5 @@
 // backend/src/modules/upload/upload.service.ts
-import { v2 as cloudinary } from 'cloudinary'; // ✅ Must be imported
+import { v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,7 +15,7 @@ export async function saveImage(
     const base64Image = file.buffer.toString('base64');
     const mimeType = file.mimetype;
 
-    // ✅ Critical: Add 'data:' prefix for Cloudinary
+    // ✅ CRITICAL: Add 'data:' prefix for Cloudinary
     const base64DataUri = `data:${mimeType};base64,${base64Image}`;
 
     const result = await cloudinary.uploader.upload(
@@ -23,7 +23,7 @@ export async function saveImage(
       {
         folder: folder,
         resource_type: 'auto',
-        public_id: file.originalname.split('.')[0],
+        public_id: file.originalname.replace(/\.[^/.]+$/, ""), // Remove extension
         overwrite: false,
       }
     );
