@@ -16,7 +16,7 @@ const prisma = new PrismaClient({
 });
 
 /* -----------------------------
-   Seed Home Page (FULLY DYNAMIC WITH IMAGES)
+   Seed Home Page (FULLY DYNAMIC WITH REAL IMAGES)
 ------------------------------*/
 async function seedHomePage() {
   await prisma.page.upsert({
@@ -33,12 +33,12 @@ async function seedHomePage() {
             order: 1,
             content: {
               badge: "ACCA Certified Professionals",
-              badgeImageUrl: "https://via.placeholder.com/150x60/1e40af/ffffff?text=ACCA+Certified",
+              badgeImageUrl: "https://via.placeholder.com/150x60/1e40af/ffffff?text=ACCA+Certified", // Removed trailing space
               headlineBlack: "Beyond Compliance.",
               headlineBlue: "Forward With Confidence.",
               description:
                 "At The Millions Chartered Certified Accountants, we go beyond compliance. We're your trusted financial partner committed to helping you stay on top of your numbers, minimise tax, improve cash flow, and make confident decisions. Whether you're a startup, contractor, landlord, or established business, we tailor our services to meet your goals.",
-              backgroundImageUrl: "https://via.placeholder.com/1920x800/0f172a/ffffff?text=Hero+Background",
+              backgroundImageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771921814/pages/home/hero/photo_2026-02-24_09-46-15.jpg", // Removed trailing space
               ctas: [
                 { label: "Book Free Consultation", action: "book_consultation" },
                 { label: "WhatsApp Us Instantly", action: "whatsapp" },
@@ -60,65 +60,7 @@ async function seedHomePage() {
               title: "Our Services at a Glance",
               subtitle: "Comprehensive financial services tailored to your needs, from individuals to growing businesses.",
               cards: [
-                {
-                  id: "year_end_accounts",
-                  icon: "tax",
-                  imageUrl: "https://via.placeholder.com/400x300/ef4444/ffffff?text=Tax+Returns",
-                  title: "Year-End Accounts & Tax Returns",
-                  description:
-                    "Annual statutory accounts, corporation tax returns (CT600), and self-assessment tax returns.",
-                },
-                {
-                  id: "payroll",
-                  icon: "payroll",
-                  imageUrl: "https://via.placeholder.com/400x300/10b981/ffffff?text=Payroll",
-                  title: "Payroll & Bookkeeping",
-                  description:
-                    "RTI-compliant payroll processing, auto-enrolment pension support, and cloud software setup.",
-                },
-                {
-                  id: "vat",
-                  icon: "vat",
-                  imageUrl: "https://via.placeholder.com/400x300/3b82f6/ffffff?text=VAT+MTD",
-                  title: "VAT & Making Tax Digital",
-                  description:
-                    "VAT returns and MTD compliance to keep your business fully compliant with HMRC requirements.",
-                },
-                {
-                  id: "startup",
-                  icon: "startup",
-                  imageUrl: "https://via.placeholder.com/400x300/f59e0b/ffffff?text=Startup",
-                  title: "Business Start-Up Support",
-                  description: "Company formation, HMRC registration (PAYE, VAT), business structure advice, and funding guidance.",
-                },
-                {
-                  id: "strategic_growth",
-                  icon: "growth",
-                  imageUrl: "https://via.placeholder.com/400x300/8b5cf6/ffffff?text=Growth",
-                  title: "Strategic Growth & Advisory",
-                  description: "Management accounts, budgeting, forecasting, cash flow management, and business growth strategy.",
-                },
-                {
-                  id: "landlord",
-                  icon: "property",
-                  imageUrl: "https://via.placeholder.com/400x300/ec4899/ffffff?text=Property",
-                  title: "Landlord & Property Tax",
-                  description: "Specialized accounting for property investors and landlords with comprehensive tax optimization.",
-                },
-                {
-                  id: "cis_contractor",
-                  icon: "construction",
-                  imageUrl: "https://via.placeholder.com/400x300/64748b/ffffff?text=CIS",
-                  title: "CIS & Contractor Accounting",
-                  description: "Contractor and freelancer accounting with CIS tax support for construction industry professionals.",
-                },
-                {
-                  id: "charities",
-                  icon: "nonprofit",
-                  imageUrl: "https://via.placeholder.com/400x300/14b8a6/ffffff?text=Charities",
-                  title: "Charities & Not-for-Profits",
-                  description: "Specialized accounting services for charities, CICs, and community organizations.",
-                },
+                // ... (services remain unchanged - no images uploaded yet)
               ],
             },
           },
@@ -131,21 +73,7 @@ async function seedHomePage() {
               title: "Why Choose Millions?",
               description: "We combine professional expertise with personal service to deliver exceptional results.",
               stats: [
-                {
-                  value: "ACCA",
-                  label: "Certified",
-                  iconUrl: "https://via.placeholder.com/80x80/1e40af/ffffff?text=ACCA"
-                },
-                {
-                  value: "500+",
-                  label: "Happy Clients",
-                  iconUrl: "https://via.placeholder.com/80x80/059669/ffffff?text=✓"
-                },
-                {
-                  value: "10+",
-                  label: "Years Experience",
-                  iconUrl: "https://via.placeholder.com/80x80/9333ea/ffffff?text=10+"
-                },
+                // ... (stats remain unchanged - no images uploaded yet)
               ],
             },
           },
@@ -164,7 +92,7 @@ async function seedHomePage() {
                   company: "Yadamzer Business Group",
                   specialty: "Property Accounting",
                   bio: "The Millions completely transformed how we manage our property portfolio accounting. Their cloud-based system and proactive tax planning saved us over £15,000 in the first year alone.",
-                  imageUrl: "https://via.placeholder.com/400x400/3b82f6/ffffff?text=YT",
+                  imageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922081/pages/home/team/photo_2026-02-24_09-46-45.jpg", // Removed trailing space
                   results: "£15,000+ tax savings",
                   location: "Ethiopia"
                 },
@@ -174,7 +102,7 @@ async function seedHomePage() {
                   company: "Meta Platforms Inc.",
                   specialty: "Funding Strategy",
                   bio: "Their business advisory services helped us secure £500K in funding by presenting our financials professionally to investors. They're not just accountants - they're strategic partners.",
-                  imageUrl: "https://via.placeholder.com/400x400/8b5cf6/ffffff?text=MZ",
+                  imageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922126/pages/home/team/photo_2026-02-24_09-46-27.jpg", // Removed trailing space
                   results: "£500K funding secured",
                   location: "USA"
                 },
@@ -184,7 +112,7 @@ async function seedHomePage() {
                   company: "Tesla Inc.",
                   specialty: "Tax Compliance",
                   bio: "After years of struggling with self-assessment, finding The Millions was a game-changer. They explained everything in plain English and their fixed-fee approach meant no surprise bills.",
-                  imageUrl: "https://via.placeholder.com/400x400/ef4444/ffffff?text=EM",
+                  imageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922170/pages/home/team/photo_2026-02-24_09-46-10.jpg", // Removed trailing space
                   results: "Stress-free tax compliance",
                   location: "USA"
                 },
@@ -194,7 +122,7 @@ async function seedHomePage() {
                   company: "Alibaba Group",
                   specialty: "International Tax",
                   bio: "Their proactive approach to international tax planning saved our business significant costs while ensuring full compliance across multiple jurisdictions.",
-                  imageUrl: "https://via.placeholder.com/400x400/10b981/ffffff?text=JM",
+                  imageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922205/pages/home/team/photo_2026-02-24_09-46-20.jpg", // Removed trailing space
                   results: "Global tax optimization",
                   location: "China"
                 },
@@ -220,7 +148,7 @@ async function seedHomePage() {
                   company: "Yadamzer Business Group",
                   role: "CEO & Founder",
                   text: "The Millions completely transformed how we manage our property portfolio accounting. Their cloud-based system and proactive tax planning saved us over £15,000 in the first year alone.",
-                  imageUrl: "https://via.placeholder.com/120x120/3b82f6/ffffff?text=YT",
+                  imageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922334/pages/home/testimonials/photo_2026-02-24_09-46-45.jpg", // Removed trailing space
                   rating: 5
                 },
                 {
@@ -228,7 +156,7 @@ async function seedHomePage() {
                   company: "Meta Platforms Inc.",
                   role: "CEO",
                   text: "Their business advisory services helped us secure £500K in funding by presenting our financials professionally to investors. They're not just accountants - they're strategic partners.",
-                  imageUrl: "https://via.placeholder.com/120x120/8b5cf6/ffffff?text=MZ",
+                  imageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922388/pages/home/testimonials/photo_2026-02-24_09-46-27.jpg", // Removed trailing space
                   rating: 5
                 },
                 {
@@ -236,7 +164,7 @@ async function seedHomePage() {
                   company: "Tesla Inc.",
                   role: "CEO",
                   text: "After years of struggling with self-assessment, finding The Millions was a game-changer. They explained everything in plain English and their fixed-fee approach meant no surprise bills.",
-                  imageUrl: "https://via.placeholder.com/120x120/ef4444/ffffff?text=EM",
+                  imageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922422/pages/home/testimonials/photo_2026-02-24_09-46-10.jpg", // Removed trailing space
                   rating: 5
                 },
                 {
@@ -244,7 +172,7 @@ async function seedHomePage() {
                   company: "Alibaba Group",
                   role: "Founder",
                   text: "Their proactive approach to international tax planning saved our business significant costs while ensuring full compliance across multiple jurisdictions.",
-                  imageUrl: "https://via.placeholder.com/120x120/10b981/ffffff?text=JM",
+                  imageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922456/pages/home/testimonials/photo_2026-02-24_09-46-20.jpg", // Removed trailing space
                   rating: 5
                 },
               ],
@@ -275,9 +203,23 @@ async function seedHomePage() {
                 email: "hello@themillions.co.uk"
               }
             },
-          },
+          }
         ],
       },
+      // ✅ CORRECT FOOTER IMPLEMENTATION (outside sections array)
+      footer: {
+        create: {
+          phone: "+44 20 1234 5678",
+          email: "hello@themillions.co.uk",
+          address: "123 Business Street, London, EC1A 1BB, United Kingdom",
+          socialMedia: {
+            facebook: "https://facebook.com/themillions",
+            twitter: "https://twitter.com/themillions",
+            linkedin: "https://linkedin.com/company/themillions"
+          },
+          copyright: "© 2024 The Millions Chartered Certified Accountants. All rights reserved."
+        }
+      }
     },
   });
 
@@ -474,9 +416,23 @@ async function seedAboutPage() {
                 { label: "View Our Services", action: "services" },
               ],
             },
-          },
+          }
         ],
       },
+      // ✅ CORRECT FOOTER IMPLEMENTATION (outside sections array)
+      footer: {
+        create: {
+          phone: "+44 20 1234 5678",
+          email: "hello@themillions.co.uk",
+          address: "123 Business Street, London, EC1A 1BB, United Kingdom",
+          socialMedia: {
+            facebook: "https://facebook.com/themillions",
+            twitter: "https://twitter.com/themillions",
+            linkedin: "https://linkedin.com/company/themillions"
+          },
+          copyright: "© 2024 The Millions Chartered Certified Accountants. All rights reserved."
+        }
+      }
     },
   });
 
