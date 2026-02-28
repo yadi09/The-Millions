@@ -23,6 +23,7 @@ const initialPages: PageItem[] = [
   { name: "FAQ", slug: "faq", description: "Frequently asked questions", lastEdited: "—" },
   { name: "Privacy Policy", slug: "privacy-policy", description: "Privacy policy and legal terms", lastEdited: "—" },
   { name: "Terms of Service", slug: "terms", description: "Terms of service agreement", lastEdited: "—" },
+  { name: "Testimonials", slug: "testimonials", description: "Client success stories and reviews", lastEdited: "—" }
 ];
 
 const AdminPagesList = () => {
