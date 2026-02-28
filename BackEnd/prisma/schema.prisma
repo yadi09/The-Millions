@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client-js"  // ✅ v6 uses this provider
 }
 
 datasource db {
@@ -12,6 +12,7 @@ model Page {
   slug      String    @unique
   title     String
   sections  Section[]
+  footer    Footer?   // Keep this relation
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -28,6 +29,19 @@ model Section {
   createdAt DateTime @default(now())
 }
 
+model Footer {
+  id          String   @id @default(uuid())
+  pageId      String   @unique
+  phone       String
+  email       String
+  address     String
+  socialMedia Json
+  copyright   String
+
+  page        Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+}
+
+// Keep your other models (User, Service, etc.)
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -63,7 +77,7 @@ model BlogPost {
   category     String
   coverImage   String?
   excerpt      String
-  content      String   // HTML from TipTap
+  content      String
   status       BlogStatus @default(DRAFT)
   author       String
   publishedAt  DateTime?

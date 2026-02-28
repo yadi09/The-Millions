@@ -9,6 +9,7 @@ import contactRoutes from "./modules/contact/contact.routes.js";
 import blogRoutes from "./modules/blog/blog.routes.js";
 import adminBlogRoutes from "./modules/blog/admin.blog.routes.js";
 import uploadRoutes from "./modules/upload/upload.routes.js";
+import footerRoutes from './modules/footer/footer.routes.js';
 
 const app = express();
 
@@ -24,5 +25,6 @@ app.use("/api/contact", contactRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/admin/blogs", adminBlogRoutes);
 app.use("/api/admin/upload", uploadRoutes);
+app.use('/api/footer', footerRoutes);
 
 export default app;
