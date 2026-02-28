@@ -16,6 +16,10 @@ import AdminLogin from "../pages/admin/Login";
 import BlogManagement from "../pages/admin/BlogManagement";
 import BlogEditor from "../pages/admin/BlogEditor";
 import ProtectedRoute from "../components/ProtectedRoute";
+import TestimonialsPage from "../pages/testimonials/page";
+import SubmitTestimonial from "../pages/testimonials/submit";
+// Admin Testimonials
+import TestimonialsManagement from "../pages/admin/TestimonialsManagement";
 
 const PublicLayout = () => (
     <Layout>
@@ -34,6 +38,8 @@ export const AppRoutes = () => (
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/testimonials" element={<TestimonialsPage />} />
+            <Route path="/submit-testimonial" element={<SubmitTestimonial />} />
             <Route path="*" element={<ComingSoonPage />} />
         </Route>
 
@@ -54,6 +60,7 @@ export const AppRoutes = () => (
             <Route path="blog" element={<BlogManagement />} />
             <Route path="blog/new" element={<BlogEditor />} />
             <Route path="blog/edit/:id" element={<BlogEditor />} />
+            <Route path="testimonials" element={<TestimonialsManagement />} />
             <Route path="settings" element={<AdminSettings />} />
         </Route>
     </Routes>
