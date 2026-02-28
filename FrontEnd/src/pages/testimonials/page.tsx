@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useGetPageQuery, useGetTestimonialsQuery } from "../../features/api/apiSlice";
-import { Loader2, Star, Quote, Play } from "lucide-react";
+import { Loader2, Star, Quote } from "lucide-react";
 import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
