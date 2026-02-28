@@ -2,67 +2,9 @@ import { useState } from "react"
 import { Card, CardContent } from "../components/ui/card"
 import { Button } from "../components/ui/button"
 import { Badge } from "../components/ui/badge"
-import { Star, Quote, ChevronLeft, ChevronRight, Play } from "lucide-react"
-import {Link} from "react-router-dom"
-
-const featuredTestimonials = [
-  {
-    id: 1,
-    name: "Yadamzer Terefe",
-    role: "CEO & Founder",
-    company: "Yadamzer Business Group",
-    image: "/Yadamzer.jpg?height=60&width=60&text=SJ",
-    rating: 5,
-    category: "Property Accounting",
-    content:
-      "The Millions completely transformed how we manage our property portfolio accounting. Their cloud-based system and proactive tax planning saved us over £15,000 in the first year alone.",
-    results: "£15,000+ tax savings",
-    videoTestimonial: false,
-    location: "Ethiopia",
-  },
-  {
-    id: 2,
-    name: "Mark Zuckerberg",
-    role: "CEO & Founder",
-    company: "Meta Platforms Inc.",
-    image: "/Mark.jpg?height=60&width=60&text=MC",
-    rating: 5,
-    category: "Business Advisory",
-    content:
-      "Their business advisory services helped us secure £500K in funding by presenting our financials professionally to investors. They're not just accountants - they're strategic partners.",
-    results: "£500K funding secured",
-    videoTestimonial: true,
-    location: "United States",
-  },
-  {
-    id: 3,
-    name: "Elon Musk",
-    role: "CEO & Founder",
-    company: "Tesla Inc.",
-    image: "/Elon.png?height=60&width=60&text=EW",
-    rating: 5,
-    category: "Self Assessment",
-    content:
-      "After years of struggling with self-assessment, finding The Millions was a game-changer. They explained everything in plain English and their fixed-fee approach meant no surprise bills.",
-    results: "Stress-free tax compliance",
-    videoTestimonial: false,
-    location: "United States",
-  },
-  {
-    id: 4,
-    name: "Jack Ma",
-    role: "CEO & Founder",
-    company: "Alibaba Group",
-    image: "/Jack.jpeg?height=60&width=60&text=DT",
-    rating: 5,
-    category: "Payroll & Bookkeeping",
-    content:
-      "The Millions implemented a cloud-based system that handles everything seamlessly. They are the best accountants in the world. I am a big fan of their work. I highly recommend them to anyone looking for a reliable and professional accounting service.",
-    results: "3 locations streamlined",
-    videoTestimonial: true,
-    location: "China",
-  },
-]
+import { Star, Quote, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
+import { Link } from "react-router-dom"
+import { useGetTestimonialsQuery } from "../features/api/apiSlice"
 
 const quickStats = [
   { label: "Client Satisfaction", value: "98%" },
@@ -72,6 +14,26 @@ const quickStats = [
 
 export function TestimonialsPreview() {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const { data: testimonials, isLoading } = useGetTestimonialsQuery({ role: 'public' })
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-gradient-to-br from-blue-50 to-slate-50 flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </section>
+    )
+  }
+
+  const featuredTestimonials = (testimonials || [])
+    .slice()
+    .sort((a, b) => {
+      // Sort by manual feature order first, then fallback to newest
+      if (a.order > 0 && b.order > 0) return a.order - b.order;
+      if (a.order > 0) return -1;
+      if (b.order > 0) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    })
+    .slice(0, 4);
 
   const nextTestimonial = () => {
     setCurrentIndex((prev) => (prev + 1) % featuredTestimonials.length)
@@ -80,6 +42,8 @@ export function TestimonialsPreview() {
   const prevTestimonial = () => {
     setCurrentIndex((prev) => (prev - 1 + featuredTestimonials.length) % featuredTestimonials.length)
   }
+
+  if (featuredTestimonials.length === 0) return null;
 
   const currentTestimonial = featuredTestimonials[currentIndex]
 
@@ -115,7 +79,7 @@ export function TestimonialsPreview() {
                     <img
                       src={currentTestimonial.image || "/placeholder.svg"}
                       alt={currentTestimonial.name}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-white"
+                      className="w-16 h-16 rounded-full object-cover border-2 border-white aspect-square shrink-0"
                     />
                     <div>
                       <h3 className="text-xl font-semibold">{currentTestimonial.name}</h3>
@@ -134,12 +98,6 @@ export function TestimonialsPreview() {
                     <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
                       {currentTestimonial.category}
                     </Badge>
-                    {currentTestimonial.videoTestimonial && (
-                      <div className="flex items-center gap-1">
-                        <Play className="w-4 h-4" />
-                        <span>Video</span>
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -190,20 +148,14 @@ export function TestimonialsPreview() {
             <button
               key={testimonial.id}
               onClick={() => setCurrentIndex(index)}
-              className={`relative group ${
-                index === currentIndex ? "ring-2 ring-blue-600 ring-offset-2" : ""
-              } rounded-lg overflow-hidden transition-all`}
+              className={`relative group ${index === currentIndex ? "ring-2 ring-blue-600 ring-offset-2" : ""
+                } rounded-lg overflow-hidden transition-all`}
             >
               <img
                 src={testimonial.image || "/placeholder.svg"}
                 alt={testimonial.name}
-                className="w-12 h-12 object-cover rounded-lg"
+                className="w-12 h-12 object-cover rounded-lg aspect-square shrink-0"
               />
-              {testimonial.videoTestimonial && (
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                  <Play className="w-4 h-4 text-white" />
-                </div>
-              )}
             </button>
           ))}
         </div>
@@ -217,17 +169,12 @@ export function TestimonialsPreview() {
                   <img
                     src={testimonial.image || "/placeholder.svg"}
                     alt={testimonial.name}
-                    className="w-10 h-10 rounded-full object-cover"
+                    className="w-10 h-10 rounded-full object-cover aspect-square shrink-0"
                   />
                   <div className="flex-1">
                     <h4 className="font-semibold text-gray-900 text-sm">{testimonial.name}</h4>
                     <p className="text-xs text-gray-600">{testimonial.company}</p>
                   </div>
-                  {testimonial.videoTestimonial && (
-                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Play className="w-3 h-3 text-blue-600" />
-                    </div>
-                  )}
                 </div>
 
                 <div className="flex items-center gap-1 mb-3">
