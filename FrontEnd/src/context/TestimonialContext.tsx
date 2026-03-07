@@ -7,7 +7,7 @@ import type { Testimonial, TestimonialLink } from '../types/testimonialTypes';
 const seedTestimonials: Testimonial[] = [
     {
         id: '1', name: 'Sarah Johnson', role: 'Property Investor',
-        company: 'Johnson Properties Ltd', image: '/Yadamzer.jpg?height=60&width=60',
+        company: 'Johnson Properties Ltd', image: 'https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922334/pages/home/testimonials/photo_2026-02-24_09-46-45.jpg',
         rating: 5, category: 'Property Accounting',
         content: 'The Millions completely transformed how we manage our property portfolio accounting. Their cloud-based system and proactive tax planning saved us over £15,000 in the first year alone.',
         results: '£15,000+ tax savings', location: 'London, UK',
@@ -15,7 +15,7 @@ const seedTestimonials: Testimonial[] = [
     },
     {
         id: '2', name: 'Marcus Chen', role: 'CEO & Founder',
-        company: 'TechStart Solutions', image: '/Mark.jpg?height=60&width=60',
+        company: 'TechStart Solutions', image: 'https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922388/pages/home/testimonials/photo_2026-02-24_09-46-27.jpg',
         rating: 5, category: 'Business Advisory',
         content: "Their business advisory services helped us secure £500K in funding by presenting our financials professionally to investors. They're not just accountants - they're strategic partners.",
         results: '£500K funding secured', location: 'Manchester, UK',
@@ -23,7 +23,7 @@ const seedTestimonials: Testimonial[] = [
     },
     {
         id: '3', name: 'Emma Williams', role: 'Freelance Consultant',
-        company: 'Self-Employed', image: '/Elon.png?height=60&width=60',
+        company: 'Self-Employed', image: 'https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922422/pages/home/testimonials/photo_2026-02-24_09-46-10.jpg',
         rating: 5, category: 'Self Assessment',
         content: 'After years of struggling with self-assessment, finding The Millions was a game-changer. They explained everything in plain English and their fixed-fee approach meant no surprise bills.',
         results: 'Stress-free tax compliance', location: 'Birmingham, UK',
@@ -31,7 +31,7 @@ const seedTestimonials: Testimonial[] = [
     },
     {
         id: '4', name: 'David Thompson', role: 'Restaurant Owner',
-        company: 'Taste of Britain Group', image: '/Jack.jpeg?height=60&width=60',
+        company: 'Taste of Britain Group', image: 'https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922456/pages/home/testimonials/photo_2026-02-24_09-46-20.jpg',
         rating: 5, category: 'Payroll & Bookkeeping',
         content: 'Managing payroll for 3 restaurant locations was a nightmare before The Millions. They implemented a cloud-based system that handles everything seamlessly.',
         results: '3 locations streamlined', location: 'Leeds, UK',

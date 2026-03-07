@@ -5,6 +5,7 @@ export interface AboutContent {
   title: string
   description: string[]
   action?: { label: string; link: string }
+  backgroundImageUrl?: string
 }
 
 export interface StatItem {
@@ -19,6 +20,9 @@ interface AboutSectionProps {
 
 export function AboutSection({ content, stats }: AboutSectionProps) {
   if (!content) return null
+
+  // Use backend Cloudinary URL if available, fall back to local image
+  const teamImageSrc = content.backgroundImageUrl || "/image.png"
 
   return (
     <section className="py-20 bg-gray-50">
@@ -64,9 +68,15 @@ export function AboutSection({ content, stats }: AboutSectionProps) {
           <div className="relative">
             <div className="aspect-square bg-gradient-to-br from-blue-100 to-gray-100 rounded-2xl overflow-hidden">
               <img
-                src="/image.png?height=500&width=500&text=The+Millions+Team"
+                src={teamImageSrc}
                 alt="The Millions Accountants Team"
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.currentTarget
+                  if (target.src !== "/placeholder.svg") {
+                    target.src = "/placeholder.svg"
+                  }
+                }}
               />
             </div>
             <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-lg border border-slate-200">

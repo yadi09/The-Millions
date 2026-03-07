@@ -2,7 +2,7 @@ import { HeroSection, type HeroContent } from "../components/HeroSection"
 import { ServicesGrid, type ServicesContent } from "../components/ServicesGrid"
 import { AboutSection, type AboutContent } from "../components/about-section"
 import { WhyChooseUs, type WhyChooseUsContent } from "../components/why-choose-us"
-import { TestimonialsPreview } from "../components/testimonials-preview"
+import { TestimonialsPreview, type TestimonialsContent } from "../components/testimonials-preview"
 import { ContactSection, type ContactContent } from "../components/contact-section"
 import { useGetPageQuery } from "../features/api/apiSlice"
 import { Loader2 } from "lucide-react"
@@ -33,6 +33,7 @@ const Home = () => {
   const aboutSection = sections.find((s: any) => s.type === 'about')
   const statsSection = sections.find((s: any) => s.type === 'stats')
   const whySection = sections.find((s: any) => s.type === 'why-choose-us')
+  const testimonialsSection = sections.find((s: any) => s.type === 'testimonials')
   const ctaSection = sections.find((s: any) => s.type === 'cta')
 
   return (
@@ -44,7 +45,7 @@ const Home = () => {
         stats={statsSection?.content?.items}
       />
       <WhyChooseUs content={whySection?.content as WhyChooseUsContent} />
-      <TestimonialsPreview />
+      <TestimonialsPreview content={testimonialsSection?.content as TestimonialsContent} />
       <ContactSection content={ctaSection?.content as ContactContent} />
     </main>
   )
