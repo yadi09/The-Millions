@@ -1,7 +1,7 @@
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card"
 import { Button } from "../../components/ui/button"
-import { Calculator, FileText, Building, TrendingUp, Users, ArrowRight, Check } from "lucide-react"
-
+import { Calculator, FileText, Building, TrendingUp, Users, ArrowRight, Check, ChevronRight, MessageCircle, Calendar } from "lucide-react"
 
 const iconMap: any = {
   FileText,
@@ -79,257 +79,219 @@ const services = [
   },
 ]
 
-const complianceServices = [
+const detailedCategories = [
   {
-    title: "Year-End Accounts & Tax Returns",
-    description: "Professional preparation of statutory accounts and tax returns",
-    items: ["Annual statutory accounts", "Corporation tax returns", "Self-assessment returns", "Tax planning advice"],
+    id: "compliance",
+    title: "Accounting & Tax Compliance",
+    services: [
+      {
+        title: "Year-End Accounts & Tax Returns",
+        description: "Professional preparation of statutory accounts and tax returns.",
+        items: ["Annual statutory accounts", "Corporation tax returns", "Self-assessment returns", "Tax planning advice"],
+      },
+      {
+        title: "VAT & Making Tax Digital",
+        description: "Complete VAT compliance and MTD implementation.",
+        items: ["VAT return preparation", "MTD software setup", "VAT planning", "HMRC correspondence"],
+      },
+    ]
   },
   {
-    title: "VAT & Making Tax Digital",
-    description: "Complete VAT compliance and MTD implementation",
-    items: ["VAT return preparation", "MTD software setup", "VAT planning", "HMRC correspondence"],
-  },
-]
-
-const advisoryServices = [
-  {
-    title: "Strategic Growth & Advisory",
-    description: "Business planning and growth strategy support",
-    items: ["Management accounts", "Cash flow forecasting", "Business planning", "Growth strategy"],
-  },
-  {
-    title: "Business Start-Up Support",
-    description: "Complete support for new business ventures",
-    items: ["Company formation", "Business structure advice", "Funding guidance", "Compliance setup"],
-  },
-]
-
-const specialistServices = [
-  {
-    title: "Landlord & Property Tax",
-    description: "Specialized services for property investors",
-    items: ["Rental income management", "Property tax returns", "Capital allowances", "Portfolio optimization"],
+    id: "payroll",
+    title: "Payroll & Bookkeeping",
+    services: [
+      {
+        title: "Payroll Services",
+        description: "RTI-compliant payroll processing and comprehensive pension support.",
+        items: ["RTI-compliant payroll processing", "Auto-enrolment pension support", "P60s and P45s", "Payroll reporting"],
+      },
+      {
+        title: "Bookkeeping Solutions",
+        description: "Accurate monthly bookkeeping and modern cloud software integration.",
+        items: ["Monthly or quarterly books", "Cloud software setup", "Bank reconciliation", "Expense management"],
+      }
+    ]
   },
   {
-    title: "CIS & Contractor Accounting",
-    description: "Construction industry and contractor services",
-    items: ["CIS compliance", "Contractor tax returns", "Subcontractor verification", "Industry-specific advice"],
+    id: "advisory",
+    title: "Start-up Support & Advisory",
+    services: [
+      {
+        title: "Strategic Growth & Advisory",
+        description: "Business planning and strategic growth insight for scale-ups and SMEs.",
+        items: ["Management accounts", "Cash flow forecasting", "Business planning", "Performance tracking"],
+      },
+      {
+        title: "Business Start-Up Support",
+        description: "Comprehensive setup and consulting for new business ventures.",
+        items: ["Company formation", "Business structure", "Funding guidance", "Initial compliance setup"],
+      },
+    ]
   },
   {
-    title: "Charities & Not-for-Profits",
-    description: "Specialized accounting for charitable organizations",
-    items: ["Charity accounts", "CIC reporting", "Grant management", "Regulatory compliance"],
-  },
-]
+    id: "specialist",
+    title: "Specialist Services",
+    services: [
+      {
+        title: "Landlord & Property Tax",
+        description: "Specialized financial services for property agencies and real estate investors.",
+        items: ["Rental income management", "Property tax returns", "Capital allowances", "Portfolio optimization"],
+      },
+      {
+        title: "CIS & Contractor Accounting",
+        description: "Dedicated accounting for the construction industry and independent contractors.",
+        items: ["CIS compliance", "Contractor tax returns", "Subcontractor verification", "Industry advice"],
+      },
+      {
+        title: "Charities & Not-for-Profits",
+        description: "Tailored reporting and compliance support for charitable organizations.",
+        items: ["Charity accounts", "CIC reporting", "Grant management", "Charity Commission compliance"],
+      },
+    ]
+  }
+];
 
 export default function ServicesPage() {
-  // Use static services data directly
-  const displayServices = services;
+  const [activeTab, setActiveTab] = useState(detailedCategories[0].id);
 
   return (
-    <main className="min-h-screen py-20">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-            Tailored Accounting Services for Individuals, Startups & Growing Businesses
+    <main className="min-h-screen bg-white font-sans text-gray-900">
+      {/* Minimalist Hero Section matching Home Page colors */}
+      <section className="pt-24 pb-16 px-4 bg-gradient-to-br from-blue-50 to-white">
+        <div className="container mx-auto max-w-5xl text-center flex flex-col items-center">
+          <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium mb-8">
+            <span className="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
+            Expert solutions
+          </div>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
+            Tailored <span className="text-blue-600">Accounting Services</span>
           </h1>
-          <p className="text-xl text-slate-600 max-w-4xl mx-auto">
-            We offer flexible, scalable accountancy and tax services built around your needs. Whether you're launching a
-            business, optimising tax efficiency, or managing growth, we're here to support your goals.
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Flexible, scalable accountancy and tax services built around your needs. From launching a business to optimising tax efficiency and managing growth.
           </p>
-
         </div>
+      </section>
 
-        {/* Main Services Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-          {displayServices.map((service: any, index: number) => {
+      {/* Main Services Grid */}
+      <section className="py-16 px-4 container mx-auto max-w-7xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {services.map((service: any, index: number) => {
             const IconComponent = iconMap[service.icon] || service.icon || FileText;
 
             return (
-              <Card key={index} className="group hover:shadow-lg transition-all duration-300">
-                <CardHeader>
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-                      <IconComponent className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors" />
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-xl font-semibold text-slate-900 mb-2">{service.title}</CardTitle>
-                      <CardDescription className="text-slate-600">{service.description}</CardDescription>
-                    </div>
+              <Card key={index} className="border-gray-200 bg-white shadow-sm hover:border-blue-200 hover:shadow-md transition-all duration-300 group flex flex-col h-full rounded-2xl">
+                <CardHeader className="pb-6">
+                  <div className="w-12 h-12 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-blue-100 transition-colors">
+                    <IconComponent className="w-6 h-6 text-blue-600" />
                   </div>
+                  <CardTitle className="text-xl font-bold text-gray-900 mb-2">{service.title}</CardTitle>
+                  <CardDescription className="text-gray-500 text-base">{service.description}</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 mb-6">
-                    {service.features.map((feature: string, featureIndex: number) => (
-                      <li key={featureIndex} className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                        <span className="text-slate-700">{feature}</span>
+                <CardContent className="flex-1 flex flex-col pt-0">
+                  <ul className="space-y-4 mb-8 flex-1">
+                    {service.features.slice(0, 4).map((feature: string, featureIndex: number) => (
+                      <li key={featureIndex} className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <span className="text-gray-600 text-sm leading-relaxed">{feature}</span>
                       </li>
                     ))}
                   </ul>
-                  <Button className="w-full group" asChild>
-                    <a href={service.href}>
-                      Learn More
-                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <div className="pt-6 border-t border-gray-100 mt-auto">
+                    <a
+                      href={service.href}
+                      className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors group/link"
+                    >
+                      Learn more
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover/link:translate-x-1 transition-transform" />
                     </a>
-                  </Button>
+                  </div>
                 </CardContent>
               </Card>
             )
           })}
         </div>
+      </section>
 
-        {/* Detailed Service Categories */}
-        <div className="space-y-16">
-          {/* Compliance Services */}
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">1. Accounting & Tax Compliance</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {complianceServices.map((service, index) => (
-                <Card key={index} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="text-lg">{service.title}</CardTitle>
-                    <CardDescription>{service.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {service.items.map((item, itemIndex) => (
-                        <li key={itemIndex} className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                          <span className="text-slate-700 text-sm">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
+      {/* Detailed Services Tabs Section */}
+      <section className="py-16 px-4 bg-gray-50/50 border-t border-gray-100">
+        <div className="container mx-auto max-w-6xl">
+          <div className="max-w-3xl mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">Explore Our Expertise</h2>
+            <p className="text-gray-600 text-lg leading-relaxed">Dive deeper into our specific service offerings designed for your unique financial landscape.</p>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
+            {/* Tabs Sidebar */}
+            <div className="lg:w-1/3 flex lg:flex-col gap-2 overflow-x-auto pb-4 lg:pb-0 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {detailedCategories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveTab(category.id)}
+                  className={`text-left px-6 py-4 rounded-xl transition-all whitespace-nowrap lg:whitespace-normal flex-shrink-0 lg:flex-shrink flex items-center justify-between group ${activeTab === category.id
+                    ? 'bg-white shadow-sm border border-blue-200 text-blue-700'
+                    : 'text-gray-500 hover:bg-white hover:text-gray-900 border border-transparent hover:shadow-sm'
+                    }`}
+                >
+                  <span className="font-semibold">{category.title}</span>
+                  <ChevronRight className={`w-4 h-4 transition-transform duration-300 hidden lg:block ${activeTab === category.id ? 'translate-x-1 text-blue-400' : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-gray-400'
+                    }`} />
+                </button>
               ))}
             </div>
-          </div>
 
-          {/* Payroll & Bookkeeping */}
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">2. Payroll & Bookkeeping</h2>
-            <Card className="max-w-4xl mx-auto">
-              <CardHeader className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Calculator className="w-8 h-8 text-blue-600" />
-                </div>
-                <CardTitle className="text-2xl">Complete Payroll & Bookkeeping Solutions</CardTitle>
-                <CardDescription>
-                  RTI-compliant payroll processing and comprehensive bookkeeping services
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-3">Payroll Services</h4>
-                    <ul className="space-y-2">
-                      {[
-                        "RTI-compliant payroll processing",
-                        "Auto-enrolment pension support",
-                        "P60s and P45s",
-                        "Payroll reporting",
-                      ].map((item, index) => (
-                        <li key={index} className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                          <span className="text-slate-700 text-sm">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-slate-900 mb-3">Bookkeeping Services</h4>
-                    <ul className="space-y-2">
-                      {[
-                        "Monthly or quarterly bookkeeping",
-                        "Cloud software setup & training",
-                        "Bank reconciliation",
-                        "Expense management",
-                      ].map((item, index) => (
-                        <li key={index} className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                          <span className="text-slate-700 text-sm">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+            {/* Content Area */}
+            <div className="lg:w-2/3">
+              {detailedCategories.map((category) => (
+                <div
+                  key={category.id}
+                  className={`space-y-8 transition-all duration-500 ${activeTab === category.id ? 'opacity-100 translate-y-0 block' : 'opacity-0 translate-y-4 hidden'
+                    }`}
+                >
+                  <h3 className="text-2xl font-bold text-gray-900 pb-4 border-b border-gray-200">{category.title}</h3>
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    {category.services.map((service, idx) => (
+                      <div key={idx} className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm transition-all hover:shadow-md hover:border-blue-100">
+                        <h4 className="text-lg font-bold text-gray-900 mb-3">{service.title}</h4>
+                        <p className="text-gray-500 text-sm mb-6 leading-relaxed">{service.description}</p>
+                        <ul className="space-y-3">
+                          {service.items.map((item, itemIdx) => (
+                            <li key={itemIdx} className="flex items-center gap-3">
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0"></div>
+                              <span className="text-gray-600 text-sm leading-relaxed">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Advisory Services */}
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">
-              3. Business Start-up Support & Advisory
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {advisoryServices.map((service, index) => (
-                <Card key={index} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="text-lg">{service.title}</CardTitle>
-                    <CardDescription>{service.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {service.items.map((item, itemIndex) => (
-                        <li key={itemIndex} className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                          <span className="text-slate-700 text-sm">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Specialist Services */}
-          <div>
-            <h2 className="text-3xl font-bold text-slate-900 mb-8 text-center">4. Specialist Services</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {specialistServices.map((service, index) => (
-                <Card key={index} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <CardTitle className="text-lg">{service.title}</CardTitle>
-                    <CardDescription>{service.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {service.items.map((item, itemIndex) => (
-                        <li key={itemIndex} className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
-                          <span className="text-slate-700 text-sm">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
               ))}
             </div>
           </div>
         </div>
+      </section>
 
-        {/* CTA Section */}
-        <div className="bg-blue-50 rounded-2xl p-8 md:p-12 text-center mt-16">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">Ready to Get Started?</h2>
-          <p className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto">
-            Whether you're starting a business, need ongoing compliance support, or want strategic growth advice, we're
-            here to help you succeed.
+      {/* Hero-like CTA Section */}
+      <section className="py-16 px-4 bg-white border-t border-gray-100">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 tracking-tight">
+            Ready to streamline your finances?
+          </h2>
+          <p className="text-gray-600 mb-10 text-xl max-w-2xl mx-auto leading-relaxed">
+            Let's discuss how our tailored services can support your immediate needs and long-term goals.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="rounded-xl">
-              Book Free Consultation
+            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 h-12 px-8 text-base">
+              <Calendar className="w-5 h-5 mr-2" />
+              Book Consultation
             </Button>
-            <Button size="lg" variant="outline" className="rounded-xl bg-transparent">
-              Get Custom Quote
+            <Button size="lg" className="bg-green-600 hover:bg-green-700 h-12 px-8 text-base text-white outline-none border-none">
+              <MessageCircle className="w-5 h-5 mr-2" />
+              WhatsApp Us Instantly
             </Button>
           </div>
         </div>
-      </div>
+      </section>
     </main>
   )
 }
