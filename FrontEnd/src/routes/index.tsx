@@ -20,6 +20,7 @@ import TestimonialsPage from "../pages/testimonials/page";
 import SubmitTestimonial from "../pages/testimonials/submit";
 // Admin Testimonials
 import TestimonialsManagement from "../pages/admin/TestimonialsManagement";
+import ServicesManagement from "../pages/admin/ServicesManagement";
 
 const PublicLayout = () => (
     <Layout>
@@ -61,6 +62,7 @@ export const AppRoutes = () => (
             <Route path="blog/new" element={<BlogEditor />} />
             <Route path="blog/edit/:id" element={<BlogEditor />} />
             <Route path="testimonials" element={<TestimonialsManagement />} />
+            <Route path="services" element={<ServicesManagement />} />
             <Route path="settings" element={<AdminSettings />} />
         </Route>
     </Routes>
