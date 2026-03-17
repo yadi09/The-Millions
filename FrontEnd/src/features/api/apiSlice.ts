@@ -3,6 +3,8 @@ import { getToken } from '../../utils/authUtils';
 import type { Page, UpdatePageRequest } from '../../types';
 import { type Testimonial, type SubmitTestimonialRequest, type TestimonialStatus } from '../../types/testimonial';
 import { dummyTestimonials } from '../../data/testimonials';
+import type { Service } from '../../types/service';
+import { defaultServices } from '../../data/services';
 
 const getMockTestimonials = (): Testimonial[] => {
   const stored = localStorage.getItem('mock_testimonials');
@@ -11,9 +13,16 @@ const getMockTestimonials = (): Testimonial[] => {
   return dummyTestimonials;
 };
 
+const getMockServices = (): Service[] => {
+  const stored = localStorage.getItem('mock_services');
+  if (stored) return JSON.parse(stored);
+  localStorage.setItem('mock_services', JSON.stringify(defaultServices));
+  return defaultServices;
+};
+
 export const apiSlice = createApi({
   reducerPath: 'api',
-  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial'],
+  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service'],
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
     prepareHeaders: (headers) => {
@@ -183,6 +192,48 @@ export const apiSlice = createApi({
       },
       invalidatesTags: ['Testimonial'],
     }),
+
+    // --- SERVICE ENDPOINTS (Mocked) ---
+    getServices: builder.query<Service[], void>({
+      queryFn: () => {
+        const all = getMockServices();
+        return { data: all.sort((a, b) => a.order - b.order) };
+      },
+      providesTags: ['Service'],
+    }),
+    createService: builder.mutation<Service, Omit<Service, 'id'>>({
+      queryFn: (newService) => {
+        const all = getMockServices();
+        const service: Service = {
+          ...newService,
+          id: `s-${Date.now()}`,
+        };
+        const updated = [...all, service];
+        localStorage.setItem('mock_services', JSON.stringify(updated));
+        return { data: service };
+      },
+      invalidatesTags: ['Service'],
+    }),
+    updateService: builder.mutation<Service, Service>({
+      queryFn: (updatedService) => {
+        const all = getMockServices();
+        const index = all.findIndex(s => s.id === updatedService.id);
+        if (index === -1) return { error: { status: 404, data: 'Not found' } as any };
+        all[index] = updatedService;
+        localStorage.setItem('mock_services', JSON.stringify(all));
+        return { data: all[index] };
+      },
+      invalidatesTags: ['Service'],
+    }),
+    deleteService: builder.mutation<void, string>({
+      queryFn: (id) => {
+        const all = getMockServices();
+        const updated = all.filter(s => s.id !== id);
+        localStorage.setItem('mock_services', JSON.stringify(updated));
+        return { data: undefined };
+      },
+      invalidatesTags: ['Service'],
+    }),
   }),
 });
 
@@ -202,4 +253,8 @@ export const {
   useSubmitTestimonialMutation,
   useUpdateTestimonialStatusMutation,
   useDeleteTestimonialMutation,
+  useGetServicesQuery,
+  useCreateServiceMutation,
+  useUpdateServiceMutation,
+  useDeleteServiceMutation,
 } = apiSlice;
