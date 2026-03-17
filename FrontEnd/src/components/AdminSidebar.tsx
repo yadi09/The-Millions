@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, Settings, LogOut, BookOpen, Star } from 'lucide-react';
+import { LayoutDashboard, FileText, Settings, LogOut, BookOpen, Star, Briefcase } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import type { RootState } from '../app/store';
@@ -88,6 +88,18 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                 >
                     <FileText size={20} />
                     Pages
+                </Link>
+
+                <Link
+                    to="/admin/services"
+                    onClick={handleNavigation}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/admin/services')
+                        ? 'bg-blue-600 text-white'
+                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                        }`}
+                >
+                    <Briefcase size={20} />
+                    Services
                 </Link>
 
                 <Link
