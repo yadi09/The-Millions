@@ -1,95 +1,112 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
-import { Button } from "./ui/button"
-import { Menu, X, Phone, MessageCircle } from "lucide-react"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const location = useLocation()
 
+  const isHome = location.pathname === "/"
+
   const navigation = [
-    { name: "Home", href: "/" },
-    { name: "Services", href: "/services" },
-    { name: "About", href: "/about" },
+    { name: "About", href: isHome ? "#philosophy" : "/#philosophy" },
+    { name: "Services", href: isHome ? "#services" : "/#services" },
+    { name: "Impact", href: isHome ? "#impact" : "/#impact" },
+    { name: "Leadership", href: isHome ? "#leadership" : "/#leadership" },
     { name: "Testimonials", href: "/testimonials" },
-    { name: "Client Portal", href: "/portal" },
     { name: "Blog", href: "/blog" },
-    { name: "Contact", href: "/contact" },
   ]
 
-  const isActive = (href: string) => {
-    return location.pathname === href
-  }
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">M</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">The Millions</span>
-            </Link>
-          </div>
+    <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-300 border-b border-white/10 ${isScrolled ? "bg-millions-dark/95 backdrop-blur-md" : "bg-transparent"
+      } py-6 px-[3%] flex items-center justify-between`}>
 
-          <nav className="hidden lg:flex space-x-8">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`transition-colors ${isActive(item.href) ? "text-blue-600 font-medium" : "text-gray-600 hover:text-blue-600"
-                  }`}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
+      {/* Logo */}
+      <Link to="/" className="flex flex-col line-none group">
+        <span className="font-cormorant text-[0.7rem] font-light tracking-[0.25em] text-millions-muted uppercase">the</span>
+        <span className="font-cormorant text-3xl font-bold text-white group-hover:text-millions-accent transition-colors">MILLIONS.</span>
+      </Link>
 
-          <div className="hidden lg:flex items-center space-x-4">
-            <Button variant="outline" size="sm">
-              <Phone className="w-4 h-4 mr-2" />
-              Call Now
-            </Button>
-            <Button size="sm" className="bg-green-600 hover:bg-green-700">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              WhatsApp
-            </Button>
-          </div>
+      {/* Desktop Links */}
+      <ul className="hidden lg:flex gap-10 list-none">
+        {navigation.map((item) => (
+          <li key={item.name}>
+            <a
+              href={item.href}
+              className="text-white/65 hover:text-millions-accent text-[0.85rem] tracking-[0.12em] uppercase transition-colors font-jost"
+            >
+              {item.name}
+            </a>
+          </li>
+        ))}
+        {/* Contact Link */}
+        <li>
+          <Link
+            to="/contact"
+            className="text-white/65 hover:text-millions-accent text-[0.85rem] tracking-[0.12em] uppercase transition-colors font-jost"
+          >
+            Contact
+          </Link>
+        </li>
+      </ul>
 
-          <button className="lg:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
+      {/* Nav CTA / Burger */}
+      <div className="flex items-center gap-4">
+        <Link
+          to="/contact"
+          className="hidden lg:block bg-transparent border border-millions-accent text-millions-accent px-6 py-2.5 text-[0.8rem] tracking-[0.1em] uppercase hover:bg-millions-accent hover:text-millions-dark transition-all duration-300 font-jost"
+        >
+          Get In Touch
+        </Link>
 
-        {isMenuOpen && (
-          <div className="lg:hidden py-4 border-t">
-            <div className="flex flex-col space-y-4">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`transition-colors ${isActive(item.href) ? "text-blue-600 font-medium" : "text-gray-600"}`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <div className="pt-4 space-y-2">
-                <Button variant="outline" size="sm" className="w-full bg-transparent">
-                  <Phone className="w-4 h-4 mr-2" />
-                  Call Now
-                </Button>
-                <Button size="sm" className="w-full bg-green-600 hover:bg-green-700">
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  WhatsApp
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Burger Button */}
+        <button
+          className="lg:hidden flex flex-col gap-[5px] p-2 z-[999]"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle Menu"
+        >
+          <span className={`block w-6 h-[2px] bg-white transition-all ${isMenuOpen ? "translate-y-[7px] rotate-45" : ""}`}></span>
+          <span className={`block w-6 h-[2px] bg-white transition-all ${isMenuOpen ? "opacity-0 scale-x-0" : ""}`}></span>
+          <span className={`block w-6 h-[2px] bg-white transition-all ${isMenuOpen ? "-translate-y-[7px] -rotate-45" : ""}`}></span>
+        </button>
       </div>
-    </header>
+
+      {/* Mobile Menu Overlay */}
+      <div className={`fixed inset-0 bg-millions-dark z-[998] flex flex-col items-center justify-center transition-all duration-500 lg:hidden ${isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
+        }`}>
+        {navigation.map((item) => (
+          <a
+            key={item.name}
+            href={item.href}
+            onClick={() => setIsMenuOpen(false)}
+            className="w-full text-center py-5 border-b border-white/10 text-white/75 font-cormorant text-2xl font-light tracking-widest hover:text-millions-accent hover:bg-millions-accent/5 transition-all"
+          >
+            {item.name}
+          </a>
+        ))}
+        <Link
+          to="/contact"
+          onClick={() => setIsMenuOpen(false)}
+          className="w-full text-center py-5 border-b border-white/10 text-white/75 font-cormorant text-2xl font-light tracking-widest hover:text-millions-accent hover:bg-millions-accent/5 transition-all"
+        >
+          Contact
+        </Link>
+        <Link
+          to="/contact"
+          onClick={() => setIsMenuOpen(false)}
+          className="mt-8 bg-millions-accent text-millions-dark px-12 py-4 text-[0.8rem] tracking-[0.15em] font-bold uppercase font-jost"
+        >
+          Get In Touch
+        </Link>
+      </div>
+    </nav>
   )
 }
