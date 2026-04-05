@@ -26,7 +26,7 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
   return (
     <>
       {/* Section 13: Get In Touch */}
-      <section id="contact" className="bg-millions-dark py-20 text-center relative overflow-hidden">
+      <section id="contact" className="bg-millions-dark py-[7rem] text-center relative overflow-hidden">
         {/* Background Text Effect */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-cormorant text-[6rem] md:text-[15rem] lg:text-[14rem] font-semibold text-white/5 whitespace-nowrap pointer-events-none z-0">
           MILLIONS

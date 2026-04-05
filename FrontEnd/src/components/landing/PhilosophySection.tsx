@@ -14,7 +14,7 @@ export const PhilosophySection: React.FC<PhilosophyProps> = ({ content }) => {
   const { label, title, paragraphs, quote, attr } = content;
 
   return (
-    <section id="philosophy" className="bg-millions-light py-20">
+    <section id="philosophy" className="bg-millions-light py-[7rem]">
       <div className="max-w-[1440px] w-[94%] mx-auto grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
         {/* Text Content */}
         <div className="animate-fade-in-up">

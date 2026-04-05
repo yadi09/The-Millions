@@ -12,7 +12,7 @@ export const OverviewSection: React.FC<OverviewProps> = ({ content }) => {
   const { label, title, paragraphs } = content;
 
   return (
-    <section id="overview" className="bg-millions-mid py-20">
+    <section id="overview" className="bg-millions-mid py-[7rem]">
       <div className="max-w-[1440px] w-[94%] mx-auto grid grid-cols-1 md:grid-cols-2 gap-20">
         <div className="animate-fade-in-up">
           <div className="flex items-center gap-4 text-millions-accent text-[0.75rem] tracking-[0.3em] uppercase mb-3 sec-label-before">

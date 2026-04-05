@@ -19,7 +19,7 @@ export const ImpactModelSection: React.FC<ImpactModelProps> = ({ content }) => {
   const { label, title, subTitle, pillars } = content;
 
   return (
-    <section id="model" className="bg-millions-light py-20">
+    <section id="model" className="bg-millions-light py-[7rem]">
       <div className="max-w-[1440px] w-[94%] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end mb-16 animate-fade-in-up">
           <div>

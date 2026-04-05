@@ -21,7 +21,7 @@ export const ServicesSection: React.FC<ServicesProps> = ({ content }) => {
   const { label, title, items, footer } = content;
 
   return (
-    <section id="services" className="bg-millions-mid py-20">
+    <section id="services" className="bg-millions-mid py-[7rem]">
       <div className="max-w-[1440px] w-[94%] mx-auto">
         <div className="animate-fade-in-up mb-12">
           <div className="flex items-center gap-4 text-millions-accent text-[0.75rem] tracking-[0.3em] uppercase mb-4 sec-label-before">

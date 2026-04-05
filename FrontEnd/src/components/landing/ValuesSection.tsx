@@ -22,7 +22,7 @@ export const ValuesSection: React.FC<ValuesProps> = ({ content }) => {
   const row2 = items.slice(4, 7);
 
   return (
-    <section id="values" className="bg-millions-dark py-20">
+    <section id="values" className="bg-millions-dark py-[7rem]">
       <div className="max-w-[1440px] w-[94%] mx-auto">
         <div className="animate-fade-in-up mb-12">
           <div className="flex items-center gap-4 text-millions-accent text-[0.75rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
