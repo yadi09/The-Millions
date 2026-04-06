@@ -9,10 +9,10 @@ export function Header() {
   const isHome = location.pathname === "/"
 
   const navigation = [
-    { name: "About", href: isHome ? "#philosophy" : "/#philosophy" },
-    { name: "Services", href: isHome ? "#services" : "/#services" },
-    { name: "Impact", href: isHome ? "#impact" : "/#impact" },
-    { name: "Leadership", href: isHome ? "#leadership" : "/#leadership" },
+    { name: "About", href: "/#philosophy" },
+    { name: "Services", href: "/#services" },
+    { name: "Impact", href: "/#impact" },
+    { name: "Leadership", href: "/#leadership" },
     { name: "Testimonials", href: "/testimonials" },
     { name: "Blog", href: "/blog" },
   ]
@@ -26,7 +26,7 @@ export function Header() {
   }, [])
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-300 border-b border-white/10 ${isScrolled ? "bg-millions-dark/95 backdrop-blur-md" : "bg-transparent"
+    <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-300 border-b border-white/10 ${isScrolled || !isHome ? "bg-millions-dark/95 backdrop-blur-md" : "bg-transparent"
       } py-6 px-[3%] flex items-center justify-between`}>
 
       {/* Logo */}
@@ -39,12 +39,12 @@ export function Header() {
       <ul className="hidden lg:flex gap-10 list-none">
         {navigation.map((item) => (
           <li key={item.name}>
-            <a
-              href={item.href}
+            <Link
+              to={item.href}
               className="text-white/65 hover:text-millions-accent text-[0.85rem] tracking-[0.12em] uppercase transition-colors font-jost"
             >
               {item.name}
-            </a>
+            </Link>
           </li>
         ))}
         {/* Contact Link */}
@@ -83,14 +83,14 @@ export function Header() {
       <div className={`fixed inset-0 bg-millions-dark z-[998] flex flex-col items-center justify-center transition-all duration-500 lg:hidden ${isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
         }`}>
         {navigation.map((item) => (
-          <a
+          <Link
             key={item.name}
-            href={item.href}
+            to={item.href}
             onClick={() => setIsMenuOpen(false)}
-            className="w-full text-center py-5 border-b border-white/10 text-white/75 font-cormorant text-2xl font-light tracking-widest hover:text-millions-accent hover:bg-millions-accent/5 transition-all"
+            className="w-full text-center py-5 border-b border-white/10 text-white/75 font-cormorant text-2xl font-light tracking-widest hover:text-millions-accent hover:bg-millions-accent/5 transition-all text-decoration-none"
           >
             {item.name}
-          </a>
+          </Link>
         ))}
         <Link
           to="/contact"
