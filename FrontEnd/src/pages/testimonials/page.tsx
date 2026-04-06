@@ -20,6 +20,7 @@ export default function TestimonialsPage() {
     const sections = pageData?.sections || [];
     const heroSection = sections.find((s: any) => s.type === "hero");
 
+    // Default hero content if none provided from CMS
     const heroContent = heroSection?.content || {
         title: "Client Success Stories",
         subtitle: "Discover how we've helped businesses achieve their financial goals through expert accounting and strategic advisory.",
@@ -38,9 +39,9 @@ export default function TestimonialsPage() {
 
     return (
         <main className="min-h-screen bg-millions-light">
-            <SubPageHero 
-                label="Success Stories" 
-                title={heroContent.title} 
+            <SubPageHero
+                label="Success Stories"
+                title={heroContent.title}
                 subText={heroContent.subtitle}
             />
 
@@ -75,11 +76,10 @@ export default function TestimonialsPage() {
                         <button
                             key={category}
                             onClick={() => setFilter(category)}
-                            className={`px-8 py-3 font-jost text-[0.7rem] tracking-[0.1em] uppercase font-bold transition-all border ${
-                                filter === category 
-                                ? "bg-millions-dark text-white border-millions-dark" 
-                                : "bg-white text-millions-muted border-millions-dark/5 hover:border-millions-accent hover:text-millions-accent"
-                            }`}
+                            className={`px-8 py-3 font-jost text-[0.7rem] tracking-[0.1em] uppercase font-bold transition-all border ${filter === category
+                                    ? "bg-millions-dark text-white border-millions-dark"
+                                    : "bg-white text-millions-muted border-millions-dark/5 hover:border-millions-accent hover:text-millions-accent"
+                                }`}
                         >
                             {category}
                         </button>
@@ -96,7 +96,7 @@ export default function TestimonialsPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1px bg-millions-dark/5 border border-millions-dark/5 animate-fade-in-up">
-                        {filteredTestimonials.map((testimonial, idx) => (
+                        {filteredTestimonials.map((testimonial) => (
                             <div key={testimonial.id} className="bg-white p-10 flex flex-col hover:bg-millions-accent/5 transition-all group border border-transparent hover:border-millions-accent/20">
                                 {/* Rating Header */}
                                 <div className="flex items-center justify-between mb-8">
@@ -133,9 +133,9 @@ export default function TestimonialsPage() {
                                     <div className="relative">
                                         <div className="w-14 h-14 bg-millions-dark flex items-center justify-center font-cormorant text-xl text-millions-accent overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-500">
                                             {testimonial.image ? (
-                                              <img src={testimonial.image} alt={testimonial.name} className="w-full h-full object-cover" />
+                                                <img src={testimonial.image} alt={testimonial.name} className="w-full h-full object-cover" />
                                             ) : (
-                                              testimonial.name.split(' ').map(n => n[0]).join('')
+                                                testimonial.name.split(' ').map(n => n[0]).join('')
                                             )}
                                         </div>
                                     </div>
@@ -156,13 +156,13 @@ export default function TestimonialsPage() {
             {/* Final CTA */}
             <section className="max-w-7xl mx-auto px-4 md:px-20 mt-10 mb-28 text-center animate-fade-in-up">
                 <div className="bg-millions-dark p-16 border-t-2 border-t-millions-accent">
-                  <h2 className="font-cormorant text-white text-3xl md:text-4xl font-light mb-8">Ready to define your own success story?</h2>
-                  <button 
-                    onClick={() => window.location.href = '/contact'}
-                    className="bg-millions-accent text-millions-dark px-12 py-4 font-jost text-[0.8rem] tracking-[0.15em] font-bold uppercase transition-all hover:bg-white hover:-translate-y-1"
-                  >
+                    <h2 className="font-cormorant text-white text-3xl md:text-4xl font-light mb-8">Ready to define your own success story?</h2>
+                    <button
+                        onClick={() => window.location.href = '/contact'}
+                        className="bg-millions-accent text-millions-dark px-12 py-4 font-jost text-[0.8rem] tracking-[0.15em] font-bold uppercase transition-all hover:bg-white hover:-translate-y-1"
+                    >
                         Secure Free Consultation
-                  </button>
+                    </button>
                 </div>
             </section>
         </main>
