@@ -25,17 +25,24 @@ export const PhilosophySection: React.FC<PhilosophyProps> = ({ content }) => {
             {title}
           </h2>
           <div className="space-y-4">
-            {paragraphs.map((p, idx) => (
-              <p key={idx} className="text-millions-body text-[1.05rem] leading-relaxed font-light">
-                {p.includes('THE MILLIONS was founded to bridge this gap.') ? (
-                  <>
-                    {p.split('THE MILLIONS was founded to bridge this gap.')[0]}
-                    <strong className="text-millions-dark font-semibold">THE MILLIONS was founded to bridge this gap.</strong>
-                    {p.split('THE MILLIONS was founded to bridge this gap.')[1]}
-                  </>
-                ) : p}
-              </p>
-            ))}
+            {paragraphs.map((p, idx) => {
+              // Robust bold parsing for **text**
+              const parts = p.split(/(\*\*.*?\*\*)/);
+              return (
+                <p key={idx} className="text-millions-body text-[1.05rem] leading-relaxed font-light">
+                  {parts.map((part, i) => {
+                    if (part.startsWith('**') && part.endsWith('**')) {
+                      return (
+                        <strong key={i} className="text-millions-dark font-semibold">
+                          {part.slice(2, -2)}
+                        </strong>
+                      );
+                    }
+                    return part;
+                  })}
+                </p>
+              );
+            })}
           </div>
         </div>
 
