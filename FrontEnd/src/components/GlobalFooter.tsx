@@ -32,56 +32,52 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
           MILLIONS
         </div>
 
-        <div className="max-w-[1000px] w-[94%] mx-auto relative z-10 animate-fade-in-up">
-          <div className="flex items-center justify-center gap-4 text-millions-accent text-[0.75rem] tracking-[0.22em] uppercase mb-4 sec-label-before">
+        <div className="max-w-[720px] w-[94%] mx-auto relative z-10 animate-fade-in-up">
+          <div className="flex items-center justify-center gap-4 text-millions-accent text-[0.8rem] tracking-[0.22em] uppercase mb-4 sec-label-before">
             {contact.label}
           </div>
-          <h2 className="font-cormorant text-white text-4xl md:text-5xl lg:text-[4.5rem] font-light leading-tight mb-8">
+          <h2 className="font-cormorant text-white text-4xl md:text-5xl lg:text-[4rem] font-light leading-tight mb-8">
             Ready to Work<br />Together?
           </h2>
-          <p className="text-white/55 text-[1.05rem] leading-relaxed font-light mb-12 max-w-sm mx-auto">
+          <p className="text-white/55 text-[1.1rem] leading-relaxed font-normal mb-12 max-w-sm mx-auto">
             {contact.subTitle}
           </p>
 
-          <div className="flex flex-wrap justify-center gap-10 md:gap-14 mb-12">
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-millions-accent text-[0.75rem] tracking-[0.22em] uppercase font-light">Phone</span>
-              <div className="flex flex-col gap-1">
+          <div className="grid grid-cols-2 gap-y-12 gap-x-8 md:gap-x-20 mb-12">
+            <div className="flex flex-col items-center gap-1.5 text-center">
+              <span className="text-millions-accent text-[0.8rem] tracking-[0.22em] uppercase font-normal">Phone</span>
+              <div className="text-white/55 text-[1.05rem] hover:text-millions-accent transition-colors font-normal flex flex-wrap justify-center gap-x-3">
                 {contact.phones.map((phone, idx) => (
-                  <a key={idx} href={`tel:${phone}`} className="text-white/55 text-[0.95rem] hover:text-millions-accent transition-colors font-light">
+                  <a key={idx} href={`tel:${phone}`}>
                     {phone}
                   </a>
                 ))}
               </div>
             </div>
-            
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-millions-accent text-[0.75rem] tracking-[0.22em] uppercase font-light">Email</span>
-              <a href={`mailto:${contact.email}`} className="text-white/55 text-[0.95rem] hover:text-millions-accent transition-colors font-light">
+
+            <div className="flex flex-col items-center gap-1.5 text-center">
+              <span className="text-millions-accent text-[0.8rem] tracking-[0.22em] uppercase font-normal">Email</span>
+              <a href={`mailto:${contact.email}`} className="text-white/55 text-[1.05rem] hover:text-millions-accent transition-colors font-normal">
                 {contact.email}
               </a>
             </div>
 
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-millions-accent text-[0.75rem] tracking-[0.22em] uppercase font-light">Website</span>
-              <a href={`https://${contact.website}`} target="_blank" rel="noopener noreferrer" className="text-white/55 text-[0.95rem] hover:text-millions-accent transition-colors font-light">
+            <div className="flex flex-col items-center gap-1.5 text-center">
+              <span className="text-millions-accent text-[0.8rem] tracking-[0.22em] uppercase font-normal">Website</span>
+              <a href={`https://${contact.website}`} target="_blank" rel="noopener noreferrer" className="text-white/55 text-[1.05rem] hover:text-millions-accent transition-colors font-normal">
                 {contact.website}
               </a>
             </div>
 
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-millions-accent text-[0.75rem] tracking-[0.22em] uppercase font-light">Address</span>
-              <div className="flex flex-col gap-1">
-                {contact.address.map((line, idx) => (
-                  <span key={idx} className="text-white/55 text-[0.95rem] font-light">
-                    {line}
-                  </span>
-                ))}
+            <div className="flex flex-col items-center gap-1.5 text-center">
+              <span className="text-millions-accent text-[0.8rem] tracking-[0.22em] uppercase font-normal">Address</span>
+              <div className="text-white/55 text-[1.05rem] font-normal flex flex-wrap justify-center gap-x-2">
+                {contact.address.join(" · ")}
               </div>
             </div>
           </div>
 
-          <a 
+          <a
             href={`mailto:${contact.email}`}
             className="inline-block bg-millions-accent text-millions-dark px-10 py-4 font-jost text-[0.85rem] tracking-[0.12em] uppercase font-medium transition-all hover:bg-[#e0bb60] hover:-translate-y-0.5"
           >
@@ -92,13 +88,13 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
 
       {/* Main Footer */}
       <footer className="bg-[#080f0e] py-8 px-4 md:px-20 text-white/25 flex flex-wrap gap-4 items-center justify-between border-t border-white/5">
-        <div className="font-cormorant text-lg">
+        <div className="font-cormorant text-[1.4rem]">
           {footer.logo}
         </div>
-        <div className="text-[0.8rem] font-light">
+        <div className="text-[0.95rem] font-normal">
           {footer.copyright}
         </div>
-        <div className="text-[0.8rem] font-light">
+        <div className="text-[0.95rem] font-normal">
           {footer.location}
         </div>
       </footer>
