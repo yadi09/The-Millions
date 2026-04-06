@@ -23,9 +23,10 @@ interface SocialImpactProps {
 
 export const SocialImpactSection: React.FC<SocialImpactProps> = ({ content }) => {
   const { label, title, subTitle, tiers, governance } = content;
+  const isSlider = tiers.length > 3;
 
   return (
-    <section id="impact" className="bg-millions-dark py-[7rem]">
+    <section id="impact" className="bg-millions-dark py-[7rem] overflow-hidden">
       <div className="max-w-[1440px] w-[94%] mx-auto">
         <div className="animate-fade-in-up mb-12">
           <div className="flex items-center gap-4 text-millions-accent text-[0.75rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
@@ -39,27 +40,13 @@ export const SocialImpactSection: React.FC<SocialImpactProps> = ({ content }) =>
           </p>
         </div>
 
-        {/* Tiers Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up">
-          {tiers.map((tier, idx) => (
-            <div 
-              key={idx} 
-              className="bg-white/5 border border-white/10 p-10 border-t-2 border-t-millions-accent"
-            >
-              <div className="inline-block bg-millions-accent text-millions-dark text-[0.75rem] tracking-[0.2em] uppercase px-3 py-1 mb-6 font-medium">
-                {tier.badge}
-              </div>
-              <h3 className="font-cormorant text-white text-[1.4rem] font-light mb-4 leading-snug">
-                {tier.title}
-              </h3>
-              <p className="text-white/45 text-[0.95rem] leading-relaxed font-light">
-                {tier.text}
-              </p>
-            </div>
-          ))}
-        </div>
+        {isSlider ? (
+          <ScrollingTiersSlider tiers={tiers} />
+        ) : (
+          <StaticTiersGrid tiers={tiers} />
+        )}
 
-        {/* Governance Box */}
+        {/* Governance Box - Always Static */}
         <div className="bg-white/5 border border-white/10 p-10 mt-10 animate-fade-in-up md:animation-delay-300">
           <h3 className="font-cormorant text-white text-[1.5rem] font-light mb-6">
             {governance.title}
@@ -86,3 +73,53 @@ export const SocialImpactSection: React.FC<SocialImpactProps> = ({ content }) =>
     </section>
   );
 };
+
+const StaticTiersGrid = ({ tiers }: { tiers: Tier[] }) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up">
+      {tiers.map((tier, idx) => (
+        <TierCard key={idx} tier={tier} />
+      ))}
+    </div>
+  );
+};
+
+const ScrollingTiersSlider = ({ tiers }: { tiers: Tier[] }) => {
+  const PX_PER_SEC = 50; 
+  const ESTIMATED_CARD_WIDTH = window.innerWidth < 1024 ? window.innerWidth : 435.2;
+
+  const duplicatedItems = [...tiers, ...tiers];
+  const duration = (tiers.length * ESTIMATED_CARD_WIDTH) / PX_PER_SEC;
+
+  return (
+    <div className="overflow-hidden marquee-mask py-2 animate-fade-in-up">
+      <div 
+        className="flex w-fit gap-6 animate-marquee hover:pause-marquee"
+        style={{ animationDuration: `${duration}s` }}
+      >
+        {duplicatedItems.map((tier, idx) => (
+          <div 
+            key={`${tier.title}-${idx}`} 
+            className="w-[94vw] md:w-[calc(94vw/3-16px)] lg:w-[435.2px] shrink-0"
+          >
+            <TierCard tier={tier} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const TierCard = ({ tier }: { tier: Tier }) => (
+  <div className="bg-white/5 border border-white/10 p-10 border-t-2 border-t-millions-accent h-full">
+    <div className="inline-block bg-millions-accent text-millions-dark text-[0.75rem] tracking-[0.2em] uppercase px-3 py-1 mb-6 font-medium">
+      {tier.badge}
+    </div>
+    <h3 className="font-cormorant text-white text-[1.4rem] font-light mb-4 leading-snug">
+      {tier.title}
+    </h3>
+    <p className="text-white/45 text-[0.95rem] leading-relaxed font-light">
+      {tier.text}
+    </p>
+  </div>
+);
