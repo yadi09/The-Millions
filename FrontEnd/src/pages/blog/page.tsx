@@ -66,80 +66,92 @@ export default function BlogPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-16">
           {/* Main Blog Feed */}
           <div className="lg:col-span-3 space-y-16">
-            {/* Featured Post Highlight */}
-            {featuredPost && (
-              <div className="animate-fade-in-up">
-                <div className="bg-white border-l-4 border-l-millions-accent overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.04)] group">
-                  <div className="md:flex h-full">
-                    <div className="md:w-1/2 overflow-hidden">
-                      <Link to={`/blog/${featuredPost.slug}`}>
-                        <img
-                          src={featuredPost.coverImage || "/placeholder.svg"}
-                          alt={featuredPost.title}
-                          className="w-full h-80 md:h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
-                        />
-                      </Link>
-                    </div>
-                    <div className="md:w-1/2 p-10 flex flex-col justify-center">
-                      <span className="text-millions-accent text-[0.6rem] tracking-[0.2em] font-bold uppercase mb-3 inline-block">
-                        Featured | {featuredPost.category}
-                      </span>
-                      <h2 className="font-cormorant text-millions-dark text-3xl font-light mb-4 group-hover:text-millions-mid transition-colors">
-                        {featuredPost.title}
-                      </h2>
-                      <p className="text-millions-body font-light text-[0.87rem] leading-relaxed mb-6 line-clamp-3">
-                        {featuredPost.excerpt}
-                      </p>
-                      
-                      <div className="flex items-center gap-6 text-[0.65rem] text-millions-muted tracking-wider uppercase mb-8">
-                        <div className="flex items-center gap-2"><User className="w-3 h-3"/>{featuredPost.author || "Admin"}</div>
-                        <div className="flex items-center gap-2"><Calendar className="w-3 h-3"/>{new Date(featuredPost.publishedAt || featuredPost.createdAt).toLocaleDateString()}</div>
-                      </div>
-
-                      <Link to={`/blog/${featuredPost.slug}`} className="group/btn flex items-center gap-3 text-millions-dark font-jost text-[0.7rem] tracking-[0.15em] uppercase font-bold hover:text-millions-accent transition-colors">
-                        Read Story <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform"/>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
+            {blogPosts.length === 0 ? (
+              <div className="bg-white p-20 text-center border border-millions-dark/5 animate-fade-in-up">
+                <TrendingUp className="w-12 h-12 text-millions-accent/20 mx-auto mb-6" />
+                <h3 className="font-cormorant text-2xl text-millions-dark mb-4">Knowledge Base: Coming Soon</h3>
+                <p className="text-millions-body font-light max-w-md mx-auto">
+                  We are currently preparing high-value financial strategies and technical insights for our archive. Stay tuned for our first publications.
+                </p>
               </div>
-            )}
+            ) : (
+              <>
+                {/* Featured Post Highlight */}
+                {featuredPost && (
+                  <div className="animate-fade-in-up">
+                    <div className="bg-white border-l-4 border-l-millions-accent overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.04)] group">
+                      <div className="md:flex h-full">
+                        <div className="md:w-1/2 overflow-hidden">
+                          <Link to={`/blog/${featuredPost.slug}`}>
+                            <img
+                              src={featuredPost.coverImage || "/placeholder.svg"}
+                              alt={featuredPost.title}
+                              className="w-full h-80 md:h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+                            />
+                          </Link>
+                        </div>
+                        <div className="md:w-1/2 p-10 flex flex-col justify-center">
+                          <span className="text-millions-accent text-[0.6rem] tracking-[0.2em] font-bold uppercase mb-3 inline-block">
+                            Featured | {featuredPost.category}
+                          </span>
+                          <h2 className="font-cormorant text-millions-dark text-3xl font-light mb-4 group-hover:text-millions-mid transition-colors">
+                            {featuredPost.title}
+                          </h2>
+                          <p className="text-millions-body font-light text-[0.87rem] leading-relaxed mb-6 line-clamp-3">
+                            {featuredPost.excerpt}
+                          </p>
+                          
+                          <div className="flex items-center gap-6 text-[0.65rem] text-millions-muted tracking-wider uppercase mb-8">
+                            <div className="flex items-center gap-2"><User className="w-3 h-3"/>{featuredPost.author || "Admin"}</div>
+                            <div className="flex items-center gap-2"><Calendar className="w-3 h-3"/>{new Date(featuredPost.publishedAt || featuredPost.createdAt).toLocaleDateString()}</div>
+                          </div>
 
-            {/* Standard Post Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              {regularPosts.map((post, idx) => (
-                <div key={post.id} className="animate-fade-in-up" style={{ animationDelay: `${0.1 * idx}s` }}>
-                  <div className="group bg-white p-6 border-b-2 border-b-transparent hover:border-b-millions-accent hover:shadow-xl transition-all duration-300 h-full flex flex-col">
-                    <Link to={`/blog/${post.slug}`} className="block overflow-hidden aspect-video mb-6">
-                      <img
-                        src={post.coverImage || "/placeholder.svg"}
-                        alt={post.title}
-                        className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
-                      />
-                    </Link>
-                    <span className="text-millions-accent text-[0.6rem] tracking-[0.2em] font-bold uppercase mb-2">
-                      {post.category}
-                    </span>
-                    <h3 className="font-cormorant text-millions-dark text-xl font-light mb-4 group-hover:text-millions-accent transition-colors leading-snug">
-                      <Link to={`/blog/${post.slug}`}>{post.title}</Link>
-                    </h3>
-                    <p className="text-millions-body font-light text-[0.82rem] leading-relaxed mb-6 line-clamp-2">
-                      {post.excerpt}
-                    </p>
-                    
-                    <div className="mt-auto flex items-center justify-between border-t border-millions-dark/5 pt-4">
-                      <div className="flex gap-4 text-[0.6rem] text-millions-muted font-light uppercase italic">
-                        <span>{featuredPost.author || "Admin"}</span>
-                        <span>{new Date(post.publishedAt || post.createdAt).toLocaleDateString()}</span>
+                          <Link to={`/blog/${featuredPost.slug}`} className="group/btn flex items-center gap-3 text-millions-dark font-jost text-[0.7rem] tracking-[0.15em] uppercase font-bold hover:text-millions-accent transition-colors">
+                            Read Story <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform"/>
+                          </Link>
+                        </div>
                       </div>
-                      <Link to={`/blog/${post.slug}`} className="text-millions-accent">
-                        <ArrowRight className="w-4 h-4" />
-                      </Link>
                     </div>
                   </div>
+                )}
+
+                {/* Standard Post Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  {regularPosts.map((post, idx) => (
+                    <div key={post.id} className="animate-fade-in-up" style={{ animationDelay: `${0.1 * idx}s` }}>
+                      <div className="group bg-white p-6 border-b-2 border-b-transparent hover:border-b-millions-accent hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+                        <Link to={`/blog/${post.slug}`} className="block overflow-hidden aspect-video mb-6">
+                          <img
+                            src={post.coverImage || "/placeholder.svg"}
+                            alt={post.title}
+                            className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+                          />
+                        </Link>
+                        <span className="text-millions-accent text-[0.6rem] tracking-[0.2em] font-bold uppercase mb-2">
+                          {post.category}
+                        </span>
+                        <h3 className="font-cormorant text-millions-dark text-xl font-light mb-4 group-hover:text-millions-accent transition-colors leading-snug">
+                          <Link to={`/blog/${post.slug}`}>{post.title}</Link>
+                        </h3>
+                        <p className="text-millions-body font-light text-[0.82rem] leading-relaxed mb-6 line-clamp-2">
+                          {post.excerpt}
+                        </p>
+                        
+                        <div className="mt-auto flex items-center justify-between border-t border-millions-dark/5 pt-4">
+                          <div className="flex gap-4 text-[0.6rem] text-millions-muted font-light uppercase italic">
+                            <span>{post.author || "Admin"}</span>
+                            <span>{new Date(post.publishedAt || post.createdAt).toLocaleDateString()}</span>
+                          </div>
+                          <Link to={`/blog/${post.slug}`} className="text-millions-accent">
+                            <ArrowRight className="w-4 h-4" />
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
 
             {/* Simple Pagination */}
             {pagination && pagination.totalPages > 1 && (
