@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Header } from "./header";
-import { Footer } from "./footer";
+import { GlobalFooter } from "./GlobalFooter";
+import { landingContent } from "../data/landingContent";
 
 type LayoutProps = {
   children: ReactNode;
@@ -8,10 +9,12 @@ type LayoutProps = {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div>
+    <div className="flex flex-col min-h-screen">
       <Header />
-      {children}
-      <Footer />
+      <main className="flex-grow">
+        {children}
+      </main>
+      <GlobalFooter contact={landingContent.contact} footer={landingContent.footer} />
     </div>
   );
 };

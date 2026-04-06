@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -69,6 +71,42 @@
   }
 }
 
+@layer utilities {
+  .hero-bg {
+    background: radial-gradient(ellipse 60% 50% at 75% 30%, rgba(201,168,76,0.08) 0%, transparent 70%), 
+                radial-gradient(ellipse 40% 60% at 20% 80%, rgba(22,58,51,0.8) 0%, transparent 60%);
+  }
+
+  .hero-gradient-line {
+    background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.18), transparent);
+  }
+
+  .sec-label-before::before {
+    content: '';
+    display: block;
+    width: 2rem;
+    height: 1px;
+    background: #c9a84c; /* Using the millions-accent hex directly for pseudo-element */
+  }
+
+  .stat-card-anim {
+    opacity: 0;
+    transform: translateX(30px);
+    animation: slideIn 0.6s ease forwards;
+  }
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.6s ease forwards;
+}
+
 /* Custom animations */
 @keyframes fadeInUp {
   from {
@@ -107,4 +145,48 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-reverse {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse 40s linear infinite;
+}
+
+.animate-marquee:hover, .animate-marquee-reverse:hover {
+  animation-play-state: paused;
+}
+
+/* Linear Mask for Marquee Fading Edges */
+.marquee-mask {
+  mask-image: linear-gradient(
+    to right, 
+    transparent, 
+    black 10%, 
+    black 90%, 
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right, 
+    transparent, 
+    black 10%, 
+    black 90%, 
+    transparent
+  );
+}
+
+.pause-marquee {
+  animation-play-state: paused;
 }

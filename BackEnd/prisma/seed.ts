@@ -263,9 +263,54 @@ async function seedAboutPage() {
 /* -----------------------------
    Run All Seeds
 ------------------------------*/
+async function seedBlogPage() {
+  await prisma.page.upsert({
+    where: { slug: "blog" },
+    update: {},
+    create: {
+      slug: "blog",
+      title: "Our Blog",
+      sections: {
+        create: [
+          {
+            type: "hero",
+            order: 1,
+            content: {
+              badge: "Financial Insights",
+              headlineBlack: "The Latest",
+              headlineBlue: "Tips & News.",
+              description: "Stay informed with expert financial advice, tax tips, and business growth strategies from our Chartered Accountants.",
+            },
+          },
+          {
+            type: "featured-posts",
+            order: 2,
+            content: {
+              title: "Editor's Pick",
+              featuredPostId: "", // Will default to most recent if empty
+            },
+          },
+          {
+            type: "popular-posts",
+            order: 3,
+            content: {
+              title: "Popular This Month",
+              show: true,
+              mode: "auto",
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  console.log("🌱 Blog page seeded");
+}
+
 async function main() {
   await seedHomePage();
   await seedAboutPage();
+  await seedBlogPage();
   await seedAdminUser();
 }
 
