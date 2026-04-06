@@ -89,10 +89,18 @@ export default function TestimonialsPage() {
 
             {/* Testimonials Grid */}
             <section className="max-w-7xl mx-auto px-4 md:px-20 pb-20">
-                {filteredTestimonials.length === 0 ? (
-                    <div className="text-center py-24 bg-white border border-millions-dark/5">
-                        <h3 className="font-cormorant text-2xl text-millions-dark font-light mb-2 italic">Refining results...</h3>
-                        <p className="text-millions-body font-light">No benchmarks found for this category yet.</p>
+                {!testimonials || testimonials.length === 0 ? (
+                    <div className="bg-white p-20 text-center border border-millions-dark/5 animate-fade-in-up">
+                        <Quote className="w-12 h-12 text-millions-accent/20 mx-auto mb-6" />
+                        <h3 className="font-cormorant text-2xl text-millions-dark mb-4 italic">Success Stories: Coming Soon</h3>
+                        <p className="text-millions-body font-light max-w-md mx-auto">
+                            We are currently finalizing permissions and preparing our client case studies for public viewing. Our track record of success will be published here shortly.
+                        </p>
+                    </div>
+                ) : filteredTestimonials.length === 0 ? (
+                    <div className="text-center py-24 bg-white border border-millions-dark/5 animate-fade-in-up">
+                        <h3 className="font-cormorant text-2xl text-millions-dark font-light mb-2 italic">Refining Results</h3>
+                        <p className="text-millions-body font-light">No client stories found in the "{filter}" category yet.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1px bg-millions-dark/5 border border-millions-dark/5 animate-fade-in-up">
