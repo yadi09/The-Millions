@@ -1,11 +1,7 @@
 import type React from "react"
-
 import { useState } from "react"
-import { Button } from "../../components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
-import { Input } from "../../components/ui/input"
-import { Textarea } from "../../components/ui/textarea"
-import { MapPin, Phone, Mail, Clock, MessageCircle, Calendar, Send, CheckCircle } from "lucide-react"
+import { SubPageHero } from "../../components/SubPageHero"
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from "lucide-react"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -19,7 +15,6 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Mock form submission
     setIsSubmitted(true)
     setTimeout(() => setIsSubmitted(false), 3000)
   }
@@ -29,234 +24,171 @@ export default function ContactPage() {
   }
 
   return (
-    <main className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 to-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Get in Touch</h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Ready to take control of your finances? Our expert team is here to help you succeed. Contact us today for
-              a free consultation.
-            </p>
-          </div>
-        </div>
-      </section>
+    <main className="min-h-screen bg-millions-light">
+      <SubPageHero 
+        label="Get in Touch" 
+        title="Ready to Start Your Journey?" 
+        subText="Our expert team is here to provide the professional advisory and learning services you need to succeed in global markets."
+      />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Contact Form */}
+      <div className="max-w-7xl mx-auto px-4 md:px-20 py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+          {/* Contact Form Section */}
           <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">Send us a Message</CardTitle>
-                <p className="text-gray-600">Fill out the form below and we'll get back to you within 24 hours.</p>
-              </CardHeader>
-              <CardContent>
-                {isSubmitted ? (
-                  <div className="text-center py-8">
-                    <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">Message Sent!</h3>
-                    <p className="text-gray-600">Thank you for contacting us. We'll get back to you within 24 hours.</p>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name *</label>
-                        <Input
-                          id="name"
-                          value={formData.name}
-                          onChange={(e) => handleInputChange("name", e.target.value)}
-                          placeholder="Abebe Kebede"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address *</label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => handleInputChange("email", e.target.value)}
-                          placeholder="abebe@reicb.com"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={(e) => handleInputChange("phone", e.target.value)}
-                          placeholder="+44 20 1234 5678"
-                        />
-                      </div>
-                      <div>
-                        <label htmlFor="service" className="block text-sm font-medium text-gray-700">Service Interested In</label>
-                        <select
-                          id="service"
-                          name="service"
-                          onChange={(e) => handleInputChange("service", e.target.value)}
-                          defaultValue=""
-                          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                        >
-                          <option value="" disabled>
-                            Select a service
-                          </option>
-                          <option value="payroll">Payroll & Bookkeeping</option>
-                          <option value="self-assessment">Self Assessment</option>
-                          <option value="company-formation">Company Formation</option>
-                          <option value="property">Property Accounting</option>
-                          <option value="management">Management Accounts</option>
-                          <option value="tax-planning">Tax Planning</option>
-                          <option value="business-advisory">Business Advisory</option>
-                          <option value="compliance">Compliance Services</option>
-                          <option value="other">Other</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message *</label>
-                      <Textarea
-                        id="message"
-                        value={formData.message}
-                        onChange={(e) => handleInputChange("message", e.target.value)}
-                        placeholder="Tell us about your requirements..."
-                        rows={5}
-                        required
-                      />
-                    </div>
-
-                    <Button type="submit" size="lg" className="w-full md:w-auto">
-                      <Send className="w-4 h-4 mr-2" />
-                      Send Message
-                    </Button>
-                  </form>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Contact Information */}
-          <div className="space-y-8">
-            {/* Quick Contact */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Contact</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <Button size="lg" className="w-full bg-green-600 hover:bg-green-700">
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  WhatsApp Us Now
-                </Button>
-                <Button size="lg" variant="outline" className="w-full bg-transparent">
-                  <Calendar className="w-5 h-5 mr-2" />
-                  Book Free Consultation
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Contact Details */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <MapPin className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Office Address</h3>
-                    <p className="text-gray-600">
-                      123 Business Street
-                      <br />
-                      London, EC1A 1BB
-                      <br />
-                      United Kingdom
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <Phone className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Phone</h3>
-                    <p className="text-gray-600">+44 20 1234 5678</p>
-                    <p className="text-sm text-gray-500">Mon-Fri: 9:00 AM - 6:00 PM</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <Mail className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
-                    <p className="text-gray-600">hello@themillions.co.uk</p>
-                    <p className="text-sm text-gray-500">We respond within 24 hours</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <Clock className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">Business Hours</h3>
-                    <div className="text-gray-600 space-y-1">
-                      <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-                      <p>Saturday: 10:00 AM - 2:00 PM</p>
-                      <p>Sunday: Closed</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Emergency Contact */}
-            <Card className="bg-red-50 border-red-200">
-              <CardHeader>
-                <CardTitle className="text-red-800">Emergency Support</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-red-700 mb-4">
-                  For urgent tax matters or HMRC deadlines, contact our emergency line:
-                </p>
-                <Button variant="destructive" className="w-full">
-                  <Phone className="w-4 h-4 mr-2" />
-                  Emergency: +44 20 1234 9999
-                </Button>
-                {/* <p className="text-xs text-red-600 mt-2">Available 24/7 for existing clients only</p> */}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Map Section */}
-        <div className="mt-16">
-          <Card>
-            <CardHeader>
-              <CardTitle>Find Our Office</CardTitle>
-              <p className="text-gray-600">
-                Located in the heart of London's financial district, easily accessible by public transport.
+            <div className="mb-10">
+              <h2 className="font-cormorant text-millions-dark text-3xl font-light mb-4">Send us a Message</h2>
+              <p className="text-millions-body font-light text-sm italic">
+                Fields marked with an asterisk (*) are required.
               </p>
-            </CardHeader>
+            </div>
 
-            <CardContent>
-              <div className="aspect-video rounded-lg overflow-hidden">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1982.4248216160718!2d-0.098350184025729!3d51.51561747963616!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48761ca4c4c86a5f%3A0x2483f4e26c1b35e!2s123%20Business%20Street%2C%20London%20EC1A%201BB!5e0!3m2!1sen!2suk!4v1704894890000!5m2!1sen!2suk"
-                  width="100%"
-                  height="100%"
-                  // allowFullScreen=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="w-full h-full border-0"
-                ></iframe>
+            {isSubmitted ? (
+              <div className="bg-white border-l-4 border-l-millions-accent p-10 text-center animate-fade-in-up">
+                <CheckCircle className="w-16 h-16 text-millions-accent mx-auto mb-4" />
+                <h3 className="font-cormorant text-2xl text-millions-dark font-light mb-2">Message Sent!</h3>
+                <p className="text-millions-body font-light">Thank you for reaching out. We will get back to you within 24 hours.</p>
               </div>
-            </CardContent>
-          </Card>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-8 animate-fade-in-up">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Full Name *</label>
+                    <input 
+                      className="bg-white border border-millions-dark/10 p-3 text-sm focus:border-millions-accent outline-none font-jost"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange("name", e.target.value)}
+                      placeholder="e.g. Abebe Kebede"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Email Address *</label>
+                    <input 
+                      type="email"
+                      className="bg-white border border-millions-dark/10 p-3 text-sm focus:border-millions-accent outline-none font-jost"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      placeholder="e.g. abebe@reicb.com"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Phone Number</label>
+                    <input 
+                      type="tel"
+                      className="bg-white border border-millions-dark/10 p-3 text-sm focus:border-millions-accent outline-none font-jost"
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange("phone", e.target.value)}
+                      placeholder="+44 20 1234 5678"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Service Interested In</label>
+                    <select 
+                      className="bg-white border border-millions-dark/10 p-3 text-sm focus:border-millions-accent outline-none font-jost appearance-none"
+                      onChange={(e) => handleInputChange("service", e.target.value)}
+                      defaultValue=""
+                    >
+                      <option value="" disabled>Select a service</option>
+                      <option value="advisory">Professional Advisory</option>
+                      <option value="learning">Professional Learning</option>
+                      <option value="ventures">Venture Development</option>
+                      <option value="impact">Social Impact & Mentorship</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Message *</label>
+                  <textarea 
+                    className="bg-white border border-millions-dark/10 p-3 text-sm focus:border-millions-accent outline-none font-jost"
+                    value={formData.message}
+                    onChange={(e) => handleInputChange("message", e.target.value)}
+                    placeholder="Tell us about your requirements..."
+                    rows={6}
+                    required
+                  />
+                </div>
+
+                <button 
+                  type="submit" 
+                  className="bg-millions-dark text-white px-10 py-4 font-jost text-[0.78rem] tracking-[0.12em] uppercase font-medium transition-all hover:bg-millions-accent hover:text-millions-dark hover:-translate-y-0.5 flex items-center gap-3 w-fit"
+                >
+                  <Send className="w-4 h-4" />
+                  Send Message
+                </button>
+              </form>
+            )}
+          </div>
+
+          {/* Contact Details Sidebar */}
+          <div className="space-y-10 animate-fade-in-up md:animation-delay-300">
+            {/* Quick Contact Block */}
+            <div className="bg-millions-dark p-10 border-t-2 border-t-millions-accent">
+              <h3 className="font-cormorant text-white text-xl font-light mb-6">Connect Directly</h3>
+              <div className="space-y-6">
+                <div className="flex items-start gap-4 group">
+                  <Phone className="w-5 h-5 text-millions-accent mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="text-[0.6rem] tracking-[0.15em] text-white/40 uppercase mb-1">Call Us</h4>
+                    <p className="text-white text-sm font-light">+44 7951 7965 92</p>
+                    <p className="text-white/30 text-[0.65rem] italic">Available Mon-Fri 9AM-6PM</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 group">
+                  <Mail className="w-5 h-5 text-millions-accent mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="text-[0.6rem] tracking-[0.15em] text-white/40 uppercase mb-1">Email Our Office</h4>
+                    <p className="text-white text-sm font-light">info@themillions.com</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 group">
+                  <MapPin className="w-5 h-5 text-millions-accent mt-1 flex-shrink-0" />
+                  <div>
+                    <h4 className="text-[0.6rem] tracking-[0.15em] text-white/40 uppercase mb-1">Headquarters</h4>
+                    <p className="text-white text-sm font-light">Terminus Terrace, Southampton</p>
+                    <p className="text-white/30 text-[0.65rem] italic">SO14 3FD, United Kingdom</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Business Hours Block */}
+            <div className="bg-white p-10 border-t-2 border-t-millions-mid">
+              <div className="flex items-center gap-3 mb-6">
+                <Clock className="w-5 h-5 text-millions-mid" />
+                <h3 className="font-cormorant text-millions-dark text-xl font-light">Business Hours</h3>
+              </div>
+              <div className="space-y-3">
+                {[
+                  { day: "Mon - Fri", hours: "9:00 AM - 6:00 PM" },
+                  { day: "Saturday", hours: "10:00 AM - 2:00 PM" },
+                  { day: "Sunday", hours: "Closed" }
+                ].map((item, idx) => (
+                  <div key={idx} className="flex justify-between items-center text-[0.8rem] font-light border-b border-millions-dark/5 pb-2">
+                    <span className="text-millions-body italic">{item.day}</span>
+                    <span className="text-millions-dark font-medium">{item.hours}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Map Placeholder Card */}
+            <div className="bg-[#f8f6f2] p-8 border border-millions-dark/5 grayscale-[0.5] opacity-80 hover:grayscale-0 hover:opacity-100 transition-all">
+              <h4 className="font-cormorant text-millions-dark mb-4">Finding Our Location</h4>
+              <p className="text-xs text-millions-body font-light leading-relaxed mb-4">
+                We are strategically positioned in the heart of Southampton, facilitating our global connections to East African markets.
+              </p>
+              <div className="aspect-video bg-millions-dark/5 border border-millions-dark/10 flex items-center justify-center text-[0.6rem] tracking-widest text-millions-muted uppercase">
+                Interactive Map Loading...
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>

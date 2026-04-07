@@ -1,5 +1,4 @@
 import { Routes, Route, Outlet } from "react-router-dom";
-import Home from "../pages/Home";
 import About from "../pages/about/page";
 import ServicesPage from "../pages/services/page";
 import ContactPage from "../pages/contact/page";
@@ -21,6 +20,7 @@ import SubmitTestimonial from "../pages/testimonials/submit";
 // Admin Testimonials
 import TestimonialsManagement from "../pages/admin/TestimonialsManagement";
 import ServicesManagement from "../pages/admin/ServicesManagement";
+import Landing from "../pages/Landing";
 
 const PublicLayout = () => (
     <Layout>
@@ -32,7 +32,7 @@ export const AppRoutes = () => (
     <Routes>
         {/* Public Routes */}
         <Route element={<PublicLayout />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Landing />} />
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/services/:slug" element={<ComingSoonPage />} />
