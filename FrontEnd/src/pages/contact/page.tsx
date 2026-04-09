@@ -1,22 +1,49 @@
 import type React from "react"
 import { useState } from "react"
 import { SubPageHero } from "../../components/SubPageHero"
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from "lucide-react"
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle } from "lucide-react"
+import { useGetContactServicesQuery, useSubmitContactMutation } from "../../features/api/apiSlice"
+import { landingContent } from "../../data/landingContent"
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    email: string;
+    phone: string;
+    serviceId: string;
+    message: string;
+  }>({
     name: "",
     email: "",
     phone: "",
-    service: "",
+    serviceId: "",
     message: "",
   })
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // API Hooks
+  const { data: services, isLoading: isLoadingServices } = useGetContactServicesQuery()
+  const [submitContact, { isLoading: isSubmitting }] = useSubmitContactMutation()
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitted(true)
-    setTimeout(() => setIsSubmitted(false), 3000)
+    setErrorMessage(null)
+
+    try {
+      await submitContact({
+        fullName: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        serviceId: formData.serviceId,
+        message: formData.message,
+      }).unwrap()
+
+      setIsSubmitted(true)
+      // Success message stays until manually cleared or timed out
+    } catch (err: any) {
+      setErrorMessage(err?.data?.error || "Failed to send message. Please try again later.")
+    }
   }
 
   const handleInputChange = (field: string, value: string) => {
@@ -86,20 +113,33 @@ export default function ContactPage() {
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Service Interested In</label>
+                    <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Service Interested In *</label>
                     <select 
-                      className="bg-white border border-millions-dark/10 p-3 text-sm focus:border-millions-accent outline-none font-jost appearance-none"
-                      onChange={(e) => handleInputChange("service", e.target.value)}
-                      defaultValue=""
+                      className="bg-white border border-millions-dark/10 p-3 text-sm focus:border-millions-accent outline-none font-jost appearance-none disabled:opacity-50"
+                      onChange={(e) => handleInputChange("serviceId", e.target.value)}
+                      value={formData.serviceId}
+                      required
+                      disabled={isLoadingServices}
                     >
-                      <option value="" disabled>Select a service</option>
-                      <option value="advisory">Professional Advisory</option>
-                      <option value="learning">Professional Learning</option>
-                      <option value="ventures">Venture Development</option>
-                      <option value="impact">Social Impact & Mentorship</option>
+                      <option value="" disabled>{isLoadingServices ? "Loading services..." : "Select a service"}</option>
+                      {services?.map((service: any) => (
+                        <option key={service.id} value={service.id}>
+                          {service.name || service.title}
+                        </option>
+                      ))}
                     </select>
+                    {(!isLoadingServices && (!services || services.length === 0)) && (
+                      <p className="text-[0.65rem] text-red-500 italic mt-1">Note: No services available in the database.</p>
+                    )}
                   </div>
                 </div>
+
+                {errorMessage && (
+                  <div className="bg-red-50 border-l-4 border-red-500 p-4 flex items-center gap-3 animate-fade-in">
+                    <AlertCircle className="w-5 h-5 text-red-500" />
+                    <p className="text-red-700 text-sm font-jost">{errorMessage}</p>
+                  </div>
+                )}
 
                 <div className="flex flex-col gap-2">
                   <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Message *</label>
@@ -115,10 +155,15 @@ export default function ContactPage() {
 
                 <button 
                   type="submit" 
-                  className="bg-millions-dark text-white px-10 py-4 font-jost text-[0.78rem] tracking-[0.12em] uppercase font-medium transition-all hover:bg-millions-accent hover:text-millions-dark hover:-translate-y-0.5 flex items-center gap-3 w-fit"
+                  disabled={isSubmitting || (services && services.length === 0)}
+                  className="bg-millions-dark text-white px-10 py-4 font-jost text-[0.78rem] tracking-[0.12em] uppercase font-medium transition-all hover:bg-millions-accent hover:text-millions-dark hover:-translate-y-0.5 flex items-center gap-3 w-fit disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Send className="w-4 h-4" />
-                  Send Message
+                  {isSubmitting ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                  {isSubmitting ? "Sending..." : "Send Message"}
                 </button>
               </form>
             )}
@@ -134,7 +179,9 @@ export default function ContactPage() {
                   <Phone className="w-5 h-5 text-millions-accent mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="text-[0.6rem] tracking-[0.15em] text-white/40 uppercase mb-1">Call Us</h4>
-                    <p className="text-white text-sm font-light">+44 7951 7965 92</p>
+                    {landingContent.contact.phones.map((phone, i) => (
+                      <p key={i} className="text-white text-sm font-light">{phone}</p>
+                    ))}
                     <p className="text-white/30 text-[0.65rem] italic">Available Mon-Fri 9AM-6PM</p>
                   </div>
                 </div>
@@ -143,7 +190,7 @@ export default function ContactPage() {
                   <Mail className="w-5 h-5 text-millions-accent mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="text-[0.6rem] tracking-[0.15em] text-white/40 uppercase mb-1">Email Our Office</h4>
-                    <p className="text-white text-sm font-light">info@themillions.com</p>
+                    <p className="text-white text-sm font-light">{landingContent.contact.email}</p>
                   </div>
                 </div>
 
@@ -151,8 +198,7 @@ export default function ContactPage() {
                   <MapPin className="w-5 h-5 text-millions-accent mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="text-[0.6rem] tracking-[0.15em] text-white/40 uppercase mb-1">Headquarters</h4>
-                    <p className="text-white text-sm font-light">Terminus Terrace, Southampton</p>
-                    <p className="text-white/30 text-[0.65rem] italic">SO14 3FD, United Kingdom</p>
+                    <p className="text-white text-sm font-light">{landingContent.contact.address.join(", ")}</p>
                   </div>
                 </div>
               </div>
