@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet } from "react-router-dom";
+import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import ContactPage from "../pages/contact/page";
 import Layout from "../components/Layout";
 import BlogPage from "../pages/blog/page";
@@ -50,7 +50,7 @@ export const AppRoutes = () => (
                 </AdminLayout>
             </ProtectedRoute>
         }>
-            <Route index element={<AdminDashboard />} />
+            <Route index element={<Navigate to="/admin/pages" replace />} />
             <Route path="pages" element={<AdminPagesList />} />
             <Route path="pages/:slug" element={<AdminPageEditor />} />
             <Route path="blog" element={<BlogManagement />} />
@@ -58,6 +58,8 @@ export const AppRoutes = () => (
             <Route path="blog/edit/:id" element={<BlogEditor />} />
             <Route path="testimonials" element={<TestimonialsManagement />} />
             <Route path="services" element={<ServicesManagement />} />
+            {/* Dashboard and Settings routes are kept for legacy but mapped to disabled components */}
+            <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="settings" element={<AdminSettings />} />
         </Route>
     </Routes>

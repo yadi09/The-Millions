@@ -10,7 +10,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col">
+        <div className="min-h-screen bg-millions-dark flex flex-col selection:bg-millions-accent selection:text-millions-dark">
             {/* Mobile Header */}
             <MobileHeader onMenuClick={() => setIsSidebarOpen(true)} />
 
@@ -23,16 +23,24 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
             {/* Mobile Overlay */}
             {isSidebarOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+                    className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm lg:hidden"
                     onClick={() => setIsSidebarOpen(false)}
                     aria-hidden="true"
                 />
             )}
 
-            {/* Main Content */}
-            <main className="flex-1 lg:ml-64">
-                <div className="p-4 md:p-8">
-                    {children}
+            {/* Main Content Area */}
+            <main className="flex-1 lg:ml-64 relative min-h-screen overflow-x-hidden">
+                {/* Background Pattern Sync */}
+                <div className="absolute inset-0 bg-[url('/grid-subtle.svg')] bg-repeat opacity-[0.03] pointer-events-none" />
+                
+                {/* Subtle Gradient Accent */}
+                <div className="absolute -top-24 -right-24 w-96 h-96 bg-millions-accent/10 rounded-full blur-[120px] pointer-events-none" />
+                
+                <div className="relative p-6 md:p-12 max-w-7xl mx-auto min-h-full">
+                    <div className="animate-fade-in-up duration-500">
+                        {children}
+                    </div>
                 </div>
             </main>
         </div>
