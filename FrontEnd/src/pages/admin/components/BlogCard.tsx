@@ -35,60 +35,59 @@ interface BlogCardProps {
 }
 
 export function BlogCard({ post, onEdit, onDelete }: BlogCardProps) {
+    const isPublished = post.status === 'published';
+
     return (
-        <Card className="hover:shadow-md transition-shadow group">
-            <div className="p-3 sm:p-4 md:p-6 flex flex-col md:flex-row md:items-center gap-3 sm:gap-4 md:gap-6">
-                {/* Icon/Image Placeholder - Scale or hide on mobile */}
-                <div className="hidden sm:flex w-10 h-10 md:w-12 md:h-12 rounded-lg bg-blue-50 items-center justify-center flex-shrink-0 text-blue-600">
-                    <FileText className="w-5 h-5 md:w-6 md:h-6" />
+        <Card className="bg-white/5 border-white/10 backdrop-blur-md rounded-none hover:border-millions-accent/30 transition-all duration-500 group animate-fade-in-up">
+            <div className="p-4 md:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+                {/* Visual Icon */}
+                <div className="hidden sm:flex w-12 h-12 bg-white/5 border border-white/10 flex-shrink-0 items-center justify-center text-millions-accent group-hover:border-millions-accent/50 transition-colors">
+                    <FileText className="w-6 h-6" />
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2 sm:mb-3">
-                        <h3 className="font-semibold text-slate-900 text-base md:text-lg leading-snug">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+                        <h3 className="font-cormorant text-xl text-white font-light leading-snug truncate group-hover:text-millions-accent transition-colors">
                             {post.title}
                         </h3>
                         <Badge
-                            variant={post.status === 'published' ? 'default' : 'secondary'}
-                            className={`w-fit text-[10px] md:text-xs px-2 py-0.5 whitespace-nowrap ${post.status === 'published'
-                                ? 'bg-green-100 text-green-700 hover:bg-green-100 shadow-none border-green-200'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-100 shadow-none border-slate-200'
+                            className={`w-fit text-[0.6rem] px-2 py-0.5 uppercase tracking-widest rounded-none border shadow-none font-jost ${isPublished
+                                ? 'bg-millions-accent/10 text-millions-accent border-millions-accent/20'
+                                : 'bg-white/5 text-white/40 border-white/10'
                                 }`}
                         >
-                            {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
+                            {post.status}
                         </Badge>
                     </div>
-                    <div className="flex items-center gap-x-3 md:gap-x-4 gap-y-2 text-[11px] sm:text-xs md:text-sm text-slate-500 flex-wrap">
-                        <Badge variant="outline" className="text-[10px] md:text-xs font-normal text-slate-500 bg-slate-50 px-2 py-0.5">
-                            {post.category}
-                        </Badge>
-                        <span className="flex items-center gap-1.5">
-                            <Calendar size={14} className="opacity-70" />
+                    <div className="flex items-center gap-x-4 gap-y-2 text-[0.7rem] text-white/40 font-jost uppercase tracking-wider flex-wrap">
+                        <span className="text-millions-accent/60 italic lowercase font-light">#{post.category}</span>
+                        <span className="flex items-center gap-2">
+                            <Calendar size={12} className="text-white/20" />
                             {post.date ? new Date(post.date).toLocaleDateString() : new Date(post.createdAt).toLocaleDateString()}
                         </span>
                         {post.views !== undefined && (
-                            <span className="flex items-center gap-1.5">
-                                <Eye size={14} className="opacity-70" />
-                                {post.views}
+                            <span className="flex items-center gap-2">
+                                <Eye size={12} className="text-white/20" />
+                                {post.views} views
                             </span>
                         )}
-                        <span className="hidden sm:inline-flex items-center gap-1.5">
-                            <span className="w-1 h-1 rounded-full bg-slate-300" />
+                        <span className="hidden sm:inline-flex items-center gap-2">
+                            <span className="w-1 h-1 rounded-full bg-white/10" />
                             by {post.author || 'Admin'}
                         </span>
                     </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-end gap-2 border-t md:border-t-0 pt-3 md:pt-0 mt-3 md:mt-0">
-                    {/* Large Screens (>= 1200px) - Buttons appear on hover */}
-                    <div className="hidden min-[1200px]:flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div className="flex items-center justify-end gap-3 border-t border-white/5 md:border-t-0 pt-4 md:pt-0 mt-2 md:mt-0">
+                    {/* Desktop Actions */}
+                    <div className="hidden min-[1100px]:flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
                         <Button
                             variant="ghost"
                             size="sm"
                             asChild
-                            className="h-9 text-xs px-3 hover:bg-slate-100"
+                            className="h-9 text-[0.65rem] uppercase tracking-widest px-4 hover:bg-white/5 hover:text-white rounded-none border border-transparent hover:border-white/10"
                         >
                             <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
                                 <Eye className="w-4 h-4 mr-2" />
@@ -99,45 +98,43 @@ export function BlogCard({ post, onEdit, onDelete }: BlogCardProps) {
                             variant="ghost"
                             size="sm"
                             onClick={() => onEdit(post.id)}
-                            className="h-9 text-xs px-3 hover:bg-slate-100"
+                            className="h-9 text-[0.65rem] uppercase tracking-widest px-4 hover:bg-millions-accent/10 hover:text-millions-accent rounded-none border border-transparent hover:border-millions-accent/20"
                         >
                             <Edit className="w-4 h-4 mr-2" />
-                            Edit
+                            Refine
                         </Button>
                         <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => onDelete(post.id)}
-                            title="Delete"
-                            className="h-9 w-9 text-red-500 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-100"
+                            className="h-9 w-9 text-white/20 hover:text-red-400 hover:bg-red-400/5 rounded-none border border-transparent hover:border-red-400/20"
                         >
                             <Trash2 className="w-4 h-4" />
                         </Button>
                     </div>
 
-                    {/* Small/Medium Screens (< 1200px) - Dropdown Menu */}
-                    <div className="min-[1200px]:hidden">
+                    {/* Mobile/Tablet Actions */}
+                    <div className="min-[1100px]:hidden">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Button variant="ghost" size="icon" className="h-9 w-9 border border-white/10 rounded-none text-white/60">
                                     <MoreVertical className="h-4 w-4" />
-                                    <span className="sr-only">Open menu</span>
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
-                                    <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center w-full">
-                                        <Eye className="mr-2 h-4 w-4" />
-                                        View Post
+                            <DropdownMenuContent align="end" className="bg-millions-dark border-white/10 rounded-none min-w-[160px]">
+                                <DropdownMenuItem asChild className="text-white/60 focus:bg-white/5 focus:text-white rounded-none cursor-pointer">
+                                    <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer" className="flex items-center w-full px-2 py-2">
+                                        <Eye className="mr-3 h-4 w-4 text-millions-accent" />
+                                        <span className="text-[0.7rem] uppercase tracking-widest font-jost">View Post</span>
                                     </a>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onEdit(post.id)}>
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    Edit
+                                <DropdownMenuItem onClick={() => onEdit(post.id)} className="text-white/60 focus:bg-millions-accent/10 focus:text-millions-accent rounded-none cursor-pointer px-2 py-2">
+                                    <Edit className="mr-3 h-4 w-4" />
+                                    <span className="text-[0.7rem] uppercase tracking-widest font-jost">Refine</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => onDelete(post.id)} className="text-red-600 focus:text-red-600 focus:bg-red-50">
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Delete
+                                <DropdownMenuItem onClick={() => onDelete(post.id)} className="text-red-400 focus:bg-red-400/5 focus:text-red-400 rounded-none cursor-pointer px-2 py-2 border-t border-white/5 mt-1">
+                                    <Trash2 className="mr-3 h-4 w-4" />
+                                    <span className="text-[0.7rem] uppercase tracking-widest font-jost">Delete</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
