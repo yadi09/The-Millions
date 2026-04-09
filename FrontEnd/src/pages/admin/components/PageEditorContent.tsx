@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useGetPageQuery, useUpdatePageMutation } from '../../../features/api/apiSlice';
 import EditorSidebar from './EditorSidebar';
 import SectionForm from './SectionForm';
-import { Loader2, Save, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, Save, CheckCircle2, AlertCircle, Layout } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import type { Page, Section } from '../../../types';
 
@@ -13,40 +13,23 @@ interface PageEditorContentProps {
 }
 
 const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContentProps) => {
-    /**
-     * Fetch page data using the slug
-     * GET /pages/:slug - This is a public endpoint that returns page data
-     * Response includes: { id, slug, title, sections: [...] }
-     */
     const { data: pageData, isLoading, error } = useGetPageQuery(slug || '');
-
-    /**
-     * Update mutation for saving changes
-     * PUT /admin/pages/:id - This is a protected endpoint that requires JWT
-     */
     const [updatePage, { isLoading: isSaving, isSuccess }] = useUpdatePageMutation();
 
-    // Local state to track edits before saving
     const [localPageData, setLocalPageData] = useState<Page | null>(null);
     const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
     const [showSuccess, setShowSuccess] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
 
-    /**
-     * Sync local state when page data is initially fetched or when data changes
-     * But avoid overwriting localPageData if it already exists to preserve unsaved edits
-     */
     useEffect(() => {
         if (pageData && !localPageData) {
             setLocalPageData(pageData);
-            // Only set default active section if none is selected yet
             if (pageData.sections?.length > 0 && !activeSectionId) {
                 setActiveSectionId(pageData.sections[0].id);
             }
         }
     }, [pageData, localPageData, activeSectionId]);
 
-    // Handle success message visibility
     useEffect(() => {
         if (isSuccess) {
             setShowSuccess(true);
@@ -56,16 +39,10 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
         }
     }, [isSuccess]);
 
-    /**
-     * Save handler - sends updates to backend
-     * CRITICAL: Must use page.id, not slug
-     * Backend route: PUT /admin/pages/:id
-     * Payload: { title, sections }
-     */
     const handleSave = async () => {
         setSaveError(null);
         if (!localPageData?.id) {
-            setSaveError('Cannot save: Page ID is missing. Please refresh and try again.');
+            setSaveError('Missing Page Identity. Please refresh.');
             return;
         }
 
@@ -77,22 +54,12 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
                     sections: localPageData.sections
                 }
             }).unwrap();
-
-            // Update local state with the saved data from server
             setLocalPageData(result);
-
-            // Note: Success state is handled by useEffect on isSuccess
         } catch (err: any) {
-            // Provide detailed error feedback
-            const errorMessage = err?.data?.message || 'Failed to save page. Please try again.';
-            setSaveError(errorMessage);
+            setSaveError(err?.data?.message || 'Sync failed.');
         }
     };
 
-    /**
-     * Update a specific section's content in local state
-     * This is called when the user edits form fields
-     */
     const handleSectionUpdate = (sectionId: string, newContent: Record<string, any>) => {
         setLocalPageData((prev: Page | null) => {
             if (!prev) return null;
@@ -105,90 +72,99 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
         });
     };
 
-    // Loading state
     if (isLoading) {
         return (
-            <div className="flex h-full items-center justify-center p-12">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <div className="flex flex-col h-full items-center justify-center p-12 bg-millions-dark">
+                <Loader2 className="w-10 h-10 text-millions-accent animate-spin mb-6" />
+                <p className="text-white/20 font-jost uppercase tracking-[0.4em] text-[0.6rem]">Syncing Architecture...</p>
             </div>
         );
     }
 
-    // Error state
     if (error || !localPageData) {
         return (
-            <div className="flex h-full items-center justify-center text-red-500 p-12">
-                <div className="text-center">
-                    <p className="font-semibold">Error loading page data</p>
-                    <p className="text-sm mt-2">Please check the page slug ({slug}) and try again</p>
+            <div className="flex h-full items-center justify-center p-12 bg-millions-dark">
+                <div className="text-center space-y-4">
+                    <p className="font-cormorant text-2xl text-red-400 italic">Interrupted. Check Path: ({slug})</p>
+                    <Button onClick={() => window.location.reload()} variant="outline" className="border-red-400/20 text-red-400 hover:bg-red-400/10 rounded-none uppercase text-[0.6rem] tracking-widest px-8">Reattempt Sync</Button>
                 </div>
             </div>
         );
     }
 
-    // Find the currently active section for editing
     const activeSection = localPageData.sections?.find((s: any) => s.id === activeSectionId);
 
     return (
-        <div className={`flex flex-col bg-slate-50 ${isModal ? 'h-[80vh]' : 'h-full'}`}>
-            {/* Header with Save Button */}
+        <div className={`flex flex-col bg-millions-dark ${isModal ? 'h-[80vh]' : 'h-full'} animate-fade-in`}>
+            {/* Header Redesign */}
             <div className={`
-                bg-white border-b border-slate-200 px-4 md:px-6 flex items-center justify-between shrink-0 z-20 sticky
-                ${isModal ? 'top-0 py-4 rounded-t-xl' : 'top-[57px] lg:top-0 h-16'}
+                bg-white/5 backdrop-blur-xl border-b border-white/10 px-6 md:px-10 flex items-center justify-between shrink-0 z-30 sticky
+                ${isModal ? 'top-0 py-6' : 'top-[57px] lg:top-0 h-24'}
             `}>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-6">
+                    <div className="hidden sm:flex w-12 h-12 border border-millions-accent/20 items-center justify-center">
+                        <Layout className="w-5 h-5 text-millions-accent" />
+                    </div>
                     <div>
-                        <h1 className="font-bold text-base md:text-lg text-slate-900 capitalize">{slug === 'home' ? (localPageData.title || 'Home Page') : localPageData.name || slug} Editor</h1>
-                        <p className="text-xs text-slate-500 hidden sm:block">
-                            {localPageData.id ? `Page ID: ${localPageData.id}` : 'Loading...'}
-                        </p>
+                        <h1 className="font-cormorant text-2xl md:text-3xl text-white font-light tracking-widest uppercase">
+                            {slug === 'home' ? 'Home Architecture' : localPageData.name || slug} Refinement
+                        </h1>
+                        <div className="flex items-center gap-3 mt-1 opacity-40">
+                             <span className="text-[0.55rem] font-jost text-white uppercase tracking-[0.3em]">Ref: {localPageData.id}</span>
+                        </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
+                
+                <div className="flex items-center gap-4">
                     {showSuccess && (
-                        <div className="hidden sm:flex items-center gap-2 text-green-600 text-sm font-medium mr-2 animate-in fade-in slide-in-from-right-2">
-                            <CheckCircle2 className="w-4 h-4" />
-                            Saved Successfully
+                        <div className="hidden sm:flex items-center gap-2 text-millions-accent text-[0.65rem] font-jost uppercase tracking-widest mr-4 animate-in fade-in slide-in-from-right-2">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Sync Confirmed
                         </div>
                     )}
 
                     {saveError && (
-                        <div className="flex items-center gap-2 text-red-600 text-sm font-medium mr-2 animate-in fade-in slide-in-from-right-2">
+                        <div className="flex items-center gap-2 text-red-400 text-[0.65rem] font-jost uppercase tracking-widest mr-2 animate-in fade-in slide-in-from-right-2">
                             <AlertCircle className="w-4 h-4" />
                             {saveError}
                         </div>
                     )}
 
                     {onClose && (
-                        <Button variant="ghost" size="sm" onClick={onClose} className="mr-2">
-                            Cancel
+                        <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={onClose} 
+                            className="bg-transparent text-white/30 hover:text-white rounded-none uppercase text-[0.65rem] tracking-widest h-10 px-6"
+                        >
+                            Discard
                         </Button>
                     )}
 
                     <Button
                         onClick={handleSave}
                         disabled={isSaving || !localPageData?.id}
-                        className="gap-2 h-9 md:h-10 text-sm"
+                        className="bg-millions-accent text-millions-dark hover:bg-millions-accent/90 rounded-none h-11 px-10 text-[0.7rem] uppercase tracking-widest font-bold shadow-xl transition-all"
                         size="sm"
                     >
                         {isSaving ? (
                             <>
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                <span className="hidden sm:inline">Saving...</span>
+                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                <span>Syncing...</span>
                             </>
                         ) : (
                             <>
-                                <Save className="w-4 h-4" />
-                                <span className="hidden sm:inline">Save Changes</span>
+                                <Save className="w-4 h-4 mr-2" />
+                                <span>Deploy Changes</span>
                             </>
                         )}
                     </Button>
                 </div>
             </div>
 
-            <div className="flex flex-1 relative flex-col md:flex-row md:overflow-hidden bg-slate-50">
-                {/* Sidebar - Section Navigator */}
-                <div className={`sticky z-10 bg-white shadow-sm md:static md:shadow-none md:z-auto md:h-full ${isModal ? 'top-0' : 'top-[121px] lg:top-16'}`}>
+            <div className={`flex flex-1 relative flex-col md:flex-row md:overflow-hidden ${isModal ? '' : 'pt-0'}`}>
+                {/* Sidebar Navigation */}
+                <div className={`sticky z-20 md:static md:w-80 border-r border-white/5 h-full`}>
                     <EditorSidebar
                         sections={localPageData.sections || []}
                         activeSectionId={activeSectionId}
@@ -196,28 +172,36 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
                     />
                 </div>
 
-                {/* Main Editor Area - Section Form */}
-                <div className="flex-1 w-full p-4 md:p-8 md:overflow-y-auto">
-                    <div className="max-w-3xl mx-auto pb-20 md:pb-0">
+                {/* Main Workspace Area */}
+                <div className="flex-1 w-full p-6 md:p-12 md:overflow-y-auto custom-scrollbar bg-black/10">
+                    <div className="max-w-4xl mx-auto pb-20 md:pb-0">
                         {activeSection ? (
-                            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
-                                <div className="mb-6 pb-6 border-b border-slate-100">
-                                    <h2 className="text-lg md:text-xl font-bold text-slate-900 capitalize">
-                                        {activeSection.type.replace('-', ' ')}
-                                    </h2>
-                                    <p className="text-sm text-slate-500">Edit the content for this section</p>
+                            <div className="bg-white/5 border border-white/10 backdrop-blur-md rounded-none p-8 md:p-12 shadow-2xl animate-fade-in-up">
+                                <div className="mb-10 pb-8 border-b border-white/5">
+                                     <div className="flex items-center gap-3 mb-3">
+                                        <div className="w-2 h-2 bg-millions-accent" />
+                                        <h2 className="font-cormorant text-2xl md:text-3xl text-white font-light tracking-widest uppercase">
+                                            {activeSection.type.replace('-', ' ')} Refinement
+                                        </h2>
+                                    </div>
+                                    <p className="text-[0.65rem] font-jost text-white/30 uppercase tracking-[0.3em]">Refine Structural Component Properties</p>
                                 </div>
 
-                                <SectionForm
-                                    key={activeSection.id}
-                                    type={activeSection.type}
-                                    content={activeSection.content}
-                                    onChange={(newContent) => handleSectionUpdate(activeSection.id, newContent)}
-                                />
+                                <div className="animate-fade-in">
+                                    <SectionForm
+                                        key={activeSection.id}
+                                        type={activeSection.type}
+                                        content={activeSection.content}
+                                        onChange={(newContent) => handleSectionUpdate(activeSection.id, newContent)}
+                                    />
+                                </div>
                             </div>
                         ) : (
-                            <div className="text-center text-slate-500 mt-20">
-                                Select a section to start editing
+                            <div className="flex flex-col items-center justify-center h-[50vh]">
+                                <div className="w-12 h-12 border border-white/10 rounded-none flex items-center justify-center mb-6">
+                                    <Layout className="w-6 h-6 text-white/10" />
+                                </div>
+                                <p className="font-cormorant text-2xl text-white/10 italic">Awaiting structural selection.</p>
                             </div>
                         )}
                     </div>
