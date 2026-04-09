@@ -234,6 +234,20 @@ export const apiSlice = createApi({
       },
       invalidatesTags: ['Service'],
     }),
+
+    // --- CONTACT FORM ENDPOINTS ---
+    getContactServices: builder.query<any[], void>({
+      query: () => '/services',
+      providesTags: ['Service'],
+    }),
+
+    submitContact: builder.mutation<any, { fullName: string; email: string; phone?: string; message: string; serviceId: string }>({
+      query: (data) => ({
+        url: '/contact',
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -257,4 +271,6 @@ export const {
   useCreateServiceMutation,
   useUpdateServiceMutation,
   useDeleteServiceMutation,
+  useGetContactServicesQuery,
+  useSubmitContactMutation,
 } = apiSlice;
