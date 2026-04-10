@@ -31,28 +31,28 @@ const AdminLogin = () => {
             <div className="w-full max-w-lg relative z-10 animate-fade-in">
                 {/* Branding Header */}
                 <div className="text-center mb-12">
-                    <div className="w-20 h-20 border border-millions-accent/30 rounded-none flex items-center justify-center mx-auto mb-8 relative group">
+                    <div className="w-20 h-20 border border-millions-accent/20 rounded-none flex items-center justify-center mx-auto mb-8 relative group">
                         <div className="absolute inset-0 bg-millions-accent/5 group-hover:bg-millions-accent/10 transition-colors" />
                         <span className="font-cormorant text-4xl font-bold text-millions-accent relative">M</span>
                     </div>
-                    <h1 className="font-cormorant text-4xl md:text-5xl font-light text-white uppercase tracking-[0.2em] mb-4">
-                        Millions
+                    <h1 className="font-cormorant text-[clamp(2.5rem,6vw,4rem)] font-light text-white leading-none mb-6">
+                        Millions <em className="italic text-millions-accent not-italic">Sync</em>
                     </h1>
-                     <div className="flex items-center justify-center gap-4 text-millions-accent text-[0.6rem] tracking-[0.4em] uppercase opacity-60">
-                        <div className="w-8 h-[1px] bg-millions-accent" />
+                     <div className="flex items-center justify-center gap-4 text-millions-accent text-[0.65rem] tracking-[0.2em] uppercase opacity-50 font-light">
+                        <div className="w-8 h-[1px] bg-millions-accent/40" />
                         Architectural Control Center
                     </div>
                 </div>
 
-                <Card className="bg-white/5 border-white/10 backdrop-blur-xl rounded-none shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-millions-accent/40 to-transparent" />
+                <Card className="bg-white/5 border-white/5 backdrop-blur-xl rounded-none shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-millions-accent/20 to-transparent" />
                     
                     <CardContent className="p-10 md:p-14">
                         <form onSubmit={handleSubmit} className="space-y-8">
                             {/* Email Input */}
                             <div className="space-y-3">
-                                <label htmlFor="email" className="text-[0.65rem] font-jost text-white/40 uppercase tracking-[0.2em] flex items-center gap-2">
-                                    <ShieldCheck size={12} className="text-millions-accent" />
+                                <label htmlFor="email" className="text-[0.6rem] font-jost text-white/30 uppercase tracking-[0.15em] flex items-center gap-2 font-light">
+                                    <ShieldCheck size={12} className="text-millions-accent/60" />
                                     Access Identity
                                 </label>
                                 <input
@@ -61,7 +61,7 @@ const AdminLogin = () => {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
-                                    className="w-full bg-white/[0.03] border border-white/10 px-6 py-4 text-white font-jost text-sm tracking-widest focus:border-millions-accent/40 outline-none transition-all rounded-none placeholder:text-white/10"
+                                    className="w-full bg-white/5 border border-white/5 px-6 py-4 text-white font-jost text-[0.85rem] tracking-wider focus:border-millions-accent/30 outline-none transition-all rounded-none placeholder:text-white/5 font-light"
                                     placeholder="ADMIN@THEMILLIONS.COM"
                                     disabled={isLoading}
                                 />
@@ -69,8 +69,8 @@ const AdminLogin = () => {
 
                             {/* Password Input */}
                             <div className="space-y-3">
-                                <label htmlFor="password" className="text-[0.65rem] font-jost text-white/40 uppercase tracking-[0.2em] flex items-center gap-2">
-                                    <Lock size={12} className="text-millions-accent" />
+                                <label htmlFor="password" className="text-[0.6rem] font-jost text-white/30 uppercase tracking-[0.15em] flex items-center gap-2 font-light">
+                                    <Lock size={12} className="text-millions-accent/60" />
                                     Security Key
                                 </label>
                                 <input
@@ -79,7 +79,7 @@ const AdminLogin = () => {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
-                                    className="w-full bg-white/[0.03] border border-white/10 px-6 py-4 text-white font-jost text-sm tracking-[0.4em] focus:border-millions-accent/40 outline-none transition-all rounded-none placeholder:text-white/10"
+                                    className="w-full bg-white/5 border border-white/5 px-6 py-4 text-white font-jost text-[0.85rem] tracking-[0.3em] focus:border-millions-accent/30 outline-none transition-all rounded-none placeholder:text-white/5 font-light"
                                     placeholder="••••••••"
                                     disabled={isLoading}
                                 />
@@ -87,8 +87,8 @@ const AdminLogin = () => {
 
                             {/* Error Message */}
                             {error && (
-                                <div className="p-4 bg-red-400/5 border border-red-400/20 rounded-none animate-shake">
-                                    <p className="text-[0.65rem] text-red-400 font-jost uppercase tracking-widest text-center">
+                                <div className="p-4 bg-red-400/5 border border-red-400/10 rounded-none animate-shake">
+                                    <p className="text-[0.6rem] text-red-400/80 font-jost uppercase tracking-widest text-center font-light">
                                         {('data' in error && typeof error.data === 'object' && error.data && 'message' in error.data)
                                             ? String(error.data.message)
                                             : 'Authentication Refused. Verify Identity.'}
@@ -99,12 +99,12 @@ const AdminLogin = () => {
                             {/* Submit Button */}
                             <Button
                                 type="submit"
-                                className="w-full bg-millions-accent text-millions-dark hover:bg-millions-accent/90 rounded-none py-8 text-[0.75rem] uppercase tracking-[0.3em] font-bold shadow-xl transition-all duration-500 group"
+                                className="w-full bg-millions-accent text-millions-dark hover:bg-white rounded-none py-7 text-[0.7rem] uppercase tracking-[0.2em] font-bold shadow-xl transition-all duration-500 group"
                                 disabled={isLoading}
                             >
                                 {isLoading ? (
                                     <>
-                                        <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                                        <Loader2 className="w-4 h-4 mr-3 animate-spin" />
                                         Authenticating...
                                     </>
                                 ) : (
@@ -117,7 +117,7 @@ const AdminLogin = () => {
 
                         {/* Regulatory Footer */}
                         <div className="mt-12 pt-8 border-t border-white/5 text-center">
-                            <p className="text-[0.55rem] font-jost text-white/20 uppercase tracking-[0.4em] leading-loose">
+                            <p className="text-[0.55rem] font-jost text-white/10 uppercase tracking-[0.2em] leading-loose font-light">
                                 Protected Architectural Area. 
                                 <br />
                                 Authorized Access Protocols Required.
