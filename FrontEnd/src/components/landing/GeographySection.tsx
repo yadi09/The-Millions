@@ -22,16 +22,16 @@ export const GeographySection: React.FC<GeographyProps> = ({ content }) => {
   const isSlider = regions.length > 2;
 
   return (
-    <section id="geography" className="bg-millions-light py-[7rem] overflow-hidden">
-      <div className="max-w-[1440px] w-[94%] mx-auto">
+    <section id="geography" className="bg-millions-light py-[7rem] px-[5%] overflow-hidden">
+      <div className="max-w-[1200px] w-[90%] mx-auto">
         <div className="animate-fade-in-up mb-12">
-          <div className="flex items-center gap-4 text-millions-accent text-[0.75rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
+          <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
             {label}
           </div>
-          <h2 className="font-cormorant text-millions-dark text-4xl md:text-5xl lg:text-[3.5rem] font-light leading-tight">
+          <h2 className="font-cormorant text-millions-dark text-[clamp(2rem,4vw,3rem)] font-light leading-tight">
             {title}
           </h2>
-          <p className="text-millions-body text-[1.05rem] leading-relaxed font-light mt-4 lg:max-w-2xl">
+          <p className="text-millions-body text-[0.9rem] leading-[1.9] font-light mt-4 lg:max-w-2xl">
             {subTitle}
           </p>
         </div>
@@ -85,16 +85,16 @@ const ScrollingGeographySlider = ({ regions }: { regions: Region[] }) => {
 
 const RegionCard = ({ region }: { region: Region }) => (
   <div className="bg-white p-10 border-l-[3px] border-l-millions-accent/30 hover:border-l-millions-accent transition-all duration-350 h-full">
-    <div className="text-millions-accent text-[0.75rem] tracking-[0.2em] uppercase mb-1 font-light">
+    <div className="text-millions-accent text-[0.68rem] tracking-[0.2em] uppercase mb-1 font-light">
       {region.label}
     </div>
-    <h3 className="font-cormorant text-millions-dark text-[1.8rem] font-light mb-1">
+    <h3 className="font-cormorant text-millions-dark text-[1.6rem] font-light mb-1">
       {region.title}
     </h3>
-    <div className="text-millions-muted text-[0.85rem] mb-4 font-light">
+    <div className="text-millions-muted text-[0.78rem] mb-4 font-light">
       {region.subTitle}
     </div>
-    <p className="text-millions-body text-[0.95rem] leading-relaxed font-light mb-6">
+    <p className="text-millions-body text-[0.83rem] leading-[1.8] font-light mb-6">
       {region.text}
     </p>
     <div className="flex flex-wrap gap-2">

@@ -21,21 +21,21 @@ export const LeadershipSection: React.FC<LeadershipProps> = ({ content }) => {
   const { label, title, subTitle, commitments, leaders } = content;
 
   return (
-    <section id="leadership" className="bg-millions-light py-[7rem]">
-      <div className="max-w-[1440px] w-[94%] mx-auto grid grid-cols-1 md:grid-cols-2 gap-20 items-start">
+    <section id="leadership" className="bg-millions-light py-[7rem] px-[5%]">
+      <div className="max-w-[1200px] w-[90%] mx-auto grid grid-cols-1 md:grid-cols-2 gap-20 items-start">
         <div className="animate-fade-in-up">
-          <div className="flex items-center gap-4 text-millions-accent text-[0.75rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
+          <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
             {label}
           </div>
-          <h2 className="font-cormorant text-millions-dark text-4xl md:text-5xl lg:text-[3.5rem] font-light leading-tight mb-6">
+          <h2 className="font-cormorant text-millions-dark text-[clamp(2rem,4vw,3rem)] font-light leading-tight mb-6">
             {title}
           </h2>
-          <p className="text-millions-body text-[1.05rem] leading-relaxed font-light mb-8 lg:max-w-md">
+          <p className="text-millions-body text-[0.9rem] leading-[1.9] font-light mb-8 lg:max-w-md">
             {subTitle}
           </p>
           <ul className="space-y-4">
             {commitments.map((item, idx) => (
-              <li key={idx} className="flex gap-4 p-4 border-b border-millions-dark/5 text-millions-body text-[0.95rem] leading-relaxed font-light">
+              <li key={idx} className="flex gap-4 p-4 border-b border-millions-dark/5 text-millions-body text-[0.83rem] leading-[1.8] font-light">
                 <span className="text-millions-accent flex-shrink-0">—</span>
                 {item}
               </li>
@@ -54,7 +54,7 @@ export const LeadershipSection: React.FC<LeadershipProps> = ({ content }) => {
                   {leader.initials}
                 </div>
                 <div>
-                  <h3 className="font-cormorant text-millions-dark text-[1.3rem] font-semibold">
+                  <h3 className="font-cormorant text-millions-dark text-[1.1rem] font-semibold">
                     {leader.name}
                   </h3>
                   <p className="text-millions-accent text-[0.8rem] tracking-wider mb-1">
