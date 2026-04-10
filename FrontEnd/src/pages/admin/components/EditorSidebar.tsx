@@ -35,11 +35,11 @@ const EditorSidebar = ({ sections, activeSectionId, onSelectSection }: EditorSid
         `}>
             {/* Desktop Header */}
             <div className="p-8 border-b border-white/5 hidden md:block">
-                <h2 className="font-cormorant text-xl text-white uppercase tracking-widest leading-none mb-4 italic">
+                <h2 className="font-cormorant text-[1.4rem] text-white font-light leading-none mb-4 italic">
                     Architecture
                 </h2>
-                <div className="flex items-center gap-3 text-millions-accent text-[0.6rem] tracking-[0.3em] uppercase opacity-60">
-                    <div className="w-4 h-[1px] bg-millions-accent" />
+                <div className="flex items-center gap-3 text-millions-accent text-[0.6rem] tracking-[0.2em] uppercase opacity-50 font-light">
+                    <div className="w-4 h-[1px] bg-millions-accent/40" />
                     Section Map
                 </div>
             </div>
@@ -48,12 +48,12 @@ const EditorSidebar = ({ sections, activeSectionId, onSelectSection }: EditorSid
             <div className="md:hidden p-4 bg-black/40 border-b border-white/5">
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="w-full flex items-center justify-between px-6 py-4 bg-white/5 border border-white/10 rounded-none text-[0.65rem] font-jost font-bold text-white uppercase tracking-widest"
+                    className="w-full flex items-center justify-between px-6 py-4 bg-white/5 border border-white/5 rounded-none text-[0.65rem] font-jost font-bold text-white uppercase tracking-[0.2em] transition-all"
                 >
                     <div className="flex items-center gap-3">
                         {activeSection ? (
                             <>
-                                <span className="text-millions-accent">{getIconForType(activeSection.type)}</span>
+                                <span className="text-millions-accent/60">{getIconForType(activeSection.type)}</span>
                                 <span className="capitalize">{activeSection.type.replace('-', ' ')}</span>
                             </>
                         ) : (
@@ -76,20 +76,20 @@ const EditorSidebar = ({ sections, activeSectionId, onSelectSection }: EditorSid
                             key={section.id}
                             onClick={() => handleSelect(section.id)}
                             className={`
-                                flex items-center gap-6 px-10 py-6 text-[0.7rem] uppercase tracking-widest transition-all duration-300 w-full border-b border-white/[0.03] group relative overflow-hidden
+                                flex items-center gap-6 px-10 py-6 text-[0.7rem] uppercase tracking-[0.15em] transition-all duration-300 w-full border-b border-white/5 group relative overflow-hidden font-light
                                 ${isActive
-                                    ? 'bg-millions-accent/10 text-millions-accent font-bold border-l-2 border-l-millions-accent border-b-millions-accent/10'
-                                    : 'text-white/40 hover:bg-white/5 hover:text-white'
+                                    ? 'bg-white/5 text-millions-accent font-bold border-l-2 border-l-millions-accent border-b-white/5'
+                                    : 'text-white/30 hover:bg-white/5 hover:text-white'
                                 }
                             `}
                         >
-                            <span className={`transition-colors duration-300 ${isActive ? 'text-millions-accent' : 'text-white/20 group-hover:text-millions-accent/60'}`}>
+                            <span className={`transition-colors duration-300 ${isActive ? 'text-millions-accent' : 'text-white/10 group-hover:text-millions-accent/40'}`}>
                                 {getIconForType(section.type)}
                             </span>
                             <span className="font-jost">{section.type.replace('-', ' ')}</span>
                             
                             {isActive && (
-                                <div className="absolute right-0 top-0 h-full w-[1px] bg-millions-accent shadow-[0_0_15px_rgba(201,168,76,0.5)]" />
+                                <div className="absolute right-0 top-0 h-full w-[1px] bg-millions-accent shadow-[0_0_15px_rgba(201,168,76,0.3)]" />
                             )}
                         </button>
                     );
@@ -98,7 +98,7 @@ const EditorSidebar = ({ sections, activeSectionId, onSelectSection }: EditorSid
             
             {/* Version Badge Footer */}
             <div className="hidden md:block p-8 border-t border-white/5 mt-auto">
-                 <p className="text-[0.55rem] font-jost text-white/20 uppercase tracking-[0.4em] text-center">
+                 <p className="text-[0.55rem] font-jost text-white/10 uppercase tracking-[0.2em] text-center font-light">
                     Structure v1.02.SYNC
                 </p>
             </div>

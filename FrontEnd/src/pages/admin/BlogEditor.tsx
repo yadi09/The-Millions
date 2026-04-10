@@ -140,28 +140,28 @@ const BlogEditor = () => {
     if (isInitialLoading) return (
         <div className="flex flex-col h-[70vh] items-center justify-center animate-pulse">
             <Loader2 className="w-10 h-10 text-millions-accent animate-spin mb-6" />
-            <p className="text-white/40 font-jost uppercase tracking-[0.4em] text-xs">Syncing Core Files...</p>
+            <p className="text-white/40 font-jost uppercase tracking-[0.25em] text-xs">Syncing Core Files...</p>
         </div>
     );
 
     return (
-        <div className="space-y-12 max-w-6xl mx-auto px-4 md:px-0 pb-32 animate-fade-in">
+        <div className="space-y-10 max-w-6xl mx-auto px-4 md:px-0 pb-32 animate-fade-in">
             {/* Header Redesign */}
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 pb-8 border-b border-white/5">
                 <div className="flex items-center gap-6">
                     <Button
                         variant="ghost"
                         onClick={() => navigate("/admin/blog")}
-                        className="h-14 w-14 rounded-none border border-white/10 hover:border-millions-accent/40 text-white/40 hover:text-millions-accent transition-all"
+                        className="h-14 w-14 rounded-none border border-white/5 hover:border-millions-accent/40 text-white/40 hover:text-millions-accent transition-all"
                     >
                         <ArrowLeft className="w-5 h-5" />
                     </Button>
                     <div>
-                        <h1 className="font-cormorant text-4xl font-light text-white uppercase tracking-widest leading-none">
-                            {isEditing ? "Editorial Refinement" : "New Architectural Note"}
+                        <h1 className="font-cormorant text-[clamp(2.2rem,4vw,3rem)] font-light text-white leading-none">
+                            {isEditing ? <>Editorial <em className="italic text-millions-accent not-italic">Refinement</em></> : <>New <em className="italic text-millions-accent not-italic">Architectural Note</em></>}
                         </h1>
-                        <div className="flex items-center gap-4 text-millions-accent text-[0.65rem] tracking-[0.3em] uppercase mt-4">
-                            <div className="w-6 h-[1px] bg-millions-accent" />
+                        <div className="flex items-center gap-4 text-millions-accent text-[0.65rem] tracking-[0.2em] uppercase mt-4">
+                            <div className="w-6 h-[1px] bg-millions-accent/40" />
                             Synchronizing Brand Perspectives
                         </div>
                     </div>
@@ -170,13 +170,13 @@ const BlogEditor = () => {
                     <Button
                         variant="outline"
                         onClick={() => handleSave("draft")}
-                        className="flex-1 lg:flex-none h-14 bg-transparent border-white/10 text-white/40 hover:border-white/30 rounded-none uppercase text-[0.65rem] tracking-widest px-8"
+                        className="flex-1 lg:flex-none h-14 bg-transparent border-white/5 text-white/30 hover:border-white/20 rounded-none uppercase text-[0.65rem] tracking-[0.2em] px-8 transition-all"
                     >
                         Save Draft
                     </Button>
                     <Button
                         onClick={() => handleSave("published")}
-                        className="flex-1 lg:flex-none h-14 bg-millions-accent text-millions-dark hover:bg-millions-accent/90 rounded-none uppercase text-[0.7rem] tracking-widest font-bold px-10 transition-all shadow-xl"
+                        className="flex-1 lg:flex-none h-14 bg-millions-accent text-millions-dark hover:bg-white rounded-none uppercase text-[0.7rem] tracking-[0.2em] font-bold px-10 transition-all shadow-xl"
                     >
                         {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
                         Deploy Note
@@ -187,26 +187,26 @@ const BlogEditor = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 {/* Main Workspace */}
                 <div className="lg:col-span-8 space-y-10">
-                    <Card className="bg-white/5 border-white/10 backdrop-blur-xl rounded-none shadow-2xl p-0 overflow-hidden">
-                        <div className="p-8 border-b border-white/5 flex items-center gap-3">
+                    <Card className="bg-white/5 border-white/5 backdrop-blur-xl rounded-none shadow-2xl p-0 overflow-hidden">
+                        <div className="p-8 border-b border-white/5 flex items-center gap-3 bg-white/5">
                             <PenTool className="text-millions-accent w-4 h-4" />
-                            <h3 className="text-[0.7rem] font-jost text-white font-bold uppercase tracking-[0.3em]">Manuscript</h3>
+                            <h3 className="text-[0.7rem] font-jost text-white/60 font-bold uppercase tracking-[0.2em]">Manuscript</h3>
                         </div>
                         <CardContent className="p-8 md:p-12 space-y-10">
                             <div className="space-y-3">
-                                <Label className="text-[0.6rem] font-jost text-white/30 uppercase tracking-[0.2em] ml-1 text-millions-accent">Perspective Title</Label>
+                                <Label className="text-[0.6rem] font-jost text-millions-accent/60 uppercase tracking-[0.15em] ml-1">Perspective Title</Label>
                                 <Input
                                     placeholder="Enter Architectural Title..."
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    className="bg-transparent border-none p-0 text-3xl md:text-5xl font-cormorant font-light text-white focus-visible:ring-0 placeholder:text-white/10 h-auto"
+                                    className="bg-transparent border-none p-0 text-3xl md:text-5xl font-cormorant font-light text-white focus-visible:ring-0 placeholder:text-white/5 h-auto italic"
                                 />
-                                <div className="h-[2px] w-12 bg-millions-accent/20" />
+                                <div className="h-[1px] w-12 bg-millions-accent/30" />
                             </div>
 
                             <div className="space-y-4">
-                                <Label className="text-[0.6rem] font-jost text-white/30 uppercase tracking-[0.2em] ml-1">Structural Body</Label>
-                                <div className="border border-white/10 bg-black/10 rounded-none flex flex-col overflow-hidden group focus-within:border-millions-accent/30 transition-all">
+                                <Label className="text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.15em] ml-1">Structural Body</Label>
+                                <div className="border border-white/5 bg-black/10 rounded-none flex flex-col overflow-hidden group focus-within:border-millions-accent/30 transition-all">
                                     <MenuBar editor={editor} />
                                     <EditorContent editor={editor} className="flex-1 cursor-text custom-prose-scroll" />
                                 </div>
@@ -214,14 +214,14 @@ const BlogEditor = () => {
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-white/5 border-white/10 backdrop-blur-xl rounded-none p-0 shadow-2xl overflow-hidden">
-                        <div className="p-8 border-b border-white/5 flex items-center gap-3">
+                    <Card className="bg-white/5 border-white/5 backdrop-blur-xl rounded-none p-0 shadow-2xl overflow-hidden">
+                        <div className="p-8 border-b border-white/5 flex items-center gap-3 bg-white/5">
                             <PenTool className="text-white/20 w-4 h-4" />
-                            <h3 className="text-[0.7rem] font-jost text-white font-bold uppercase tracking-[0.3em]">Abstract</h3>
+                            <h3 className="text-[0.7rem] font-jost text-white/60 font-bold uppercase tracking-[0.2em]">Abstract</h3>
                         </div>
                         <CardContent className="p-8 md:p-12 pt-6">
                             <textarea
-                                className="w-full bg-transparent border-none p-0 text-white font-jost italic font-light leading-relaxed text-sm focus-within:ring-0 placeholder:text-white/10 resize-none min-h-[100px]"
+                                className="w-full bg-transparent border-none p-0 text-white/60 font-jost italic font-light leading-relaxed text-[0.9rem] focus-within:ring-0 placeholder:text-white/5 resize-none min-h-[100px]"
                                 placeholder="Refine the editorial summary for public indexing..."
                                 value={excerpt}
                                 onChange={(e) => setExcerpt(e.target.value)}
@@ -232,37 +232,37 @@ const BlogEditor = () => {
 
                 {/* Metadata Sidebar */}
                 <div className="lg:col-span-4 space-y-10">
-                    <Card className="bg-white/5 border-white/10 backdrop-blur-xl rounded-none p-0 shadow-2xl overflow-hidden">
-                        <div className="p-8 border-b border-white/5 flex items-center gap-3 bg-black/20">
+                    <Card className="bg-white/5 border-white/5 backdrop-blur-xl rounded-none p-0 shadow-2xl overflow-hidden">
+                        <div className="p-8 border-b border-white/5 flex items-center gap-3 bg-white/5">
                             <Layout className="text-millions-accent w-4 h-4" />
-                            <h3 className="text-[0.7rem] font-jost text-white font-bold uppercase tracking-[0.3em]">Identity Control</h3>
+                            <h3 className="text-[0.7rem] font-jost text-white/60 font-bold uppercase tracking-[0.2em]">Identity Control</h3>
                         </div>
                         <CardContent className="p-8 space-y-8">
                             <div className="space-y-3">
-                                <Label className="text-[0.6rem] font-jost text-white/40 uppercase tracking-[0.2em] font-medium">Archival Path (Slug)</Label>
+                                <Label className="text-[0.6rem] font-jost text-white/30 uppercase tracking-[0.15em] font-medium">Archival Path (Slug)</Label>
                                 <Input
                                     value={slug}
                                     onChange={(e) => setSlug(e.target.value)}
-                                    className="bg-white/5 border-white/10 text-white font-jost tracking-widest text-xs focus:border-millions-accent/40 rounded-none h-11"
+                                    className="bg-white/5 border-white/5 text-white/50 font-jost tracking-wider text-xs focus:border-millions-accent/30 rounded-none h-11"
                                 />
                             </div>
 
                             <div className="space-y-3 relative">
-                                <Label className="text-[0.6rem] font-jost text-white/40 uppercase tracking-[0.2em] font-medium">Domain Category</Label>
+                                <Label className="text-[0.6rem] font-jost text-white/30 uppercase tracking-[0.15em] font-medium">Domain Category</Label>
                                 <Input
                                     placeholder="SELECT TAXONOMY..."
                                     value={category}
                                     onChange={(e) => { setCategory(e.target.value); setShowSuggestions(true); }}
                                     onFocus={() => setShowSuggestions(true)}
                                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                                    className="bg-white/5 border-white/10 text-white font-jost tracking-widest text-xs focus:border-millions-accent/40 rounded-none h-11"
+                                    className="bg-white/5 border-white/5 text-white/50 font-jost tracking-wider text-xs focus:border-millions-accent/30 rounded-none h-11"
                                 />
                                 {showSuggestions && (
                                     <div className="absolute z-[60] w-full mt-2 bg-millions-dark border border-white/10 rounded-none shadow-2xl overflow-hidden py-1">
                                         {EXISTING_CATEGORIES.filter(c => c.toLowerCase().includes(category.toLowerCase())).map(cat => (
                                             <div
                                                 key={cat}
-                                                className="px-6 py-3 text-[0.65rem] text-white/50 uppercase tracking-widest cursor-pointer hover:bg-millions-accent/10 hover:text-millions-accent transition-all font-jost"
+                                                className="px-6 py-3 text-[0.65rem] text-white/40 uppercase tracking-widest cursor-pointer hover:bg-millions-accent/10 hover:text-millions-accent transition-all font-jost"
                                                 onClick={() => setCategory(cat)}
                                             >
                                                 {cat}
@@ -273,22 +273,22 @@ const BlogEditor = () => {
                             </div>
 
                             <div className="space-y-3">
-                                <Label className="text-[0.6rem] font-jost text-white/40 uppercase tracking-[0.2em] font-medium">Architect (Author)</Label>
+                                <Label className="text-[0.6rem] font-jost text-white/30 uppercase tracking-[0.15em] font-medium">Architect (Author)</Label>
                                 <Input
                                     placeholder="Mark"
                                     value={author}
                                     onChange={(e) => setAuthor(e.target.value)}
-                                    className="bg-white/5 border-white/10 text-white font-jost tracking-widest text-xs focus:border-millions-accent/40 rounded-none h-11"
+                                    className="bg-white/5 border-white/5 text-white/50 font-jost tracking-wider text-xs focus:border-millions-accent/30 rounded-none h-11"
                                 />
                             </div>
 
                             <div className="space-y-4">
-                                <Label className="text-[0.6rem] font-jost text-white/40 uppercase tracking-[0.2em] font-medium">Visual Asset (Cover)</Label>
+                                <Label className="text-[0.6rem] font-jost text-white/30 uppercase tracking-[0.15em] font-medium">Visual Asset (Cover)</Label>
                                 <div className="flex gap-2">
                                     <Input
                                         value={coverImage}
                                         onChange={(e) => setCoverImage(e.target.value)}
-                                        className="bg-white/5 border-white/10 text-white font-jost tracking-widest text-[0.6rem] focus:border-millions-accent/40 rounded-none h-11"
+                                        className="bg-white/5 border-white/5 text-white/40 font-jost tracking-wider text-[0.6rem] focus:border-millions-accent/30 rounded-none h-11"
                                         placeholder="HTTPS://..."
                                     />
                                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
@@ -297,13 +297,13 @@ const BlogEditor = () => {
                                         size="icon"
                                         onClick={() => fileInputRef.current?.click()}
                                         disabled={isUploading}
-                                        className="h-11 w-11 bg-white/5 border-white/10 text-white/30 hover:text-millions-accent hover:border-millions-accent/40 rounded-none shrink-0"
+                                        className="h-11 w-11 bg-white/5 border-white/5 text-white/20 hover:text-millions-accent hover:border-millions-accent/30 rounded-none shrink-0"
                                     >
                                         {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                                     </Button>
                                 </div>
                                 {coverImage && (
-                                    <div className="relative group border border-white/10 p-1 bg-black/20 animate-fade-in-up">
+                                    <div className="relative group border border-white/5 p-1 bg-black/20 animate-fade-in-up">
                                         <div className="aspect-[16/10] overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
                                             <img src={coverImage} alt="Cover Preview" className="object-cover w-full h-full scale-105" />
                                         </div>

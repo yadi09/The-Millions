@@ -35,21 +35,21 @@ export default function BlogManagement() {
     };
 
     return (
-        <div className="space-y-6 md:space-y-12 max-w-6xl mx-auto pb-20">
+        <div className="space-y-8 md:space-y-10 max-w-6xl mx-auto pb-20">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 animate-fade-in">
                 <div>
-                    <h1 className="font-cormorant text-4xl md:text-5xl font-light text-white mb-4 uppercase tracking-widest leading-none">
-                        Editorial Sync
+                    <h1 className="font-cormorant text-[clamp(2.2rem,5vw,3.5rem)] font-light text-white mb-4 leading-none">
+                        Editorial <em className="italic text-millions-accent not-italic">Sync</em>
                     </h1>
-                     <div className="flex items-center gap-4 text-millions-accent text-[0.7rem] tracking-[0.3em] uppercase mb-4 md:mb-0">
-                        <div className="w-8 h-[1px] bg-millions-accent" />
+                     <div className="flex items-center gap-4 text-millions-accent text-[0.7rem] tracking-[0.2em] uppercase mb-4 md:mb-0">
+                        <div className="w-8 h-[1px] bg-millions-accent/40" />
                         Manage Architectural Reflections
                     </div>
                 </div>
                 <Button 
                     onClick={() => navigate('/admin/blog/new')} 
-                    className="bg-millions-accent text-millions-dark hover:bg-millions-accent/80 rounded-none uppercase tracking-widest text-[0.7rem] px-8 h-12 transition-all duration-300 font-bold"
+                    className="bg-millions-accent text-millions-dark hover:bg-white rounded-none uppercase tracking-[0.2em] text-[0.65rem] px-8 h-12 transition-all duration-300 font-bold"
                 >
                     <Plus className="w-4 h-4 mr-2" />
                     New Refinement
@@ -57,12 +57,12 @@ export default function BlogManagement() {
             </div>
 
             {/* Filters & Search - Glassmorphism */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white/5 p-4 rounded-none border border-white/10 backdrop-blur-md shadow-2xl animate-fade-in-up">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white/5 p-4 rounded-none border border-white/5 backdrop-blur-md shadow-sm animate-fade-in-up">
                 <div className="relative flex-1">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 w-4 h-4" />
                     <Input
                         placeholder="Search refinements..."
-                        className="pl-12 w-full h-11 bg-white/5 border-white/5 focus:border-millions-accent/40 rounded-none text-white font-jost text-sm uppercase tracking-widest placeholder:text-white/20 placeholder:normal-case focus:ring-0 transition-all"
+                        className="pl-12 w-full h-11 bg-white/5 border-white/5 focus:border-millions-accent/30 rounded-none text-white font-jost text-[0.8rem] tracking-wider placeholder:text-white/10 placeholder:tracking-normal focus:ring-0 transition-all font-light"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
