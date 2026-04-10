@@ -19,16 +19,16 @@ export const ValuesSection: React.FC<ValuesProps> = ({ content }) => {
   const isSlider = items.length > 7;
 
   return (
-    <section id="values" className="bg-millions-dark py-[7rem] overflow-hidden border-t border-white/5">
-      <div className="max-w-[1440px] w-[94%] mx-auto">
+    <section id="values" className="bg-millions-dark py-[7rem] px-[5%] overflow-hidden border-t border-white/5">
+      <div className="max-w-[1200px] w-[90%] mx-auto">
         <div className="animate-fade-in-up mb-12">
-          <div className="flex items-center gap-4 text-millions-accent text-[0.75rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
+          <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
             {label}
           </div>
-          <h2 className="font-cormorant text-white text-4xl md:text-5xl lg:text-[3.5rem] font-light leading-tight">
+          <h2 className="font-cormorant text-white text-[clamp(2rem,4vw,3rem)] font-light leading-tight">
             {title}
           </h2>
-          <p className="text-white/50 text-[1.05rem] leading-relaxed font-light mt-2 italic">
+          <p className="text-white/50 text-[0.9rem] leading-[1.9] font-light mt-2 italic">
             {subTitle}
           </p>
         </div>
@@ -119,7 +119,7 @@ const ValueCard = ({ name, text, className = "" }: ValueItem & { className?: str
     <h4 className="font-cormorant text-white text-[1.4rem] font-semibold mb-3 group-hover:text-millions-accent transition-colors">
       {name}
     </h4>
-    <p className="text-white/40 text-[0.95rem] leading-relaxed font-light">
+    <p className="text-white/40 text-[0.83rem] leading-[1.8] font-light">
       {text}
     </p>
   </div>
