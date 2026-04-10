@@ -48,27 +48,27 @@ export function BlogCard({ post, onEdit, onDelete }: BlogCardProps) {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
-                        <h3 className="font-cormorant text-xl text-white font-light leading-snug truncate group-hover:text-millions-accent transition-colors">
+                        <h3 className="font-cormorant text-[1.3rem] text-white font-light leading-snug truncate group-hover:text-millions-accent transition-colors italic">
                             {post.title}
                         </h3>
                         <Badge
-                            className={`w-fit text-[0.6rem] px-2 py-0.5 uppercase tracking-widest rounded-none border shadow-none font-jost ${isPublished
+                            className={`w-fit text-[0.6rem] px-2 py-0.5 uppercase tracking-wider rounded-none border shadow-none font-jost font-light ${isPublished
                                 ? 'bg-millions-accent/10 text-millions-accent border-millions-accent/20'
-                                : 'bg-white/5 text-white/40 border-white/10'
+                                : 'bg-white/5 text-white/30 border-white/5'
                                 }`}
                         >
                             {post.status}
                         </Badge>
                     </div>
-                    <div className="flex items-center gap-x-4 gap-y-2 text-[0.7rem] text-white/40 font-jost uppercase tracking-wider flex-wrap">
-                        <span className="text-millions-accent/60 italic lowercase font-light">#{post.category}</span>
+                    <div className="flex items-center gap-x-4 gap-y-2 text-[0.7rem] text-white/30 font-jost uppercase tracking-[0.15em] flex-wrap font-light">
+                        <span className="text-millions-accent/50 italic lowercase">#{post.category}</span>
                         <span className="flex items-center gap-2">
-                            <Calendar size={12} className="text-white/20" />
+                            <Calendar size={12} className="text-white/10" />
                             {post.date ? new Date(post.date).toLocaleDateString() : new Date(post.createdAt).toLocaleDateString()}
                         </span>
                         {post.views !== undefined && (
                             <span className="flex items-center gap-2">
-                                <Eye size={12} className="text-white/20" />
+                                <Eye size={12} className="text-white/10" />
                                 {post.views} views
                             </span>
                         )}
@@ -87,7 +87,7 @@ export function BlogCard({ post, onEdit, onDelete }: BlogCardProps) {
                             variant="ghost"
                             size="sm"
                             asChild
-                            className="h-9 text-[0.65rem] uppercase tracking-widest px-4 hover:bg-white/5 hover:text-white rounded-none border border-transparent hover:border-white/10"
+                            className="h-9 text-[0.65rem] uppercase tracking-[0.2em] px-4 hover:bg-white/5 hover:text-white rounded-none border border-white/5 hover:border-white/20 transition-all"
                         >
                             <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
                                 <Eye className="w-4 h-4 mr-2" />
@@ -98,7 +98,7 @@ export function BlogCard({ post, onEdit, onDelete }: BlogCardProps) {
                             variant="ghost"
                             size="sm"
                             onClick={() => onEdit(post.id)}
-                            className="h-9 text-[0.65rem] uppercase tracking-widest px-4 hover:bg-millions-accent/10 hover:text-millions-accent rounded-none border border-transparent hover:border-millions-accent/20"
+                            className="h-9 text-[0.65rem] uppercase tracking-[0.2em] px-4 hover:bg-millions-accent/10 hover:text-millions-accent rounded-none border border-millions-accent/20 transition-all font-bold"
                         >
                             <Edit className="w-4 h-4 mr-2" />
                             Refine
@@ -107,7 +107,7 @@ export function BlogCard({ post, onEdit, onDelete }: BlogCardProps) {
                             variant="ghost"
                             size="icon"
                             onClick={() => onDelete(post.id)}
-                            className="h-9 w-9 text-white/20 hover:text-red-400 hover:bg-red-400/5 rounded-none border border-transparent hover:border-red-400/20"
+                            className="h-9 w-9 text-white/20 hover:text-red-400 hover:bg-red-400/5 rounded-none border border-transparent hover:border-red-400/20 transition-all"
                         >
                             <Trash2 className="w-4 h-4" />
                         </Button>
