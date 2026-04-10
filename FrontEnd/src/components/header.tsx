@@ -27,21 +27,21 @@ export function Header() {
 
   return (
     <nav className={`fixed top-0 left-0 w-full z-[100] transition-all duration-300 border-b border-white/10 ${isScrolled || !isHome ? "bg-millions-dark/95 backdrop-blur-md" : "bg-transparent"
-      } py-6 px-[3%] flex items-center justify-between`}>
+      } py-5 px-[5%] flex items-center justify-between`}>
 
       {/* Logo */}
       <Link to="/" className="flex flex-col line-none group">
-        <span className="font-cormorant text-[0.7rem] font-light tracking-[0.25em] text-millions-muted uppercase">the</span>
-        <span className="font-cormorant text-3xl font-bold text-white group-hover:text-millions-accent transition-colors">MILLIONS.</span>
+        <span className="font-cormorant text-[0.6rem] font-light tracking-[0.25em] text-millions-muted uppercase">the</span>
+        <span className="font-cormorant text-[1.5rem] font-semibold text-white group-hover:text-millions-accent transition-colors">MILLIONS.</span>
       </Link>
 
       {/* Desktop Links */}
-      <ul className="hidden lg:flex gap-10 list-none">
+      <ul className="hidden lg:flex gap-6 list-none">
         {navigation.map((item) => (
           <li key={item.name}>
             <Link
               to={item.href}
-              className="text-white/65 hover:text-millions-accent text-[0.85rem] tracking-[0.12em] uppercase transition-colors font-jost"
+              className="text-white/65 hover:text-millions-accent text-[0.75rem] tracking-[0.12em] uppercase transition-colors font-jost"
             >
               {item.name}
             </Link>
@@ -51,7 +51,7 @@ export function Header() {
         <li>
           <Link
             to="/contact"
-            className="text-white/65 hover:text-millions-accent text-[0.85rem] tracking-[0.12em] uppercase transition-colors font-jost"
+            className="text-white/65 hover:text-millions-accent text-[0.75rem] tracking-[0.12em] uppercase transition-colors font-jost"
           >
             Contact
           </Link>
@@ -62,9 +62,9 @@ export function Header() {
       <div className="flex items-center gap-4">
         <Link
           to="/contact"
-          className="hidden lg:block bg-transparent border border-millions-accent text-millions-accent px-6 py-2.5 text-[0.8rem] tracking-[0.1em] uppercase hover:bg-millions-accent hover:text-millions-dark transition-all duration-300 font-jost"
+          className="hidden lg:block bg-transparent border border-millions-accent text-millions-accent px-[1.3rem] py-[0.5rem] text-[0.72rem] tracking-[0.1em] uppercase hover:bg-millions-accent hover:text-millions-dark transition-all duration-300 font-jost"
         >
-          Get In Touch
+          WhatsApp Us
         </Link>
 
         {/* Burger Button */}
