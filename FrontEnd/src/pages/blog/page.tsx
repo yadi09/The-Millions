@@ -45,9 +45,9 @@ export default function BlogPage() {
 
   return (
     <main className="min-h-screen bg-millions-light">
-      <SubPageHero 
-        label={heroSection?.content?.badge || "Financial Insights"} 
-        title={heroSection?.content?.headlineBlack || "Our Knowledge Base"} 
+      <SubPageHero
+        label={heroSection?.content?.badge || "Financial Insights"}
+        title={heroSection?.content?.headlineBlack || "Our Knowledge Base"}
         subText={heroSection?.content?.description || "Stay informed with the latest updates and strategies from our expert team."}
       />
 
@@ -56,7 +56,7 @@ export default function BlogPage() {
         <div className="mb-20 animate-fade-in-up">
           <div className="max-w-xl mx-auto relative group">
             <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-millions-accent w-5 h-5 group-focus-within:scale-110 transition-transform" />
-            <input 
+            <input
               placeholder="Search for articles, e.g., 'tax changes'"
               className="w-full pl-16 pr-8 py-5 rounded-none bg-white border border-millions-dark/10 shadow-sm focus:border-millions-accent outline-none font-jost text-sm"
             />
@@ -67,10 +67,10 @@ export default function BlogPage() {
           {/* Main Blog Feed */}
           <div className="lg:col-span-3 space-y-16">
             {blogPosts.length === 0 ? (
-              <div className="bg-white p-20 text-center border border-millions-dark/5 animate-fade-in-up">
-                <TrendingUp className="w-12 h-12 text-millions-accent/20 mx-auto mb-6" />
-                <h3 className="font-cormorant text-2xl text-millions-dark mb-4">Knowledge Base: Coming Soon</h3>
-                <p className="text-millions-body font-light max-w-md mx-auto">
+              <div className="bg-white/40 backdrop-blur-sm p-24 text-center border-t border-millions-dark/5 animate-fade-in-up">
+                <TrendingUp className="w-10 h-10 text-millions-accent/20 mx-auto mb-8 font-light" />
+                <h3 className="font-cormorant text-[clamp(1.5rem,3vw,2.2rem)] text-millions-dark mb-4 italic font-light">Knowledge Base: Synchronizing</h3>
+                <p className="text-millions-body font-light text-[0.9rem] max-w-md mx-auto leading-relaxed">
                   We are currently preparing high-value financial strategies and technical insights for our archive. Stay tuned for our first publications.
                 </p>
               </div>
@@ -79,9 +79,9 @@ export default function BlogPage() {
                 {/* Featured Post Highlight */}
                 {featuredPost && (
                   <div className="animate-fade-in-up">
-                    <div className="bg-white border-l-4 border-l-millions-accent overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.04)] group">
+                    <div className="bg-white/60 backdrop-blur-sm border border-millions-dark/5 border-l-2 border-l-millions-accent overflow-hidden shadow-sm hover:shadow-2xl group transition-all duration-500">
                       <div className="md:flex h-full">
-                        <div className="md:w-1/2 overflow-hidden">
+                        <div className="md:w-1/2 overflow-hidden aspect-[4/3] md:aspect-auto">
                           <Link to={`/blog/${featuredPost.slug}`}>
                             <img
                               src={featuredPost.coverImage || "/placeholder.svg"}
@@ -100,14 +100,14 @@ export default function BlogPage() {
                           <p className="text-millions-body font-light text-[0.87rem] leading-relaxed mb-6 line-clamp-3">
                             {featuredPost.excerpt}
                           </p>
-                          
+
                           <div className="flex items-center gap-6 text-[0.65rem] text-millions-muted tracking-wider uppercase mb-8">
-                            <div className="flex items-center gap-2"><User className="w-3 h-3"/>{featuredPost.author || "Admin"}</div>
-                            <div className="flex items-center gap-2"><Calendar className="w-3 h-3"/>{new Date(featuredPost.publishedAt || featuredPost.createdAt).toLocaleDateString()}</div>
+                            <div className="flex items-center gap-2"><User className="w-3 h-3" />{featuredPost.author || "Admin"}</div>
+                            <div className="flex items-center gap-2"><Calendar className="w-3 h-3" />{new Date(featuredPost.publishedAt || featuredPost.createdAt).toLocaleDateString()}</div>
                           </div>
 
                           <Link to={`/blog/${featuredPost.slug}`} className="group/btn flex items-center gap-3 text-millions-dark font-jost text-[0.7rem] tracking-[0.15em] uppercase font-bold hover:text-millions-accent transition-colors">
-                            Read Story <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform"/>
+                            Read Story <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-2 transition-transform" />
                           </Link>
                         </div>
                       </div>
@@ -136,7 +136,7 @@ export default function BlogPage() {
                         <p className="text-millions-body font-light text-[0.82rem] leading-relaxed mb-6 line-clamp-2">
                           {post.excerpt}
                         </p>
-                        
+
                         <div className="mt-auto flex items-center justify-between border-t border-millions-dark/5 pt-4">
                           <div className="flex gap-4 text-[0.6rem] text-millions-muted font-light uppercase italic">
                             <span>{post.author || "Admin"}</span>
@@ -160,7 +160,7 @@ export default function BlogPage() {
                   <button
                     key={i + 1}
                     onClick={() => setCurrentPage(i + 1)}
-                    className={`w-10 h-10 font-jost text-sm transition-all ${currentPage === i+1 ? 'bg-millions-dark text-white' : 'text-millions-muted hover:text-millions-accent'}`}
+                    className={`w-10 h-10 font-jost text-sm transition-all ${currentPage === i + 1 ? 'bg-millions-dark text-white' : 'text-millions-muted hover:text-millions-accent'}`}
                   >
                     {i + 1}
                   </button>
@@ -172,14 +172,14 @@ export default function BlogPage() {
           {/* Sidebar */}
           <aside className="space-y-12 animate-fade-in-up md:animation-delay-500">
             {/* Categories Block */}
-            <div className="bg-white p-8 border-t-2 border-t-millions-mid">
-              <h4 className="font-cormorant text-millions-dark text-xl font-light mb-6 uppercase tracking-widest text-[0.9rem]">Insights By Category</h4>
-              <ul className="space-y-2">
+            <div className="bg-millions-dark p-10 border-t-2 border-t-millions-accent shadow-xl">
+              <h4 className="font-cormorant text-white text-[1rem] font-light mb-10 uppercase tracking-[0.3em] italic">Archive Taxonomy</h4>
+              <ul className="space-y-4">
                 {categories.map((category) => (
                   <li key={category.name}>
-                    <Link to="#" className="flex justify-between items-center py-2 text-[0.8rem] group text-millions-body hover:text-millions-accent transition-colors font-light">
+                    <Link to="#" className="flex justify-between items-center py-2.5 text-[0.75rem] tracking-widest group text-white/40 hover:text-millions-accent transition-colors font-light uppercase">
                       <span>{category.name}</span>
-                      <span className="text-[0.6rem] bg-millions-dark/5 px-2 py-1 group-hover:bg-millions-accent group-hover:text-millions-dark transition-colors">{category.count}</span>
+                      <span className="text-[0.6rem] bg-white/5 px-2.5 py-1.5 group-hover:bg-millions-accent group-hover:text-millions-dark transition-colors">{category.count}</span>
                     </Link>
                   </li>
                 ))}
@@ -192,9 +192,9 @@ export default function BlogPage() {
               <p className="text-white/40 text-[0.75rem] font-light leading-relaxed mb-6">
                 Receive curated financial strategies directly in your inbox.
               </p>
-              <input 
-                placeholder="Your email address" 
-                className="w-full bg-white/5 border border-white/10 p-3 text-xs text-white outline-none focus:border-millions-accent mb-4" 
+              <input
+                placeholder="Your email address"
+                className="w-full bg-white/5 border border-white/10 p-3 text-xs text-white outline-none focus:border-millions-accent mb-4"
               />
               <button className="w-full bg-millions-accent text-millions-dark py-3 font-jost text-[0.7rem] font-bold uppercase tracking-widest hover:bg-white transition-all">
                 Subscribe

@@ -8,12 +8,13 @@ type EditorSidebarProps = {
 };
 
 const getIconForType = (type: string) => {
+    const iconClass = "w-4 h-4";
     switch (type) {
-        case 'hero': return <Image size={18} />;
-        case 'services': return <List size={18} />;
-        case 'cta': return <PhoneCall size={18} />;
-        case 'about': return <Type size={18} />;
-        default: return <LayoutTemplate size={18} />;
+        case 'hero': return <Image className={iconClass} />;
+        case 'services': return <List className={iconClass} />;
+        case 'cta': return <PhoneCall className={iconClass} />;
+        case 'about': return <Type className={iconClass} />;
+        default: return <LayoutTemplate className={iconClass} />;
     }
 };
 
@@ -29,58 +30,77 @@ const EditorSidebar = ({ sections, activeSectionId, onSelectSection }: EditorSid
 
     return (
         <div className={`
-            w-full bg-white border-b border-slate-200
-            flex flex-col
-            md:static md:z-auto md:w-64 md:border-r md:border-b-0 md:h-full md:flex-col
+            w-full h-full bg-millions-dark/80 backdrop-blur-xl border-r border-white/5
+            flex flex-col z-20 transition-all duration-500
         `}>
             {/* Desktop Header */}
-            <div className="p-4 border-b border-slate-200 hidden md:block">
-                <h2 className="font-semibold text-slate-900">Page Sections</h2>
-                <p className="text-xs text-slate-500">Select a section to edit</p>
+            <div className="p-8 border-b border-white/5 hidden md:block">
+                <h2 className="font-cormorant text-[1.4rem] text-white font-light leading-none mb-4 italic">
+                    Architecture
+                </h2>
+                <div className="flex items-center gap-3 text-millions-accent text-[0.6rem] tracking-[0.2em] uppercase opacity-50 font-light">
+                    <div className="w-4 h-[1px] bg-millions-accent/40" />
+                    Section Map
+                </div>
             </div>
 
             {/* Mobile Menu Trigger */}
-            <div className="md:hidden p-2">
+            <div className="md:hidden p-4 bg-black/40 border-b border-white/5">
                 <button
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="w-full flex items-center justify-between px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-medium text-slate-700"
+                    className="w-full flex items-center justify-between px-6 py-4 bg-white/5 border border-white/5 rounded-none text-[0.65rem] font-jost font-bold text-white uppercase tracking-[0.2em] transition-all"
                 >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                         {activeSection ? (
                             <>
-                                {getIconForType(activeSection.type)}
+                                <span className="text-millions-accent/60">{getIconForType(activeSection.type)}</span>
                                 <span className="capitalize">{activeSection.type.replace('-', ' ')}</span>
                             </>
                         ) : (
-                            <span>Select Section</span>
+                            <span>Select Component</span>
                         )}
                     </div>
-                    {isMenuOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    {isMenuOpen ? <ChevronUp size={16} className="text-white/20" /> : <ChevronDown size={16} className="text-white/20" />}
                 </button>
             </div>
 
-            {/* Sections List - Dropdown on mobile, Sidebar on desktop */}
+            {/* Sections List */}
             <div className={`
                 ${isMenuOpen ? 'flex' : 'hidden md:flex'}
-                flex-col gap-1 p-2 bg-white
-                md:flex md:flex-col md:overflow-y-auto md:space-y-1 md:p-2 md:touch-auto
+                flex-col gap-0 p-0 overflow-y-auto custom-scrollbar md:h-full bg-black/5
             `}>
-                {sections.map((section) => (
-                    <button
-                        key={section.id}
-                        onClick={() => handleSelect(section.id)}
-                        className={`
-                            flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors w-full
-                            ${activeSectionId === section.id
-                                ? 'bg-blue-50 text-blue-700 font-medium'
-                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                            }
-                        `}
-                    >
-                        {getIconForType(section.type)}
-                        <span className="capitalize">{section.type.replace('-', ' ')}</span>
-                    </button>
-                ))}
+                {sections.map((section) => {
+                    const isActive = activeSectionId === section.id;
+                    return (
+                        <button
+                            key={section.id}
+                            onClick={() => handleSelect(section.id)}
+                            className={`
+                                flex items-center gap-6 px-10 py-6 text-[0.7rem] uppercase tracking-[0.15em] transition-all duration-300 w-full border-b border-white/5 group relative overflow-hidden font-light
+                                ${isActive
+                                    ? 'bg-white/5 text-millions-accent font-bold border-l-2 border-l-millions-accent border-b-white/5'
+                                    : 'text-white/30 hover:bg-white/5 hover:text-white'
+                                }
+                            `}
+                        >
+                            <span className={`transition-colors duration-300 ${isActive ? 'text-millions-accent' : 'text-white/10 group-hover:text-millions-accent/40'}`}>
+                                {getIconForType(section.type)}
+                            </span>
+                            <span className="font-jost">{section.type.replace('-', ' ')}</span>
+                            
+                            {isActive && (
+                                <div className="absolute right-0 top-0 h-full w-[1px] bg-millions-accent shadow-[0_0_15px_rgba(201,168,76,0.3)]" />
+                            )}
+                        </button>
+                    );
+                })}
+            </div>
+            
+            {/* Version Badge Footer */}
+            <div className="hidden md:block p-8 border-t border-white/5 mt-auto">
+                 <p className="text-[0.55rem] font-jost text-white/10 uppercase tracking-[0.2em] text-center font-light">
+                    Structure v1.02.SYNC
+                </p>
             </div>
         </div>
     );

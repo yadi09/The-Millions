@@ -20,18 +20,18 @@ export const ImpactModelSection: React.FC<ImpactModelProps> = ({ content }) => {
   const isSlider = pillars.length > 4;
 
   return (
-    <section id="model" className="bg-millions-light py-[7rem] overflow-hidden">
-      <div className="max-w-[1440px] w-[94%] mx-auto">
+    <section id="model" className="bg-millions-light py-[7rem] px-[5%] overflow-hidden">
+      <div className="max-w-[1200px] w-[90%] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end mb-16 animate-fade-in-up">
           <div>
-            <div className="flex items-center gap-4 text-millions-accent text-[0.75rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
+            <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
               {label}
             </div>
-            <h2 className="font-cormorant text-millions-dark text-4xl md:text-5xl lg:text-[3.5rem] font-light leading-tight">
+            <h2 className="font-cormorant text-millions-dark text-[clamp(2rem,4vw,3rem)] font-light leading-tight">
               {title}
             </h2>
           </div>
-          <p className="text-millions-body text-[1.05rem] leading-relaxed font-light lg:max-w-md">
+          <p className="text-millions-body text-[0.9rem] leading-[1.9] font-light lg:max-w-md">
             {subTitle}
           </p>
         </div>
@@ -107,13 +107,13 @@ const PillarCard = ({ pillar, className = "" }: { pillar: Pillar; className?: st
   <div 
     className={`bg-white p-10 border-b-2 border-b-transparent hover:border-b-millions-accent hover:-translate-y-1 transition-all duration-300 group hover:shadow-[0_16px_36px_rgba(13,36,32,0.08)] ${className}`}
   >
-    <div className="font-cormorant text-millions-accent/20 text-5xl font-light leading-none mb-4 group-hover:text-millions-accent/40 transition-colors">
+    <div className="font-cormorant text-millions-accent/20 text-[3rem] font-light leading-none mb-4 group-hover:text-millions-accent/40 transition-colors">
       {pillar.num}
     </div>
     <h3 className="font-cormorant text-millions-dark text-[1.5rem] font-light mb-3">
       {pillar.title}
     </h3>
-    <p className="text-millions-body text-[0.95rem] leading-relaxed font-light">
+    <p className="text-millions-body text-[0.83rem] leading-[1.8] font-light">
       {pillar.text}
     </p>
   </div>

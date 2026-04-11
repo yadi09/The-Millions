@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, Settings, LogOut, BookOpen, Star, Briefcase } from 'lucide-react';
+import { FileText, LogOut, BookOpen, Star, Briefcase, User } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import type { RootState } from '../app/store';
@@ -26,113 +26,81 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
     };
 
     const handleNavigation = () => {
-        // Close sidebar on mobile when a link is clicked
         if (window.innerWidth < 1024) {
             onClose();
         }
     };
 
+    const navLinks = [
+        { to: "/admin/pages", icon: FileText, label: "Pages" },
+        { to: "/admin/blog", icon: BookOpen, label: "Blog" },
+        { to: "/admin/services", icon: Briefcase, label: "Services" },
+        { to: "/admin/testimonials", icon: Star, label: "Testimonials" },
+    ];
+
     return (
         <aside
             className={`
-                fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white 
-                transform transition-transform duration-300 ease-in-out
+                fixed inset-y-0 left-0 z-50 w-64 bg-millions-dark text-white 
+                transform transition-transform duration-300 ease-in-out border-r border-white/10
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
                 lg:translate-x-0 lg:fixed lg:z-40
             `}
         >
-            <div className="p-6 border-b border-slate-800">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
-                        A
+            <div className="p-8 border-b border-white/5 bg-white/5">
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 border border-millions-accent/40 rounded-none flex items-center justify-center text-millions-accent font-cormorant text-xl font-bold shadow-[0_0_15px_rgba(201,168,76,0.1)]">
+                        M
                     </div>
-                    <div>
-                        <h1 className="font-bold text-lg">Admin</h1>
-                        <p className="text-xs text-slate-400">{user?.email || 'admin@example.com'}</p>
+                    <div className="min-w-0">
+                        <h1 className="font-cormorant font-light text-[1.1rem] leading-none mb-1 text-white">Admin <em className="italic text-millions-accent not-italic">Sync</em></h1>
+                        <p className="text-[0.6rem] text-white/30 font-jost uppercase tracking-[0.2em] truncate">
+                            {user?.email || 'admin@themillions.com'}
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <nav className="p-4 space-y-2">
-                <Link
-                    to="/admin"
-                    onClick={handleNavigation}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${location.pathname === '/admin'
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                        }`}
-                >
-                    <LayoutDashboard size={20} />
-                    Dashboard
-                </Link>
-
-                <Link
-                    to="/admin/blog"
-                    onClick={handleNavigation}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/admin/blog')
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                        }`}
-                >
-                    <BookOpen size={20} />
-                    Blog
-                </Link>
-
-                <Link
-                    to="/admin/pages"
-                    onClick={handleNavigation}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/admin/pages')
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                        }`}
-                >
-                    <FileText size={20} />
-                    Pages
-                </Link>
-
-                <Link
-                    to="/admin/services"
-                    onClick={handleNavigation}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/admin/services')
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                        }`}
-                >
-                    <Briefcase size={20} />
-                    Services
-                </Link>
-
-                <Link
-                    to="/admin/testimonials"
-                    onClick={handleNavigation}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/admin/testimonials')
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                        }`}
-                >
-                    <Star size={20} />
-                    Testimonials
-                </Link>
-
-                <Link
-                    to="/admin/settings"
-                    onClick={handleNavigation}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive('/admin/settings')
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                        }`}
-                >
-                    <Settings size={20} />
-                    Settings
-                </Link>
+            <nav className="p-4 mt-6 space-y-2">
+                {navLinks.map((link) => {
+                    const active = isActive(link.to);
+                    const Icon = link.icon;
+                    return (
+                        <Link
+                            key={link.to}
+                            to={link.to}
+                            onClick={handleNavigation}
+                            className={`flex items-center gap-4 px-6 py-4 transition-all duration-300 group relative ${active
+                                ? 'text-millions-accent bg-white/5'
+                                : 'text-white/40 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            {active && (
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] h-6 bg-millions-accent" />
+                            )}
+                            <Icon size={16} className={`${active ? 'text-millions-accent' : 'text-white/20 group-hover:text-white/40'}`} />
+                            <span className="font-jost text-[0.7rem] uppercase tracking-[0.2em] font-medium">
+                                {link.label}
+                            </span>
+                        </Link>
+                    );
+                })}
             </nav>
 
-            <div className="absolute bottom-0 w-full p-4 border-t border-slate-800">
+            <div className="absolute bottom-0 w-full p-6 border-t border-white/5 bg-white/5">
+                <div className="flex items-center gap-3 px-4 py-2 mb-4">
+                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+                        <User size={12} className="text-white/40" />
+                    </div>
+                    <span className="text-[0.65rem] font-jost text-white/40 uppercase tracking-widest truncate font-light">
+                        {user?.email || 'Administrator'}
+                    </span>
+                </div>
                 <button
                     onClick={handleLogout}
-                    className="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors w-full"
+                    className="flex items-center gap-3 px-4 py-3 text-white/30 hover:text-red-400 transition-all font-jost text-[0.6rem] uppercase tracking-[0.2em] w-full group"
                 >
-                    <LogOut size={20} />
+                    <LogOut size={14} className="group-hover:-translate-x-1 transition-transform" />
                     Logout
                 </button>
             </div>
