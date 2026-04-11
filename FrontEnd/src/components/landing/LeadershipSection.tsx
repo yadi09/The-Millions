@@ -30,12 +30,12 @@ export const LeadershipSection: React.FC<LeadershipProps> = ({ content }) => {
           <h2 className="font-cormorant text-millions-dark text-[clamp(2rem,4vw,3rem)] font-light leading-tight mb-6">
             {title}
           </h2>
-          <p className="text-millions-body text-[0.9rem] leading-[1.9] font-light mb-8 lg:max-w-md">
+          <p className="text-millions-body text-[0.9rem] leading-[1.9] font-medium mb-8 lg:max-w-md">
             {subTitle}
           </p>
-          <ul className="space-y-4">
+          <ul className="space-y-1">
             {commitments.map((item, idx) => (
-              <li key={idx} className="flex gap-4 p-4 border-b border-millions-dark/5 text-millions-body text-[0.83rem] leading-[1.8] font-light">
+              <li key={idx} className="flex gap-4 p-2 border-b border-millions-dark/5 text-millions-body text-[0.85rem] leading-[1.8] font-medium">
                 <span className="text-millions-accent flex-shrink-0">—</span>
                 {item}
               </li>
@@ -44,10 +44,10 @@ export const LeadershipSection: React.FC<LeadershipProps> = ({ content }) => {
         </div>
 
         <div className="animate-fade-in-up md:animation-delay-300">
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 mt-4">
             {leaders.map((leader, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className="flex items-center gap-6 bg-white p-6 border-l-2 border-l-transparent hover:border-l-millions-accent hover:shadow-[0_8px_24px_rgba(13,36,32,0.07)] transition-all duration-300 group"
               >
                 <div className="w-14 h-14 bg-millions-mid flex items-center justify-center font-cormorant text-2xl text-millions-accent flex-shrink-0">
