@@ -16,7 +16,6 @@ const AdminPageEditor = () => {
             <PageEditorContent
                 slug={slug}
                 onClose={() => navigate('/admin/pages')}
-                isModal={false}
             />
         </div>
     );
