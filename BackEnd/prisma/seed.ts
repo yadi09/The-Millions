@@ -458,3 +458,6 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+// ✅ ADD THIS EMPTY EXPORT STATEMENT TO MAKE FILE A MODULE
+export {};
