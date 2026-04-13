@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSubmitTestimonialMutation } from "../../features/api/apiSlice";
+import { useSubmitTestimonialMutation, useGetServicesQuery } from "../../features/api/apiSlice";
 import { SubPageHero } from "../../components/SubPageHero";
-import { CheckCircle, Star, Upload, X, AlertCircle } from "lucide-react";
+import { CheckCircle, Star, Upload, X, AlertCircle, Loader2 } from "lucide-react";
 
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -20,6 +20,7 @@ function validate(formData: Record<string, string>, rating: number): FormErrors 
     const role = formData.role.trim();
     const location = formData.location.trim();
     const category = formData.category;
+    const customCategory = formData.customCategory.trim();
     const results = formData.results.trim();
     const content = formData.content.trim();
 
@@ -43,6 +44,10 @@ function validate(formData: Record<string, string>, rating: number): FormErrors 
     else if (location.length > 100) errors.location = "Location must be under 100 characters.";
 
     if (!category) errors.category = "Please select a service category.";
+    
+    if (category === "Other" && !customCategory) {
+        errors.customCategory = "Please specify the service received.";
+    }
 
     if (rating < 1 || rating > 5) errors.rating = "Please select a rating between 1 and 5.";
 
@@ -61,7 +66,9 @@ const ErrorMsg = ({ msg }: { msg?: string }) =>
 
 export default function SubmitTestimonial() {
     const navigate = useNavigate();
+    const { data: services, isLoading: isLoadingServices } = useGetServicesQuery();
     const [submitTestimonial, { isLoading, isSuccess }] = useSubmitTestimonialMutation();
+    
     const [rating, setRating] = useState(5);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [errors, setErrors] = useState<FormErrors>({});
@@ -72,10 +79,17 @@ export default function SubmitTestimonial() {
         role: "",
         company: "",
         category: "",
+        customCategory: "",
         content: "",
         results: "",
         location: "",
     });
+
+    const categories = useMemo(() => {
+        if (!services) return ["Other"];
+        const serviceNames = services.map(s => s.name);
+        return [...serviceNames, "Other"];
+    }, [services]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const updated = { ...formData, [e.target.name]: e.target.value };
@@ -129,9 +143,12 @@ export default function SubmitTestimonial() {
 
         if (Object.values(validationErrors).some((v) => v)) return;
 
+        const finalCategory = trimmed.category === "Other" ? trimmed.customCategory : trimmed.category;
+
         try {
             await submitTestimonial({
                 ...trimmed,
+                category: finalCategory,
                 rating,
                 image: imagePreview || undefined,
                 videoTestimonial: false,
@@ -279,26 +296,48 @@ export default function SubmitTestimonial() {
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <label htmlFor="category" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Service Category *</label>
-                                    <select
-                                        id="category"
-                                        name="category"
-                                        value={formData.category}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        className={`bg-white border ${errors.category ? 'border-red-400' : 'border-millions-dark/10'} p-3 text-sm focus:border-millions-accent outline-none font-jost appearance-none`}
-                                        required
-                                    >
-                                        <option value="" disabled>Select service</option>
-                                        <option value="Property Accounting">Property Accounting</option>
-                                        <option value="Business Advisory">Business Advisory</option>
-                                        <option value="Self Assessment">Self Assessment</option>
-                                        <option value="Payroll & Bookkeeping">Payroll & Bookkeeping</option>
-                                        <option value="Corporate Tax">Corporate Tax</option>
-                                        <option value="Other">Other</option>
-                                    </select>
+                                    <div className="relative">
+                                        <select
+                                            id="category"
+                                            name="category"
+                                            value={formData.category}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            className={`w-full bg-white border ${errors.category ? 'border-red-400' : 'border-millions-dark/10'} p-3 text-sm focus:border-millions-accent outline-none font-jost appearance-none disabled:opacity-50`}
+                                            required
+                                            disabled={isLoadingServices}
+                                        >
+                                            <option value="" disabled>{isLoadingServices ? "Loading domains..." : "Select service domain"}</option>
+                                            {categories.map((cat) => (
+                                                <option key={cat} value={cat}>{cat}</option>
+                                            ))}
+                                        </select>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-millions-dark/30">
+                                            {isLoadingServices ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3 rotate-45" />}
+                                        </div>
+                                    </div>
                                     <ErrorMsg msg={errors.category} />
                                 </div>
                             </div>
+
+                            {formData.category === "Other" && (
+                                <div className="flex flex-col gap-2 animate-fade-in">
+                                    <label htmlFor="customCategory" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Specify Service *</label>
+                                    <input
+                                        id="customCategory"
+                                        name="customCategory"
+                                        type="text"
+                                        value={formData.customCategory}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        className={`bg-white border ${errors.customCategory ? 'border-red-400' : 'border-millions-dark/10'} p-3 text-sm focus:border-millions-accent outline-none font-jost`}
+                                        placeholder="What service did you receive?"
+                                        maxLength={100}
+                                        required
+                                    />
+                                    <ErrorMsg msg={errors.customCategory} />
+                                </div>
+                            )}
 
                             <div className="flex flex-col gap-4">
                                 <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Overall Rating *</label>
