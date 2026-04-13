@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSubmitTestimonialMutation } from "../../features/api/apiSlice";
-import { Button } from "../../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
-import { CheckCircle2, Loader2, Star, Upload, X } from "lucide-react";
+import { SubPageHero } from "../../components/SubPageHero";
+import { CheckCircle, Star, Upload, X, AlertCircle } from "lucide-react";
 
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -56,13 +56,11 @@ function validate(formData: Record<string, string>, rating: number): FormErrors 
     return errors;
 }
 
-const inputClass = (hasError: boolean) =>
-    `w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${hasError ? 'border-red-400 bg-red-50/50' : 'border-slate-300'}`;
-
 const ErrorMsg = ({ msg }: { msg?: string }) =>
-    msg ? <p className="text-xs text-red-600 mt-1">{msg}</p> : null;
+    msg ? <p className="text-[0.65rem] text-red-500 italic mt-1">{msg}</p> : null;
 
 export default function SubmitTestimonial() {
+    const navigate = useNavigate();
     const [submitTestimonial, { isLoading, isSuccess }] = useSubmitTestimonialMutation();
     const [rating, setRating] = useState(5);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -82,14 +80,12 @@ export default function SubmitTestimonial() {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const updated = { ...formData, [e.target.name]: e.target.value };
         setFormData(updated);
-        // Re-validate on change only if user has already attempted to submit
         if (touched) {
             setErrors(validate(updated, rating));
         }
     };
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        // Validate single field on blur for immediate feedback
         const fieldErrors = validate({ ...formData, [e.target.name]: e.target.value }, rating);
         setErrors((prev) => ({ ...prev, [e.target.name]: fieldErrors[e.target.name] || '' }));
     };
@@ -124,7 +120,6 @@ export default function SubmitTestimonial() {
         e.preventDefault();
         setTouched(true);
 
-        // Trim all values before validation
         const trimmed = Object.fromEntries(
             Object.entries(formData).map(([k, v]) => [k, v.trim()])
         ) as typeof formData;
@@ -143,48 +138,62 @@ export default function SubmitTestimonial() {
             }).unwrap();
         } catch (error) {
             console.error("Failed to submit testimonial", error);
-            setErrors({ submit: "Something went wrong. Please try again." });
+            const errorMessage = (error as { data?: { error?: string } })?.data?.error || "Something went wrong. Please try again.";
+            setErrors({ submit: errorMessage });
         }
     };
 
     if (isSuccess) {
         return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-                <Card className="max-w-md w-full text-center">
-                    <CardContent className="pt-10 pb-8 px-8">
-                        <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-6" />
-                        <h2 className="text-2xl font-bold text-slate-900 mb-2">Thank You!</h2>
-                        <p className="text-slate-600 mb-6">
-                            Your testimonial has been successfully submitted and is pending review by our team.
-                            We appreciate you taking the time to share your experience!
+            <main className="min-h-screen bg-millions-light">
+                <SubPageHero
+                    label="Success"
+                    title="Thank You!"
+                    subText="Your testimonial has been successfully submitted and is pending review by our team."
+                />
+                <div className="max-w-3xl mx-auto px-4 py-20">
+                    <div className="bg-white/60 backdrop-blur-sm border-l-4 border-l-millions-accent p-12 shadow-[0_20px_50px_rgba(0,0,0,0.04)] text-center animate-fade-in-up">
+                        <CheckCircle className="w-16 h-16 text-millions-accent mx-auto mb-6" />
+                        <h3 className="font-cormorant text-[clamp(1.8rem,3vw,2.5rem)] text-millions-dark font-light mb-4">Submission Received</h3>
+                        <p className="text-millions-body font-light text-[0.95rem] mb-10">
+                            We appreciate you taking the time to share your experience with The Millions. 
+                            Your feedback helps us grow and inspires others.
                         </p>
-                        <Button onClick={() => window.location.href = '/'} variant="outline">
+                        <button
+                            onClick={() => navigate('/')}
+                            className="bg-millions-dark text-white px-10 py-4 font-jost text-[0.78rem] tracking-[0.12em] uppercase font-medium transition-all hover:bg-millions-accent hover:text-millions-dark mx-auto block"
+                        >
                             Return to Homepage
-                        </Button>
-                    </CardContent>
-                </Card>
-            </div>
+                        </button>
+                    </div>
+                </div>
+            </main>
         );
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-2xl mx-auto">
-                <div className="text-center mb-10">
-                    <h1 className="text-3xl font-bold text-slate-900 mb-2">Share Your Experience</h1>
-                    <p className="text-slate-600">Help us inspire others by sharing how The Millions has impacted your business.</p>
-                </div>
+        <main className="min-h-screen bg-millions-light">
+            <SubPageHero
+                label="Share Your Experience"
+                title="Your Success is Our Story"
+                subText="Help us inspire others by sharing how The Millions has impacted your business or property investment journey."
+            />
 
-                <Card className="shadow-lg border-blue-100">
-                    <CardHeader className="bg-blue-50/50 border-b border-blue-100 pb-6">
-                        <CardTitle>Testimonial Details</CardTitle>
-                        <CardDescription>All fields are required unless marked otherwise.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                        <form onSubmit={handleSubmit} noValidate className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-1">
-                                    <label htmlFor="name" className="text-sm font-medium text-slate-700">Full Name</label>
+            <div className="max-w-7xl mx-auto px-4 md:px-20 py-20">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+                    {/* Form Section */}
+                    <div className="lg:col-span-2">
+                        <div className="mb-10">
+                            <h2 className="font-cormorant text-millions-dark text-3xl font-light mb-4">Testimonial Details</h2>
+                            <p className="text-millions-body font-light text-sm italic">
+                                Fields marked with an asterisk (*) are required.
+                            </p>
+                        </div>
+
+                        <form onSubmit={handleSubmit} noValidate className="space-y-10 animate-fade-in-up bg-white/60 backdrop-blur-sm p-10 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-millions-dark/5">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="flex flex-col gap-2">
+                                    <label htmlFor="name" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Full Name *</label>
                                     <input
                                         id="name"
                                         name="name"
@@ -192,14 +201,15 @@ export default function SubmitTestimonial() {
                                         value={formData.name}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        className={inputClass(!!errors.name)}
-                                        placeholder="John Doe"
+                                        className={`bg-white border ${errors.name ? 'border-red-400' : 'border-millions-dark/10'} p-3 text-sm focus:border-millions-accent outline-none font-jost`}
+                                        placeholder="e.g. John Doe"
                                         maxLength={100}
+                                        required
                                     />
                                     <ErrorMsg msg={errors.name} />
                                 </div>
-                                <div className="space-y-1">
-                                    <label htmlFor="email" className="text-sm font-medium text-slate-700">Email Address</label>
+                                <div className="flex flex-col gap-2">
+                                    <label htmlFor="email" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Email Address *</label>
                                     <input
                                         id="email"
                                         name="email"
@@ -207,13 +217,17 @@ export default function SubmitTestimonial() {
                                         value={formData.email}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        className={inputClass(!!errors.email)}
-                                        placeholder="john@example.com"
+                                        className={`bg-white border ${errors.email ? 'border-red-400' : 'border-millions-dark/10'} p-3 text-sm focus:border-millions-accent outline-none font-jost`}
+                                        placeholder="e.g. john@example.com"
+                                        required
                                     />
                                     <ErrorMsg msg={errors.email} />
                                 </div>
-                                <div className="space-y-1">
-                                    <label htmlFor="company" className="text-sm font-medium text-slate-700">Company Name</label>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="flex flex-col gap-2">
+                                    <label htmlFor="company" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Company Name *</label>
                                     <input
                                         id="company"
                                         name="company"
@@ -221,14 +235,15 @@ export default function SubmitTestimonial() {
                                         value={formData.company}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        className={inputClass(!!errors.company)}
-                                        placeholder="Acme Corp"
+                                        className={`bg-white border ${errors.company ? 'border-red-400' : 'border-millions-dark/10'} p-3 text-sm focus:border-millions-accent outline-none font-jost`}
+                                        placeholder="e.g. Acme Corp"
                                         maxLength={100}
+                                        required
                                     />
                                     <ErrorMsg msg={errors.company} />
                                 </div>
-                                <div className="space-y-1">
-                                    <label htmlFor="role" className="text-sm font-medium text-slate-700">Your Role/Title</label>
+                                <div className="flex flex-col gap-2">
+                                    <label htmlFor="role" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Your Role/Title *</label>
                                     <input
                                         id="role"
                                         name="role"
@@ -236,14 +251,18 @@ export default function SubmitTestimonial() {
                                         value={formData.role}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        className={inputClass(!!errors.role)}
-                                        placeholder="CEO & Founder"
+                                        className={`bg-white border ${errors.role ? 'border-red-400' : 'border-millions-dark/10'} p-3 text-sm focus:border-millions-accent outline-none font-jost`}
+                                        placeholder="e.g. CEO & Founder"
                                         maxLength={100}
+                                        required
                                     />
                                     <ErrorMsg msg={errors.role} />
                                 </div>
-                                <div className="space-y-1">
-                                    <label htmlFor="location" className="text-sm font-medium text-slate-700">Location</label>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="flex flex-col gap-2">
+                                    <label htmlFor="location" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Location *</label>
                                     <input
                                         id="location"
                                         name="location"
@@ -251,43 +270,124 @@ export default function SubmitTestimonial() {
                                         value={formData.location}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        className={inputClass(!!errors.location)}
-                                        placeholder="London, UK"
+                                        className={`bg-white border ${errors.location ? 'border-red-400' : 'border-millions-dark/10'} p-3 text-sm focus:border-millions-accent outline-none font-jost`}
+                                        placeholder="e.g. London, UK"
                                         maxLength={100}
+                                        required
                                     />
                                     <ErrorMsg msg={errors.location} />
                                 </div>
+                                <div className="flex flex-col gap-2">
+                                    <label htmlFor="category" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Service Category *</label>
+                                    <select
+                                        id="category"
+                                        name="category"
+                                        value={formData.category}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        className={`bg-white border ${errors.category ? 'border-red-400' : 'border-millions-dark/10'} p-3 text-sm focus:border-millions-accent outline-none font-jost appearance-none`}
+                                        required
+                                    >
+                                        <option value="" disabled>Select service</option>
+                                        <option value="Property Accounting">Property Accounting</option>
+                                        <option value="Business Advisory">Business Advisory</option>
+                                        <option value="Self Assessment">Self Assessment</option>
+                                        <option value="Payroll & Bookkeeping">Payroll & Bookkeeping</option>
+                                        <option value="Corporate Tax">Corporate Tax</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <ErrorMsg msg={errors.category} />
+                                </div>
                             </div>
 
-                            {/* Optional Image Upload */}
-                            <div className="space-y-1">
-                                <label className="text-sm font-medium text-slate-700">
-                                    Profile Photo <span className="text-slate-400 font-normal">(Optional)</span>
+                            <div className="flex flex-col gap-4">
+                                <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Overall Rating *</label>
+                                <div className="flex gap-2">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            type="button"
+                                            onClick={() => {
+                                                setRating(star);
+                                                if (touched) setErrors((prev) => ({ ...prev, rating: '' }));
+                                            }}
+                                            className="focus:outline-none transition-transform hover:scale-110"
+                                        >
+                                            <Star
+                                                className={`w-8 h-8 ${rating >= star ? 'fill-millions-accent text-millions-accent' : 'text-millions-dark/10'}`}
+                                                strokeWidth={1.5}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                                <ErrorMsg msg={errors.rating} />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <label htmlFor="results" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Concrete Results Achieved *</label>
+                                <input
+                                    id="results"
+                                    name="results"
+                                    type="text"
+                                    value={formData.results}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={`bg-white border ${errors.results ? 'border-red-400' : 'border-millions-dark/10'} p-3 text-sm focus:border-millions-accent outline-none font-jost`}
+                                    placeholder="e.g. £15,000+ tax savings"
+                                    maxLength={100}
+                                    required
+                                />
+                                <ErrorMsg msg={errors.results} />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <div className="flex justify-between items-baseline">
+                                    <label htmlFor="content" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Your Testimonial *</label>
+                                    <span className={`text-[0.6rem] ${formData.content.trim().length > 1000 ? 'text-red-500' : 'text-millions-muted'}`}>
+                                        {formData.content.trim().length}/1000
+                                    </span>
+                                </div>
+                                <textarea
+                                    id="content"
+                                    name="content"
+                                    rows={6}
+                                    value={formData.content}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className={`bg-white border ${errors.content ? 'border-red-400' : 'border-millions-dark/10'} p-3 text-sm focus:border-millions-accent outline-none font-jost resize-none`}
+                                    placeholder="Tell us about your experience working with The Millions..."
+                                    maxLength={1000}
+                                    required
+                                />
+                                <ErrorMsg msg={errors.content} />
+                            </div>
+
+                            <div className="flex flex-col gap-4">
+                                <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">
+                                    Profile Photo <span className="text-millions-muted italic font-light lowercase">(Optional)</span>
                                 </label>
                                 {imagePreview ? (
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-6 bg-white p-4 border border-millions-dark/5">
                                         <img
                                             src={imagePreview}
                                             alt="Preview"
-                                            className="w-16 h-16 rounded-full object-cover border-2 border-blue-200 aspect-square shrink-0"
+                                            className="w-20 h-20 rounded-none object-cover border border-millions-dark/10 aspect-square shrink-0"
                                         />
-                                        <Button
+                                        <button
                                             type="button"
-                                            variant="outline"
-                                            size="sm"
                                             onClick={removeImage}
-                                            className="text-red-600 border-red-200 hover:bg-red-50"
+                                            className="text-[0.6rem] tracking-widest uppercase text-red-500 flex items-center gap-2 hover:text-red-700 transition-colors"
                                         >
-                                            <X className="w-4 h-4 mr-1" /> Remove
-                                        </Button>
+                                            <X className="w-3 h-3" /> Remove Photo
+                                        </button>
                                     </div>
                                 ) : (
                                     <label
                                         htmlFor="image-upload"
-                                        className={`flex items-center justify-center gap-2 w-full px-3 py-4 border-2 border-dashed rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-colors text-sm text-slate-500 ${errors.image ? 'border-red-400 bg-red-50/50' : 'border-slate-300'}`}
+                                        className={`flex flex-col items-center justify-center gap-4 w-full py-10 border-2 border-dashed ${errors.image ? 'border-red-400 bg-red-50/20' : 'border-millions-dark/10'} cursor-pointer hover:border-millions-accent hover:bg-white/50 transition-all text-millions-muted`}
                                     >
-                                        <Upload className="w-4 h-4" />
-                                        Click to upload a photo (JPG, PNG, WebP — max 2MB)
+                                        <Upload className="w-6 h-6 text-millions-accent" />
+                                        <span className="text-[0.7rem] tracking-wide font-light">Click to upload (JPG, PNG, WebP — max 2MB)</span>
                                         <input
                                             id="image-upload"
                                             type="file"
@@ -300,113 +400,61 @@ export default function SubmitTestimonial() {
                                 <ErrorMsg msg={errors.image} />
                             </div>
 
-                            <div className="space-y-1">
-                                <label htmlFor="category" className="text-sm font-medium text-slate-700">Service Category</label>
-                                <select
-                                    id="category"
-                                    name="category"
-                                    value={formData.category}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    className={`${inputClass(!!errors.category)} bg-white`}
-                                >
-                                    <option value="" disabled>Select the primary service we provided</option>
-                                    <option value="Property Accounting">Property Accounting</option>
-                                    <option value="Business Advisory">Business Advisory</option>
-                                    <option value="Self Assessment">Self Assessment</option>
-                                    <option value="Payroll & Bookkeeping">Payroll & Bookkeeping</option>
-                                    <option value="Corporate Tax">Corporate Tax</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                                <ErrorMsg msg={errors.category} />
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className="text-sm font-medium text-slate-700">Overall Rating</label>
-                                <div className="flex gap-2">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                        <button
-                                            key={star}
-                                            type="button"
-                                            onClick={() => {
-                                                setRating(star);
-                                                if (touched) setErrors((prev) => ({ ...prev, rating: '' }));
-                                            }}
-                                            className="focus:outline-none"
-                                        >
-                                            <Star
-                                                className={`w-8 h-8 ${rating >= star ? 'fill-yellow-400 text-yellow-400' : 'text-slate-300'}`}
-                                                strokeWidth={1.5}
-                                            />
-                                        </button>
-                                    ))}
-                                </div>
-                                <ErrorMsg msg={errors.rating} />
-                            </div>
-
-                            <div className="space-y-1">
-                                <label htmlFor="results" className="text-sm font-medium text-slate-700">Concrete Results Achieved (Short)</label>
-                                <input
-                                    id="results"
-                                    name="results"
-                                    type="text"
-                                    value={formData.results}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    className={inputClass(!!errors.results)}
-                                    placeholder="e.g. £15,000+ tax savings"
-                                    maxLength={100}
-                                />
-                                <ErrorMsg msg={errors.results} />
-                            </div>
-
-                            <div className="space-y-1">
-                                <div className="flex justify-between items-baseline">
-                                    <label htmlFor="content" className="text-sm font-medium text-slate-700">Your Testimonial</label>
-                                    <span className={`text-xs ${formData.content.trim().length > 1000 ? 'text-red-500' : 'text-slate-400'}`}>
-                                        {formData.content.trim().length}/1000
-                                    </span>
-                                </div>
-                                <textarea
-                                    id="content"
-                                    name="content"
-                                    rows={5}
-                                    value={formData.content}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    className={`${inputClass(!!errors.content)} resize-none`}
-                                    placeholder="Tell us about your experience working with The Millions..."
-                                    maxLength={1000}
-                                />
-                                <ErrorMsg msg={errors.content} />
-                            </div>
-
                             {errors.submit && (
-                                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
-                                    {errors.submit}
+                                <div className="bg-red-50 border-l-4 border-red-500 p-4 flex items-center gap-3 animate-fade-in">
+                                    <AlertCircle className="w-5 h-5 text-red-500" />
+                                    <p className="text-red-700 text-sm font-jost">{errors.submit}</p>
                                 </div>
                             )}
 
-                            <div className="pt-4 border-t border-slate-100">
-                                <Button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="w-full py-6 text-lg bg-blue-600 hover:bg-blue-700"
-                                >
-                                    {isLoading ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                            Submitting...
-                                        </>
-                                    ) : (
-                                        "Submit Testimonial"
-                                    )}
-                                </Button>
-                            </div>
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className="bg-millions-dark text-white px-10 py-4 font-jost text-[0.78rem] tracking-[0.12em] uppercase font-medium transition-all hover:bg-millions-accent hover:text-millions-dark hover:-translate-y-0.5 flex items-center gap-3 w-fit disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isLoading ? (
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                ) : (
+                                    <CheckCircle className="w-4 h-4" />
+                                )}
+                                {isLoading ? "Submitting..." : "Submit Testimonial"}
+                            </button>
                         </form>
-                    </CardContent>
-                </Card>
+                    </div>
+
+                    {/* Sidebar / Info Section */}
+                    <div className="space-y-10 animate-fade-in-up md:animation-delay-300">
+                        <div className="bg-millions-dark p-10 border-t-2 border-t-millions-accent">
+                            <h3 className="font-cormorant text-white text-xl font-light mb-6">Why Share?</h3>
+                            <p className="text-white/70 text-sm font-light leading-relaxed mb-6">
+                                Your journey helps others understand the value of professional advisory and financial management in the property and business sectors.
+                            </p>
+                            <ul className="space-y-4">
+                                {[
+                                    "Inspire fellow entrepreneurs",
+                                    "Help us improve our services",
+                                    "Build credibility for your brand",
+                                    "Join our community of success"
+                                ].map((item, i) => (
+                                    <li key={i} className="flex items-center gap-3 text-[0.75rem] text-white/50 font-light italic">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-millions-accent"></span>
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <div className="bg-white/60 backdrop-blur-sm p-10 border border-millions-dark/5 border-t-2 border-t-millions-mid shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
+                            <h3 className="font-cormorant text-millions-dark text-[1.4rem] font-light mb-4">Guidelines</h3>
+                            <div className="space-y-4 text-millions-body text-[0.85rem] font-light leading-relaxed">
+                                <p>Be as specific as possible about the results you've achieved.</p>
+                                <p>Mention specific services like <span className="text-millions-dark font-medium italic">Property Accounting</span> or <span className="text-millions-dark font-medium italic">Business Advisory</span>.</p>
+                                <p>We value honesty and detailed feedback above all else.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
     );
 }
