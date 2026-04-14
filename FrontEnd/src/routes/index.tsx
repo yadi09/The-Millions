@@ -18,6 +18,7 @@ import SubmitTestimonial from "../pages/testimonials/submit";
 // Admin Testimonials
 import TestimonialsManagement from "../pages/admin/TestimonialsManagement";
 import ServicesManagement from "../pages/admin/ServicesManagement";
+import ServiceEditor from "../pages/admin/ServiceEditor";
 import Landing from "../pages/Landing";
 
 const PublicLayout = () => (
@@ -58,6 +59,8 @@ export const AppRoutes = () => (
             <Route path="blog/edit/:id" element={<BlogEditor />} />
             <Route path="testimonials" element={<TestimonialsManagement />} />
             <Route path="services" element={<ServicesManagement />} />
+            <Route path="services/new" element={<ServiceEditor />} />
+            <Route path="services/edit/:id" element={<ServiceEditor />} />
             {/* Dashboard and Settings routes are kept for legacy but mapped to disabled components */}
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="settings" element={<AdminSettings />} />
