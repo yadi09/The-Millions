@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
-import { X, MessageSquare } from "lucide-react";
-import PageEditorContent from "./components/PageEditorContent";
+import { MessageSquare } from "lucide-react";
 import { useGetPageQuery } from "../../features/api/apiSlice";
 import { useNavigate } from "react-router-dom";
 
@@ -21,20 +20,8 @@ const initialPages: PageItem[] = [
 const AdminPagesList = () => {
   const navigate = useNavigate();
   const [pages] = useState<PageItem[]>(initialPages);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
 
   const { data: homePage, isLoading: isHomeLoading } = useGetPageQuery("home");
-
-  const openEditor = (slug: string) => {
-    setSelectedSlug(slug);
-    setIsEditOpen(true);
-  };
-
-  const closeEditor = () => {
-    setIsEditOpen(false);
-    setSelectedSlug(null);
-  };
 
   return (
     <div className="space-y-10 max-w-6xl mx-auto pb-20">
@@ -81,14 +68,7 @@ const AdminPagesList = () => {
                     <span className="text-[0.65rem] text-white/50 font-jost italic font-light tracking-wide">{page.lastEdited}</span>
                   </div>
                   <Button
-                    onClick={() => {
-                      const isMobile = window.innerWidth < 1024;
-                      if (isMobile) {
-                        navigate(`/admin/pages/${page.slug}`);
-                      } else {
-                        openEditor(page.slug);
-                      }
-                    }}
+                    onClick={() => navigate(`/admin/pages/${page.slug}`)}
                     className="bg-transparent border border-millions-accent/40 text-millions-accent hover:bg-millions-accent hover:text-millions-dark rounded-none uppercase text-[0.65rem] tracking-[0.2em] px-6 h-10 transition-all duration-300 font-bold"
                   >
                     Refine
@@ -99,28 +79,6 @@ const AdminPagesList = () => {
           );
         })}
       </div>
-
-      {/* Modal Editor Overlay */}
-      {isEditOpen && selectedSlug && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-millions-dark/95 backdrop-blur-xl animate-in fade-in duration-300">
-          <div className="w-full max-w-7xl h-[92vh] bg-millions-dark border border-white/10 shadow-2xl overflow-hidden flex flex-col relative animate-in zoom-in-95 duration-300">
-            <button
-              onClick={closeEditor}
-              className="absolute top-6 right-6 z-[110] p-3 text-white/40 hover:text-white hover:rotate-90 transition-all duration-300"
-            >
-              <X size={24} />
-            </button>
-
-            <div className="flex-1 overflow-hidden p-8 md:p-12">
-              <PageEditorContent
-                slug={selectedSlug}
-                onClose={closeEditor}
-                isModal={true}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
