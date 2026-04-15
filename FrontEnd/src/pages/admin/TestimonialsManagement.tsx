@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     useGetTestimonialsQuery,
     useUpdateTestimonialStatusMutation,
@@ -7,8 +7,10 @@ import {
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
-import { Check, Trash2, ArrowUp, Link2, Copy, Loader2 } from "lucide-react";
+import { Check, Trash2, ArrowUp, Link2, Copy, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Testimonial } from "../../types/testimonial";
+
+const ITEMS_PER_PAGE = 4;
 
 export default function TestimonialsManagement() {
     const { data: testimonials, isLoading } = useGetTestimonialsQuery({ role: 'admin' });
@@ -16,10 +18,24 @@ export default function TestimonialsManagement() {
     const [deleteTestimonial] = useDeleteTestimonialMutation();
     const [copied, setCopied] = useState(false);
     const [activeView, setActiveView] = useState<'pending' | 'approved'>('pending');
+    const [currentPage, setCurrentPage] = useState(1);
 
     const pendingTestimonials = (testimonials || []).filter(t => t.status === 'pending');
     const approvedTestimonials = (testimonials || []).filter(t => t.status === 'approved')
         .sort((a, b) => b.order - a.order);
+
+    const currentItems = activeView === 'pending' ? pendingTestimonials : approvedTestimonials;
+    const totalPages = Math.max(1, Math.ceil(currentItems.length / ITEMS_PER_PAGE));
+
+    // Reset page to 1 whenever view changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeView]);
+
+    const paginatedItems = currentItems.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
 
     const handleCopyLink = () => {
         const link = `${window.location.origin}/submit-testimonial`;
@@ -199,26 +215,51 @@ export default function TestimonialsManagement() {
                 </button>
             </div>
 
-            <div className="animate-fade-in-up">
-                {activeView === 'pending' ? (
-                    <div className="space-y-8">
-                        {pendingTestimonials.length === 0 ? (
-                            <div className="text-center p-24 border border-dashed border-white/5 bg-white/5 rounded-none">
-                                <p className="font-cormorant text-white/20 italic text-xl font-light">The queue is currently silent.</p>
-                            </div>
-                        ) : (
-                            pendingTestimonials.map(t => <TestimonialCard key={t.id} t={t} isPending={true} />)
-                        )}
+            <div className="animate-fade-in-up space-y-10">
+                {paginatedItems.length === 0 ? (
+                    <div className="text-center p-24 border border-dashed border-white/5 bg-white/5 rounded-none">
+                        <p className="font-cormorant text-white/20 italic text-xl font-light">
+                            {activeView === 'pending' ? 'The queue is currently silent.' : 'No active evidence.'}
+                        </p>
                     </div>
                 ) : (
                     <div className="space-y-8">
-                        {approvedTestimonials.length === 0 ? (
-                            <div className="text-center p-24 border border-dashed border-white/5 bg-white/5 rounded-none">
-                                <p className="font-cormorant text-white/20 italic text-xl font-light">No active evidence.</p>
-                            </div>
-                        ) : (
-                            approvedTestimonials.map(t => <TestimonialCard key={t.id} t={t} isPending={false} />)
-                        )}
+                        {paginatedItems.map(t => (
+                            <TestimonialCard 
+                                key={t.id} 
+                                t={t} 
+                                isPending={activeView === 'pending'} 
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {/* Architectural Pagination Controls */}
+                {currentItems.length > ITEMS_PER_PAGE && (
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t border-white/5">
+                        <div className="flex items-center gap-4 text-millions-accent text-[0.6rem] tracking-[0.3em] uppercase order-2 sm:order-1 outline-none">
+                            <div className="w-10 h-[1px] bg-millions-accent/30" />
+                            Refinement Page {currentPage.toString().padStart(2, '0')} / {totalPages.toString().padStart(2, '0')}
+                        </div>
+                        
+                        <div className="flex items-center gap-px order-1 sm:order-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="border-white/5 bg-transparent text-white/40 hover:bg-white/5 hover:text-white rounded-none h-12 w-12 p-0 disabled:opacity-5 transition-all outline-none"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                disabled={currentPage === totalPages}
+                                className="border-white/5 bg-transparent text-white/40 hover:bg-white/5 hover:text-white rounded-none h-12 w-12 p-0 disabled:opacity-5 transition-all outline-none"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </Button>
+                        </div>
                     </div>
                 )}
             </div>
