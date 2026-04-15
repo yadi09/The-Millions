@@ -48,7 +48,7 @@ export default function TestimonialsManagement() {
     };
 
     const TestimonialCard = ({ t, isPending }: { t: Testimonial, isPending: boolean }) => (
-        <Card className="mb-6 bg-white/5 border-white/5 backdrop-blur-md rounded-none hover:border-millions-accent/30 transition-all duration-500 group animate-fade-in-up shadow-sm hover:shadow-xl">
+        <Card className="bg-white/5 border-white/5 backdrop-blur-md rounded-none hover:border-millions-accent/30 transition-all duration-500 group animate-fade-in-up shadow-sm hover:shadow-xl">
             <CardContent className="p-6 md:p-8">
                 <div className="flex flex-col md:flex-row justify-between gap-8">
                     <div className="flex-1">
