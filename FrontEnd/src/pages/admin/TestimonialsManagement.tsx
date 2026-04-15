@@ -15,6 +15,7 @@ export default function TestimonialsManagement() {
     const [updateStatus] = useUpdateTestimonialStatusMutation();
     const [deleteTestimonial] = useDeleteTestimonialMutation();
     const [copied, setCopied] = useState(false);
+    const [activeView, setActiveView] = useState<'pending' | 'approved'>('pending');
 
     const pendingTestimonials = (testimonials || []).filter(t => t.status === 'pending');
     const approvedTestimonials = (testimonials || []).filter(t => t.status === 'approved')
@@ -164,42 +165,62 @@ export default function TestimonialsManagement() {
                 </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
-                {/* Pending Area */}
-                <div>
-                    <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
-                        <h2 className="font-cormorant text-[1.4rem] text-white font-light tracking-wider italic">Pending Sync</h2>
-                        {pendingTestimonials.length > 0 && (
-                            <span className="flex items-center justify-center w-5 h-5 bg-millions-accent text-millions-dark rounded-full text-[0.6rem] font-bold">{pendingTestimonials.length}</span>
-                        )}
-                    </div>
-                    <div className="space-y-0">
+            {/* View Switcher Toggle */}
+            <div className="flex items-center gap-8 border-b border-white/5 pb-2 animate-fade-in">
+                <button
+                    onClick={() => setActiveView('pending')}
+                    className={`pb-4 px-2 text-[0.7rem] uppercase tracking-[0.3em] font-bold transition-all relative ${
+                        activeView === 'pending' ? 'text-millions-accent' : 'text-white/20 hover:text-white/40'
+                    }`}
+                >
+                    Pending Sync
+                    {pendingTestimonials.length > 0 && (
+                        <span className="ml-3 text-[0.6rem] bg-millions-accent/10 border border-millions-accent/20 px-2 py-0.5 text-millions-accent">
+                            {pendingTestimonials.length}
+                        </span>
+                    )}
+                    {activeView === 'pending' && (
+                        <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-millions-accent animate-in fade-in slide-in-from-left-4 duration-500" />
+                    )}
+                </button>
+                <button
+                    onClick={() => setActiveView('approved')}
+                    className={`pb-4 px-2 text-[0.7rem] uppercase tracking-[0.3em] font-bold transition-all relative ${
+                        activeView === 'approved' ? 'text-millions-accent' : 'text-white/20 hover:text-white/40'
+                    }`}
+                >
+                    Live Proof
+                    <span className="ml-3 text-[0.6rem] bg-white/5 border border-white/10 px-2 py-0.5 text-white/40">
+                        {approvedTestimonials.length}
+                    </span>
+                    {activeView === 'approved' && (
+                        <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-millions-accent animate-in fade-in slide-in-from-right-4 duration-500" />
+                    )}
+                </button>
+            </div>
+
+            <div className="animate-fade-in-up">
+                {activeView === 'pending' ? (
+                    <div className="space-y-8">
                         {pendingTestimonials.length === 0 ? (
-                            <div className="text-center p-16 border border-dashed border-white/5 bg-white/5 rounded-none">
-                                <p className="font-cormorant text-white/20 italic font-light">The queue is currently silent.</p>
+                            <div className="text-center p-24 border border-dashed border-white/5 bg-white/5 rounded-none">
+                                <p className="font-cormorant text-white/20 italic text-xl font-light">The queue is currently silent.</p>
                             </div>
                         ) : (
                             pendingTestimonials.map(t => <TestimonialCard key={t.id} t={t} isPending={true} />)
                         )}
                     </div>
-                </div>
-
-                {/* Live Area */}
-                <div>
-                    <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
-                        <h2 className="font-cormorant text-[1.4rem] text-millions-accent font-light tracking-wider italic">Live Proof</h2>
-                        <span className="text-[0.6rem] font-jost text-white/20 uppercase tracking-widest">({approvedTestimonials.length})</span>
-                    </div>
-                    <div className="space-y-0">
+                ) : (
+                    <div className="space-y-8">
                         {approvedTestimonials.length === 0 ? (
-                            <div className="text-center p-16 border border-dashed border-white/5 bg-white/5 rounded-none">
+                            <div className="text-center p-24 border border-dashed border-white/5 bg-white/5 rounded-none">
                                 <p className="font-cormorant text-white/20 italic text-xl font-light">No active evidence.</p>
                             </div>
                         ) : (
                             approvedTestimonials.map(t => <TestimonialCard key={t.id} t={t} isPending={false} />)
                         )}
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );
