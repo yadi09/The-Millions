@@ -8,10 +8,11 @@ import type { Page, Section } from '../../../types';
 
 interface PageEditorContentProps {
     slug: string;
+    isStandalone?: boolean;
     onClose?: () => void;
 }
 
-const PageEditorContent = ({ slug, onClose }: PageEditorContentProps) => {
+const PageEditorContent = ({ slug, isStandalone, onClose }: PageEditorContentProps) => {
     const { data: pageData, isLoading, error } = useGetPageQuery(slug || '');
     const [updatePage, { isLoading: isSaving, isSuccess }] = useUpdatePageMutation();
 
@@ -59,6 +60,18 @@ const PageEditorContent = ({ slug, onClose }: PageEditorContentProps) => {
         }
     };
 
+    const handleDiscard = () => {
+        if (onClose) {
+            onClose();
+        } else if (pageData) {
+            // Reset to server state
+            setLocalPageData(pageData);
+            if (pageData.sections?.length > 0) {
+                setActiveSectionId(pageData.sections[0].id);
+            }
+        }
+    };
+
     const handleSectionUpdate = (sectionId: string, newContent: Record<string, any>) => {
         setLocalPageData((prev: Page | null) => {
             if (!prev) return null;
@@ -93,6 +106,12 @@ const PageEditorContent = ({ slug, onClose }: PageEditorContentProps) => {
 
     const activeSection = localPageData.sections?.find((s: any) => s.id === activeSectionId);
 
+    const getHeaderTitle = () => {
+        if (slug === 'home') return <>Home <em className="italic text-millions-accent not-italic">Architecture</em></>;
+        if (slug === 'global-footer') return <>Global Footer <em className="italic text-millions-accent not-italic">Refinement</em></>;
+        return <>{localPageData.name || slug} <em className="italic text-millions-accent not-italic">Refinement</em></>;
+    };
+
     return (
         <div className="flex flex-col bg-millions-dark h-full animate-fade-in">
             {/* Header Redesign */}
@@ -103,7 +122,7 @@ const PageEditorContent = ({ slug, onClose }: PageEditorContentProps) => {
                     </div>
                     <div>
                         <h1 className="font-cormorant text-2xl md:text-3xl text-white font-light tracking-wider leading-none">
-                            {slug === 'home' ? <>Home <em className="italic text-millions-accent not-italic">Architecture</em></> : <>{localPageData.name || slug} <em className="italic text-millions-accent not-italic">Refinement</em></>}
+                            {getHeaderTitle()}
                         </h1>
                         <div className="flex items-center gap-3 mt-2 opacity-30 font-light">
                              <span className="text-[0.55rem] font-jost text-white uppercase tracking-[0.2em]">Ref: {localPageData.id}</span>
@@ -126,16 +145,14 @@ const PageEditorContent = ({ slug, onClose }: PageEditorContentProps) => {
                         </div>
                     )}
 
-                    {onClose && (
-                        <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={onClose} 
-                            className="bg-transparent text-white/20 hover:text-white rounded-none uppercase text-[0.65rem] tracking-[0.2em] h-10 px-6 transition-all"
-                        >
-                            Discard
-                        </Button>
-                    )}
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={handleDiscard} 
+                        className="bg-transparent text-white/20 hover:text-white rounded-none uppercase text-[0.65rem] tracking-[0.2em] h-10 px-6 transition-all"
+                    >
+                        {isStandalone ? "Discard Changes" : "Discard"}
+                    </Button>
 
                     <Button
                         onClick={handleSave}
