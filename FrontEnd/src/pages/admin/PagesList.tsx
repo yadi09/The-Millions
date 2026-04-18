@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { MessageSquare } from "lucide-react";
-import { useGetPageQuery } from "../../features/api/apiSlice";
 import { useNavigate } from "react-router-dom";
 
 interface PageItem {
@@ -14,16 +13,14 @@ interface PageItem {
 }
 
 const initialPages: PageItem[] = [
-  { name: "Testimonials", slug: "testimonials", description: "Client success and impact proof", lastEdited: "Ready for Sync", icon: MessageSquare }
+  { name: "Global Architecture", slug: "global", description: "Global site-wide structural elements", lastEdited: "Architectural Default", icon: MessageSquare }
 ];
 
 const AdminPagesList = () => {
-  const navigate = useNavigate();
-  const [pages] = useState<PageItem[]>(initialPages);
+    const navigate = useNavigate();
+    const [pages] = useState<PageItem[]>(initialPages);
 
-  const { data: homePage, isLoading: isHomeLoading } = useGetPageQuery("home");
-
-  return (
+    return (
     <div className="space-y-10 max-w-6xl mx-auto pb-20">
       <div className="animate-fade-in">
         <h1 className="font-cormorant text-[clamp(2.2rem,5vw,3.5rem)] font-light text-white mb-4 leading-tight">
@@ -50,12 +47,12 @@ const AdminPagesList = () => {
                     <Icon className="w-4 h-4 text-millions-accent" />
                   </div>
                   <span className="text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.15em] italic font-light">
-                    {page.slug === "home" ? (homePage ? "Active Sync" : isHomeLoading ? "Syncing..." : "Offline") : "Architecture"}
+                    {page.slug === "home" ? "Active Sync" : "Architecture"}
                   </span>
                 </div>
 
                 <h3 className="font-cormorant text-[1.6rem] text-white font-light mb-2 italic">
-                  {page.slug === "home" ? (homePage?.title || page.name) : page.name}
+                  {page.name}
                 </h3>
 
                 <p className="text-white/40 text-[0.85rem] font-jost leading-relaxed mb-8 h-10 line-clamp-2 font-light">
