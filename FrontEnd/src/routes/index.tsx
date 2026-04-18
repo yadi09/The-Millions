@@ -12,6 +12,8 @@ import AdminSettings from "../pages/admin/Settings";
 import AdminLogin from "../pages/admin/Login";
 import BlogManagement from "../pages/admin/BlogManagement";
 import BlogEditor from "../pages/admin/BlogEditor";
+import HomeArchitectureEditor from '../pages/admin/home-editor/HomeArchitectureEditor';
+import FooterArchitectureEditor from '../pages/admin/home-editor/FooterArchitectureEditor';
 import ProtectedRoute from "../components/ProtectedRoute";
 import TestimonialsPage from "../pages/testimonials/page";
 import SubmitTestimonial from "../pages/testimonials/submit";
@@ -54,6 +56,8 @@ export const AppRoutes = () => (
             <Route index element={<Navigate to="/admin/pages" replace />} />
             <Route path="pages" element={<AdminPagesList />} />
             <Route path="pages/:slug" element={<AdminPageEditor />} />
+            <Route path="landing" element={<HomeArchitectureEditor />} />
+            <Route path="footer" element={<FooterArchitectureEditor />} />
             <Route path="blog" element={<BlogManagement />} />
             <Route path="blog/new" element={<BlogEditor />} />
             <Route path="blog/edit/:id" element={<BlogEditor />} />
