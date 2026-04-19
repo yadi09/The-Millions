@@ -49,12 +49,14 @@ model User {
   createdAt DateTime @default(now())
 }
 
+// ✅ UPDATED SERVICE MODEL WITH DESCRIPTION
 model Service {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  messages  ContactMessage[]
+  id          String           @id @default(uuid())
+  name        String
+  description String           // ✅ NEW FIELD
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  messages    ContactMessage[]
 }
 
 model ContactMessage {
