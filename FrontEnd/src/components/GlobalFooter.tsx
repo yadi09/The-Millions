@@ -92,7 +92,7 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
           {footer.logo}
         </div>
         <div className="text-[0.7rem] font-light text-white/20">
-          {footer.copyright}
+          © {new Date().getFullYear()} {footer.copyright}
         </div>
         <div className="text-[0.7rem] font-light text-white/20">
           {footer.location}
