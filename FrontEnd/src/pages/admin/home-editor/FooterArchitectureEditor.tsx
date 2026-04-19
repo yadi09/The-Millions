@@ -3,18 +3,18 @@ import { useGetPageQuery, useUpdatePageMutation } from '../../../features/api/ap
 import { Loader2, CheckCircle2, Info, Mail, MapPin, Globe, Phone, Monitor } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import type { Page, Section } from '../../../types';
-import { 
-    DarkInput, 
-    DarkTextarea, 
-    FieldGroup, 
-    ListManager, 
+import {
+    DarkInput,
+    DarkTextarea,
+    FieldGroup,
+    ListManager,
     FormSectionHeader
 } from './EditorUI';
 import { landingContent } from '../../../data/landingContent';
 
 
 const FooterArchitectureEditor = () => {
-    const { data: pageData, isLoading } = useGetPageQuery('global-footer');
+    const { data: pageData, isLoading, error } = useGetPageQuery('global-footer');
     const [updatePage, { isLoading: isSaving, isSuccess }] = useUpdatePageMutation();
 
     const [localPageData, setLocalPageData] = useState<Page | null>(null);
@@ -127,7 +127,7 @@ const FooterArchitectureEditor = () => {
                         <p className="text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.2em] mt-2">Shared Institutional Identity & Reach</p>
                     </div>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
                     {showSuccess && (
                         <div className="hidden sm:flex items-center gap-2 text-millions-accent text-[0.65rem] font-jost uppercase tracking-[0.15em] mr-4">
@@ -146,7 +146,7 @@ const FooterArchitectureEditor = () => {
 
             <div className="flex-1 overflow-y-auto custom-scrollbar bg-black/10">
                 <div className="max-w-4xl mx-auto p-8 md:p-16 space-y-20 pb-40">
-                    
+
                     {/* CONTACT INTERFACE */}
                     <div className="animate-fade-in">
                         <FormSectionHeader title="Contact Interface" icon={Mail} description="The primary engagement gateway." />
@@ -155,7 +155,7 @@ const FooterArchitectureEditor = () => {
                             <FieldGroup label="Main Title"><DarkInput value={c.title || ''} onChange={e => updateContact('title', e.target.value)} /></FieldGroup>
                         </div>
                         <FieldGroup label="Inquiry Sub-title"><DarkTextarea value={c.subTitle || ''} onChange={e => updateContact('subTitle', e.target.value)} /></FieldGroup>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mt-12 bg-white/[0.01] p-8 border border-white/5">
                             <div className="space-y-6">
                                 <FieldGroup label="Official Email"><div className="flex gap-3"><Mail className="w-4 h-4 text-white/10 mt-3" /><DarkInput value={c.email || ''} onChange={e => updateContact('email', e.target.value)} /></div></FieldGroup>
@@ -163,7 +163,7 @@ const FooterArchitectureEditor = () => {
                             </div>
                             <div className="space-y-6">
                                 <FieldGroup label="Engagement Button"><DarkInput value={c.buttonText || ''} onChange={e => updateContact('buttonText', e.target.value)} /></FieldGroup>
-                                <ListManager 
+                                <ListManager
                                     label="Direct Lines"
                                     items={c.phones || []}
                                     onAdd={() => updateContact('phones', [...(c.phones || []), ''])}
@@ -176,7 +176,7 @@ const FooterArchitectureEditor = () => {
                         </div>
 
                         <div className="mt-8">
-                            <ListManager 
+                            <ListManager
                                 label="Physical Presence (Address Lines)"
                                 items={c.address || []}
                                 onAdd={() => updateContact('address', [...(c.address || []), ''])}
@@ -193,7 +193,7 @@ const FooterArchitectureEditor = () => {
                         <FormSectionHeader title="Base Architecture" icon={Monitor} description="Copyright and legal placement." />
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <FieldGroup label="Logo Text"><DarkInput value={f.logo || ''} onChange={e => updateFooter('logo', e.target.value)} /></FieldGroup>
-                            <FieldGroup label="Copyright Notice"><DarkInput value={f.copyright || ''} onChange={e => updateFooter('copyright', e.target.value)} /></FieldGroup>
+                            <FieldGroup label="Copyright Notice (Year is Auto-Dynamic)"><DarkInput value={f.copyright || ''} onChange={e => updateFooter('copyright', e.target.value)} /></FieldGroup>
                             <FieldGroup label="Operating Location"><DarkInput value={f.location || ''} onChange={e => updateFooter('location', e.target.value)} /></FieldGroup>
                         </div>
                     </div>
