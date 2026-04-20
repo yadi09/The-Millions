@@ -14,7 +14,7 @@ import { landingContent } from '../../../data/landingContent';
 
 
 const FooterArchitectureEditor = () => {
-    const { data: pageData, isLoading, error } = useGetPageQuery('global-footer');
+    const { data: pageData, isLoading } = useGetPageQuery('global-footer');
     const [updatePage, { isLoading: isSaving, isSuccess }] = useUpdatePageMutation();
 
     const [localPageData, setLocalPageData] = useState<Page | null>(null);
