@@ -53,7 +53,7 @@ export const AppRoutes = () => (
                 </AdminLayout>
             </ProtectedRoute>
         }>
-            <Route index element={<Navigate to="/admin/pages" replace />} />
+            <Route index element={<Navigate to="/admin/landing" replace />} />
             <Route path="pages" element={<AdminPagesList />} />
             <Route path="pages/:slug" element={<AdminPageEditor />} />
             <Route path="landing" element={<HomeArchitectureEditor />} />
