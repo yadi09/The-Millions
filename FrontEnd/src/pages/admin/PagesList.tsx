@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Mail, BookOpen, Layers } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface PageItem {
@@ -13,7 +13,9 @@ interface PageItem {
 }
 
 const initialPages: PageItem[] = [
-  { name: "Global Architecture", slug: "global", description: "Global site-wide structural elements", lastEdited: "Architectural Default", icon: MessageSquare }
+  { name: "Testimonials", slug: "testimonials", description: "Success stories and client feedback identity", lastEdited: "Ready to Sync", icon: MessageSquare },
+  { name: "Contact Page", slug: "contact", description: "Inquiry gateways and engagement architecture", lastEdited: "Ready to Sync", icon: Mail },
+  { name: "Editorial Blog", slug: "blog", description: "Insights, tips and knowledge platform identity", lastEdited: "Ready to Sync", icon: BookOpen }
 ];
 
 const AdminPagesList = () => {
