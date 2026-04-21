@@ -15,7 +15,7 @@ const AdminLogin = () => {
         e.preventDefault();
         try {
             await login({ email, password }).unwrap();
-            navigate('/admin');
+            navigate('/admin/landing');
         } catch (err) {
             console.error('Login failed:', err);
         }
