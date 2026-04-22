@@ -3,10 +3,9 @@ import PageEditorContent from './components/PageEditorContent';
 
 interface AdminPageEditorProps {
     forcedSlug?: string;
-    isStandalone?: boolean;
 }
 
-const AdminPageEditor = ({ forcedSlug, isStandalone }: AdminPageEditorProps) => {
+const AdminPageEditor = ({ forcedSlug }: AdminPageEditorProps) => {
     // Get the slug from the URL params (e.g., /admin/pages/home -> slug = "home")
     const { slug: paramSlug } = useParams();
     const navigate = useNavigate();
@@ -22,8 +21,7 @@ const AdminPageEditor = ({ forcedSlug, isStandalone }: AdminPageEditorProps) => 
         <div className="h-[calc(100vh-4rem)] -m-4 md:-m-8">
             <PageEditorContent
                 slug={slug}
-                isStandalone={isStandalone}
-                onClose={isStandalone ? undefined : () => navigate('/admin/pages')}
+                onClose={() => navigate('/admin/pages')}
             />
         </div>
     );
