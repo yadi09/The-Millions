@@ -96,7 +96,7 @@ const HomeArchitectureEditor = () => {
             }).unwrap();
             setLocalPageData(result);
         } catch (err: any) {
-            setSaveError(err?.data?.message || 'Archival Sync failed.');
+            setSaveError(err?.data?.message || 'Sync failed. Please verify your connection.');
         }
     };
 
