@@ -224,14 +224,23 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Map Placeholder Card */}
-            <div className="bg-[#f8f6f2] p-8 border border-millions-dark/5 grayscale-[0.5] opacity-80 hover:grayscale-0 hover:opacity-100 transition-all">
-              <h4 className="font-cormorant text-millions-dark mb-4">Finding Our Location</h4>
-              <p className="text-xs text-millions-body font-light leading-relaxed mb-4">
+            {/* Interactive Map Card */}
+            <div className="bg-[#f8f6f2] p-8 border border-millions-dark/5 transition-all">
+              <h4 className="font-cormorant text-millions-dark mb-4 uppercase tracking-widest text-sm">Finding Our Location</h4>
+              <p className="text-xs text-millions-body font-light leading-relaxed mb-6">
                 We are strategically positioned in the heart of Southampton, facilitating our global connections to East African markets.
               </p>
-              <div className="aspect-video bg-millions-dark/5 border border-millions-dark/10 flex items-center justify-center text-[0.6rem] tracking-widest text-millions-muted uppercase">
-                Interactive Map Loading...
+              <div className="aspect-video bg-millions-dark/5 border border-millions-dark/10 overflow-hidden group hover:border-millions-accent/30 transition-all">
+                <iframe
+                  title="The Millions Southampton Office"
+                  src="https://maps.google.com/maps?q=Terminus+Terrace,+Southampton+SO14+3FD,+UK&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                  className="w-full h-full grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
+                  frameBorder="0"
+                  scrolling="no"
+                  marginHeight={0}
+                  marginWidth={0}
+                  loading="lazy"
+                />
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     useGetTestimonialsQuery,
     useUpdateTestimonialStatusMutation,
@@ -7,18 +7,35 @@ import {
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
-import { Check, Trash2, ArrowUp, Link2, Copy, Loader2 } from "lucide-react";
+import { Check, Trash2, ArrowUp, Link2, Copy, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Testimonial } from "../../types/testimonial";
+
+const ITEMS_PER_PAGE = 4;
 
 export default function TestimonialsManagement() {
     const { data: testimonials, isLoading } = useGetTestimonialsQuery({ role: 'admin' });
     const [updateStatus] = useUpdateTestimonialStatusMutation();
     const [deleteTestimonial] = useDeleteTestimonialMutation();
     const [copied, setCopied] = useState(false);
+    const [activeView, setActiveView] = useState<'pending' | 'approved'>('pending');
+    const [currentPage, setCurrentPage] = useState(1);
 
     const pendingTestimonials = (testimonials || []).filter(t => t.status === 'pending');
     const approvedTestimonials = (testimonials || []).filter(t => t.status === 'approved')
         .sort((a, b) => b.order - a.order);
+
+    const currentItems = activeView === 'pending' ? pendingTestimonials : approvedTestimonials;
+    const totalPages = Math.max(1, Math.ceil(currentItems.length / ITEMS_PER_PAGE));
+
+    // Reset page to 1 whenever view changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [activeView]);
+
+    const paginatedItems = currentItems.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
 
     const handleCopyLink = () => {
         const link = `${window.location.origin}/submit-testimonial`;
@@ -47,7 +64,7 @@ export default function TestimonialsManagement() {
     };
 
     const TestimonialCard = ({ t, isPending }: { t: Testimonial, isPending: boolean }) => (
-        <Card className="mb-6 bg-white/5 border-white/5 backdrop-blur-md rounded-none hover:border-millions-accent/30 transition-all duration-500 group animate-fade-in-up shadow-sm hover:shadow-xl">
+        <Card className="bg-white/5 border-white/5 backdrop-blur-md rounded-none hover:border-millions-accent/30 transition-all duration-500 group animate-fade-in-up shadow-sm hover:shadow-xl">
             <CardContent className="p-6 md:p-8">
                 <div className="flex flex-col md:flex-row justify-between gap-8">
                     <div className="flex-1">
@@ -164,42 +181,87 @@ export default function TestimonialsManagement() {
                 </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-12">
-                {/* Pending Area */}
-                <div>
-                    <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
-                        <h2 className="font-cormorant text-[1.4rem] text-white font-light tracking-wider italic">Pending Sync</h2>
-                        {pendingTestimonials.length > 0 && (
-                            <span className="flex items-center justify-center w-5 h-5 bg-millions-accent text-millions-dark rounded-full text-[0.6rem] font-bold">{pendingTestimonials.length}</span>
-                        )}
-                    </div>
-                    <div className="space-y-0">
-                        {pendingTestimonials.length === 0 ? (
-                            <div className="text-center p-16 border border-dashed border-white/5 bg-white/5 rounded-none">
-                                <p className="font-cormorant text-white/20 italic font-light">The queue is currently silent.</p>
-                            </div>
-                        ) : (
-                            pendingTestimonials.map(t => <TestimonialCard key={t.id} t={t} isPending={true} />)
-                        )}
-                    </div>
-                </div>
+            {/* View Switcher Toggle */}
+            <div className="flex items-center gap-8 border-b border-white/5 pb-2 animate-fade-in">
+                <button
+                    onClick={() => setActiveView('pending')}
+                    className={`pb-4 px-2 text-[0.7rem] uppercase tracking-[0.3em] font-bold transition-all relative ${
+                        activeView === 'pending' ? 'text-millions-accent' : 'text-white/20 hover:text-white/40'
+                    }`}
+                >
+                    Pending Sync
+                    {pendingTestimonials.length > 0 && (
+                        <span className="ml-3 text-[0.6rem] bg-millions-accent/10 border border-millions-accent/20 px-2 py-0.5 text-millions-accent">
+                            {pendingTestimonials.length}
+                        </span>
+                    )}
+                    {activeView === 'pending' && (
+                        <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-millions-accent animate-in fade-in slide-in-from-left-4 duration-500" />
+                    )}
+                </button>
+                <button
+                    onClick={() => setActiveView('approved')}
+                    className={`pb-4 px-2 text-[0.7rem] uppercase tracking-[0.3em] font-bold transition-all relative ${
+                        activeView === 'approved' ? 'text-millions-accent' : 'text-white/20 hover:text-white/40'
+                    }`}
+                >
+                    Live Proof
+                    <span className="ml-3 text-[0.6rem] bg-white/5 border border-white/10 px-2 py-0.5 text-white/40">
+                        {approvedTestimonials.length}
+                    </span>
+                    {activeView === 'approved' && (
+                        <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-millions-accent animate-in fade-in slide-in-from-right-4 duration-500" />
+                    )}
+                </button>
+            </div>
 
-                {/* Live Area */}
-                <div>
-                    <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
-                        <h2 className="font-cormorant text-[1.4rem] text-millions-accent font-light tracking-wider italic">Live Proof</h2>
-                        <span className="text-[0.6rem] font-jost text-white/20 uppercase tracking-widest">({approvedTestimonials.length})</span>
+            <div className="animate-fade-in-up space-y-10">
+                {paginatedItems.length === 0 ? (
+                    <div className="text-center p-24 border border-dashed border-white/5 bg-white/5 rounded-none">
+                        <p className="font-cormorant text-white/20 italic text-xl font-light">
+                            {activeView === 'pending' ? 'The queue is currently silent.' : 'No active evidence.'}
+                        </p>
                     </div>
-                    <div className="space-y-0">
-                        {approvedTestimonials.length === 0 ? (
-                            <div className="text-center p-16 border border-dashed border-white/5 bg-white/5 rounded-none">
-                                <p className="font-cormorant text-white/20 italic text-xl font-light">No active evidence.</p>
-                            </div>
-                        ) : (
-                            approvedTestimonials.map(t => <TestimonialCard key={t.id} t={t} isPending={false} />)
-                        )}
+                ) : (
+                    <div className="space-y-8">
+                        {paginatedItems.map(t => (
+                            <TestimonialCard 
+                                key={t.id} 
+                                t={t} 
+                                isPending={activeView === 'pending'} 
+                            />
+                        ))}
                     </div>
-                </div>
+                )}
+
+                {/* Architectural Pagination Controls */}
+                {currentItems.length > ITEMS_PER_PAGE && (
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-10 border-t border-white/5">
+                        <div className="flex items-center gap-4 text-millions-accent text-[0.6rem] tracking-[0.3em] uppercase order-2 sm:order-1 outline-none">
+                            <div className="w-10 h-[1px] bg-millions-accent/30" />
+                            Refinement Page {currentPage.toString().padStart(2, '0')} / {totalPages.toString().padStart(2, '0')}
+                        </div>
+                        
+                        <div className="flex items-center gap-px order-1 sm:order-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="border-white/5 bg-transparent text-white/40 hover:bg-white/5 hover:text-white rounded-none h-12 w-12 p-0 disabled:opacity-5 transition-all outline-none"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                disabled={currentPage === totalPages}
+                                className="border-white/5 bg-transparent text-white/40 hover:bg-white/5 hover:text-white rounded-none h-12 w-12 p-0 disabled:opacity-5 transition-all outline-none"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
