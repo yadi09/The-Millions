@@ -8,11 +8,11 @@ import type { Page, Section } from '../../../types';
 
 interface PageEditorContentProps {
     slug: string;
-    isStandalone?: boolean;
     onClose?: () => void;
+    isModal?: boolean;
 }
 
-const PageEditorContent = ({ slug, isStandalone, onClose }: PageEditorContentProps) => {
+const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContentProps) => {
     const { data: pageData, isLoading, error } = useGetPageQuery(slug || '');
     const [updatePage, { isLoading: isSaving, isSuccess }] = useUpdatePageMutation();
 
@@ -60,18 +60,6 @@ const PageEditorContent = ({ slug, isStandalone, onClose }: PageEditorContentPro
         }
     };
 
-    const handleDiscard = () => {
-        if (onClose) {
-            onClose();
-        } else if (pageData) {
-            // Reset to server state
-            setLocalPageData(pageData);
-            if (pageData.sections?.length > 0) {
-                setActiveSectionId(pageData.sections[0].id);
-            }
-        }
-    };
-
     const handleSectionUpdate = (sectionId: string, newContent: Record<string, any>) => {
         setLocalPageData((prev: Page | null) => {
             if (!prev) return null;
@@ -106,23 +94,20 @@ const PageEditorContent = ({ slug, isStandalone, onClose }: PageEditorContentPro
 
     const activeSection = localPageData.sections?.find((s: any) => s.id === activeSectionId);
 
-    const getHeaderTitle = () => {
-        if (slug === 'home') return <>Home <em className="italic text-millions-accent not-italic">Architecture</em></>;
-        if (slug === 'global-footer') return <>Global Footer <em className="italic text-millions-accent not-italic">Refinement</em></>;
-        return <>{localPageData.name || slug} <em className="italic text-millions-accent not-italic">Refinement</em></>;
-    };
-
     return (
-        <div className="flex flex-col bg-millions-dark h-full animate-fade-in">
+        <div className={`flex flex-col bg-millions-dark ${isModal ? 'h-[80vh]' : 'h-full'} animate-fade-in`}>
             {/* Header Redesign */}
-            <div className="bg-white/5 backdrop-blur-xl border-b border-white/5 px-6 md:px-10 flex items-center justify-between shrink-0 z-30 sticky top-[57px] lg:top-0 h-24">
+            <div className={`
+                bg-white/5 backdrop-blur-xl border-b border-white/5 px-6 md:px-10 flex items-center justify-between shrink-0 z-30 sticky
+                ${isModal ? 'top-0 py-6' : 'top-[57px] lg:top-0 h-24'}
+            `}>
                 <div className="flex items-center gap-6">
                     <div className="hidden sm:flex w-12 h-12 border border-millions-accent/10 items-center justify-center">
                         <Layout className="w-5 h-5 text-millions-accent/60" />
                     </div>
                     <div>
                         <h1 className="font-cormorant text-2xl md:text-3xl text-white font-light tracking-wider leading-none">
-                            {getHeaderTitle()}
+                            {slug === 'home' ? <>Home <em className="italic text-millions-accent not-italic">Architecture</em></> : <>{localPageData.name || slug} <em className="italic text-millions-accent not-italic">Refinement</em></>}
                         </h1>
                         <div className="flex items-center gap-3 mt-2 opacity-30 font-light">
                              <span className="text-[0.55rem] font-jost text-white uppercase tracking-[0.2em]">Ref: {localPageData.id}</span>
@@ -145,14 +130,16 @@ const PageEditorContent = ({ slug, isStandalone, onClose }: PageEditorContentPro
                         </div>
                     )}
 
-                    <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={handleDiscard} 
-                        className="bg-transparent text-white/20 hover:text-white rounded-none uppercase text-[0.65rem] tracking-[0.2em] h-10 px-6 transition-all"
-                    >
-                        {isStandalone ? "Discard Changes" : "Discard"}
-                    </Button>
+                    {onClose && (
+                        <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={onClose} 
+                            className="bg-transparent text-white/20 hover:text-white rounded-none uppercase text-[0.65rem] tracking-[0.2em] h-10 px-6 transition-all"
+                        >
+                            Discard
+                        </Button>
+                    )}
 
                     <Button
                         onClick={handleSave}
@@ -175,9 +162,9 @@ const PageEditorContent = ({ slug, isStandalone, onClose }: PageEditorContentPro
                 </div>
             </div>
 
-            <div className="flex flex-1 relative flex-col md:flex-row md:overflow-hidden pt-0">
+            <div className={`flex flex-1 relative flex-col md:flex-row md:overflow-hidden ${isModal ? '' : 'pt-0'}`}>
                 {/* Sidebar Navigation */}
-                <div className="sticky z-20 md:static md:w-80 border-r border-white/5 h-full">
+                <div className={`sticky z-20 md:static md:w-80 border-r border-white/5 h-full`}>
                     <EditorSidebar
                         sections={localPageData.sections || []}
                         activeSectionId={activeSectionId}
@@ -192,12 +179,12 @@ const PageEditorContent = ({ slug, isStandalone, onClose }: PageEditorContentPro
                             <div className="bg-white/5 border border-white/5 backdrop-blur-md rounded-none p-8 md:p-12 shadow-2xl animate-fade-in-up">
                                 <div className="mb-10 pb-8 border-b border-white/5">
                                      <div className="flex items-center gap-3 mb-3">
-                                         <div className="w-1.5 h-1.5 bg-millions-accent/60" />
-                                         <h2 className="font-cormorant text-2xl md:text-3xl text-white font-light tracking-wider leading-none italic">
-                                             {activeSection.type.replace('-', ' ')} Refinement
-                                         </h2>
-                                     </div>
-                                     <p className="text-[0.65rem] font-jost text-white/20 uppercase tracking-[0.2em] font-light">Refine Structural Component Properties</p>
+                                        <div className="w-1.5 h-1.5 bg-millions-accent/60" />
+                                        <h2 className="font-cormorant text-2xl md:text-3xl text-white font-light tracking-wider leading-none italic">
+                                            {activeSection.type.replace('-', ' ')} Refinement
+                                        </h2>
+                                    </div>
+                                    <p className="text-[0.65rem] font-jost text-white/20 uppercase tracking-[0.2em] font-light">Refine Structural Component Properties</p>
                                 </div>
 
                                 <div className="animate-fade-in">
