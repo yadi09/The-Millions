@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
-import { MessageSquare, Mail, BookOpen, Layers } from "lucide-react";
+import { MessageSquare, Mail, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface PageItem {
