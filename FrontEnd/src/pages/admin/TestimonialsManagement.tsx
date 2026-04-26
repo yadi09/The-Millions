@@ -9,6 +9,7 @@ import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Check, Trash2, ArrowUp, Link2, Copy, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Testimonial } from "../../types/testimonial";
+import { toast } from 'sonner';
 
 const ITEMS_PER_PAGE = 4;
 
@@ -16,7 +17,6 @@ export default function TestimonialsManagement() {
     const { data: testimonials, isLoading } = useGetTestimonialsQuery({ role: 'admin' });
     const [updateStatus] = useUpdateTestimonialStatusMutation();
     const [deleteTestimonial] = useDeleteTestimonialMutation();
-    const [copied, setCopied] = useState(false);
     const [activeView, setActiveView] = useState<'pending' | 'approved'>('pending');
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -40,18 +40,33 @@ export default function TestimonialsManagement() {
     const handleCopyLink = () => {
         const link = `${window.location.origin}/submit-testimonial`;
         navigator.clipboard.writeText(link);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        toast.success('Submission link copied to clipboard.');
     };
 
     const handleApprove = async (id: string) => {
-        await updateStatus({ id, status: 'approved', order: 0 });
+        const promise = updateStatus({ id, status: 'approved', order: 0 }).unwrap();
+        toast.promise(promise, {
+            loading: 'Approving testimonial...',
+            success: 'Testimonial approved.',
+            error: 'Failed to approve testimonial.'
+        });
     };
 
     const handleDelete = async (id: string) => {
-        if (confirm("Are you sure you want to delete this architectural proof?")) {
-            await deleteTestimonial(id);
-        }
+        toast('Remove this testimonial?', {
+            action: {
+                label: 'Delete',
+                onClick: async () => {
+                    try {
+                        await deleteTestimonial(id).unwrap();
+                        toast.success('Testimonial removed.');
+                    } catch {
+                        toast.error('Failed to delete testimonial.');
+                    }
+                }
+            },
+            cancel: { label: 'Cancel', onClick: () => {} },
+        });
     };
 
     const handleFeature = async (id: string, currentOrder: number) => {
@@ -173,8 +188,8 @@ export default function TestimonialsManagement() {
                                 onClick={handleCopyLink}
                                 className="bg-millions-accent text-millions-dark hover:bg-white rounded-none px-8 font-jost text-[0.65rem] uppercase tracking-[0.2em] font-bold h-auto shrink-0 transition-all"
                             >
-                                {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
-                                {copied ? 'Copied' : 'Copy'}
+                                <Copy className="w-4 h-4 mr-2" />
+                                Copy
                             </Button>
                         </div>
                     </div>

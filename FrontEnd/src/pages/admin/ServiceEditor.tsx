@@ -10,6 +10,7 @@ import {
     X, Save, Loader2, ArrowLeft
 } from "lucide-react";
 import type { Service } from "../../types/service";
+import { toast } from 'sonner';
 
 const emptyService = (): Omit<Service, "id"> => ({
     name: "",
@@ -40,17 +41,22 @@ const ServiceEditor = () => {
     }, [id, services]);
 
     const handleSave = async () => {
-        if (!formData.name.trim()) return;
-        try {
-            if (id && existingService) {
-                await updateService({ ...formData, id }).unwrap();
-            } else {
-                await createService(formData).unwrap();
-            }
-            navigate("/admin/services");
-        } catch (error) {
-            console.error("Failed to save service", error);
+        if (!formData.name.trim()) {
+            toast.error('Domain Nomenclature is required.');
+            return;
         }
+        const promise = id && existingService
+            ? updateService({ ...formData, id }).unwrap()
+            : createService(formData).unwrap();
+
+        toast.promise(promise, {
+            loading: 'Provisioning domain...',
+            success: () => {
+                navigate('/admin/services');
+                return id ? 'Domain updated successfully.' : 'New domain provisioned successfully.';
+            },
+            error: (err: any) => err?.data?.error || err?.data?.message || 'Failed to save service.'
+        });
     };
 
     if (id && isLoadingServices) {

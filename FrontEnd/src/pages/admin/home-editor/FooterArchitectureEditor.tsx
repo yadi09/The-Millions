@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useGetPageQuery, useUpdatePageMutation } from '../../../features/api/apiSlice';
-import { Loader2, CheckCircle2, Info, Mail, MapPin, Globe, Phone, Monitor } from 'lucide-react';
+import { Loader2, Info, Mail, MapPin, Globe, Phone, Monitor } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { toast } from 'sonner';
 import type { Page, Section } from '../../../types';
 import {
     DarkInput,
@@ -15,11 +16,8 @@ import { landingContent } from '../../../data/landingContent';
 
 const FooterArchitectureEditor = () => {
     const { data: pageData, isLoading } = useGetPageQuery('global-footer');
-    const [updatePage, { isLoading: isSaving, isSuccess }] = useUpdatePageMutation();
-
+    const [updatePage, { isLoading: isSaving }] = useUpdatePageMutation();
     const [localPageData, setLocalPageData] = useState<Page | null>(null);
-    const [showSuccess, setShowSuccess] = useState(false);
-    const [, setSaveError] = useState<string | null>(null);
 
     useEffect(() => {
         if (!localPageData) {
@@ -44,34 +42,28 @@ const FooterArchitectureEditor = () => {
         }
     }, [pageData, localPageData]);
 
-    useEffect(() => {
-        if (isSuccess) {
-            setShowSuccess(true);
-            setSaveError(null);
-            const timer = setTimeout(() => setShowSuccess(false), 2000);
-            return () => clearTimeout(timer);
-        }
-    }, [isSuccess]);
-
     const handleSave = async () => {
-        setSaveError(null);
         if (!localPageData?.id) {
-            setSaveError('Missing Footer Architecture Identity.');
+            toast.error('Missing Footer Architecture Identity.');
             return;
         }
 
-        try {
-            const result = await updatePage({
-                id: localPageData.id,
-                data: {
-                    title: localPageData.title,
-                    sections: localPageData.sections
-                }
-            }).unwrap();
-            setLocalPageData(result);
-        } catch (err: any) {
-            setSaveError(err?.data?.message || 'Archival Sync failed.');
-        }
+        const promise = updatePage({
+            id: localPageData.id,
+            data: {
+                title: localPageData.title,
+                sections: localPageData.sections
+            }
+        }).unwrap();
+
+        toast.promise(promise, {
+            loading: 'Deploying Architecture...',
+            success: (result: Page) => {
+                setLocalPageData(result);
+                return 'Footer architecture successfully synchronized.';
+            },
+            error: (err: any) => err?.data?.error || err?.data?.message || 'Archival Sync failed.'
+        });
     };
 
     const handleDiscard = () => {
@@ -129,12 +121,6 @@ const FooterArchitectureEditor = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    {showSuccess && (
-                        <div className="hidden sm:flex items-center gap-2 text-millions-accent text-[0.65rem] font-jost uppercase tracking-[0.15em] mr-4">
-                            <CheckCircle2 className="w-3" />
-                            Archival Confirmed
-                        </div>
-                    )}
 
                     <Button variant="ghost" size="sm" onClick={handleDiscard} className="text-white/20 hover:text-white uppercase text-[0.65rem] tracking-[0.2em]">Discard</Button>
 

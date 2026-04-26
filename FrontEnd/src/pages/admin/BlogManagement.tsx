@@ -9,6 +9,7 @@ import { BlogCard } from './components/BlogCard';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useGetBlogPostsQuery, useDeleteBlogPostMutation } from '../../features/api/apiSlice';
+import { toast } from 'sonner';
 
 export default function BlogManagement() {
     const navigate = useNavigate();
@@ -25,13 +26,20 @@ export default function BlogManagement() {
     );
 
     const handleDelete = async (id: string) => {
-        if (confirm("Are you sure you want to delete this architectural note?")) {
-            try {
-                await deletePost(id).unwrap();
-            } catch (err) {
-                alert(err instanceof Error ? err.message : "Error deleting post");
-            }
-        }
+        toast('Delete this architectural note?', {
+            action: {
+                label: 'Delete',
+                onClick: async () => {
+                    try {
+                        await deletePost(id).unwrap();
+                        toast.success('Architectural note removed.');
+                    } catch (err) {
+                        toast.error(err instanceof Error ? err.message : 'Error deleting post');
+                    }
+                }
+            },
+            cancel: { label: 'Cancel', onClick: () => {} },
+        });
     };
 
     return (
