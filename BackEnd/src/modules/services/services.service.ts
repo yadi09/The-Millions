@@ -5,8 +5,10 @@ const prisma = new PrismaClient();
 
 export async function getAllServices() {
   return prisma.service.findMany({
-    include: {
-      messages: true
+    select: {
+      id: true,
+      name: true,
+      description: true
     }
   });
 }

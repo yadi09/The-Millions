@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"  // ✅ v6 uses this provider
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -12,7 +12,6 @@ model Page {
   slug      String    @unique
   title     String
   sections  Section[]
-  footer    Footer?   // Keep this relation
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -30,18 +29,19 @@ model Section {
 }
 
 model Footer {
-  id          String   @id @default(uuid())
-  pageId      String   @unique
-  phone       String
-  email       String
-  address     String
-  socialMedia Json
-  copyright   String
+  id                String   @id @default(cuid())
+  phone             String
+  email             String
+  address           String
+  socialMedia       Json
+  copyright         String
+  showContactBlock  Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  page        Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  @@map("footer")
 }
 
-// Keep your other models (User, Service, etc.)
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -49,11 +49,10 @@ model User {
   createdAt DateTime @default(now())
 }
 
-// ✅ UPDATED SERVICE MODEL WITH DESCRIPTION
 model Service {
   id          String           @id @default(uuid())
   name        String
-  description String           // ✅ NEW FIELD
+  description String?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   messages    ContactMessage[]

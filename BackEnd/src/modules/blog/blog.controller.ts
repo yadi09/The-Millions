@@ -20,9 +20,8 @@ export async function getBlogs(req: Request, res: Response) {
 
 export async function getBlog(req: Request, res: Response) {
     try {
-        const { slug } = req.params;
-        // FIX: Cast slug to string
-        const blog = await getBlogBySlug(slug as string);
+        const { slug } = req.params as { slug: string };
+        const blog = await getBlogBySlug(slug);
 
         if (!blog) {
             return res.status(404).json({ message: 'Blog post not found' });

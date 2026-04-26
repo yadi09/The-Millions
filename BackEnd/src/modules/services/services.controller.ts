@@ -35,8 +35,7 @@ export const createServiceController = async (req: Request, res: Response): Prom
 
 export const getServiceByIdController = async (req: Request, res: Response): Promise<void> => {
   try {
-    // ✅ FIX: Handle possible array type for id
-    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const { id } = req.params as { id: string };
     
     if (!id) {
       res.status(400).json({ error: 'Service ID is required' });
@@ -58,8 +57,7 @@ export const getServiceByIdController = async (req: Request, res: Response): Pro
 
 export const updateServiceController = async (req: Request, res: Response): Promise<void> => {
   try {
-    // ✅ FIX: Handle possible array type for id
-    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const { id } = req.params as { id: string };
     
     if (!id) {
       res.status(400).json({ error: 'Service ID is required' });
@@ -77,8 +75,7 @@ export const updateServiceController = async (req: Request, res: Response): Prom
 
 export const deleteServiceController = async (req: Request, res: Response): Promise<void> => {
   try {
-    // ✅ FIX: Handle possible array type for id
-    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const { id } = req.params as { id: string };
     
     if (!id) {
       res.status(400).json({ error: 'Service ID is required' });

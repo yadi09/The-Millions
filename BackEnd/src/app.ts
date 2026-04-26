@@ -10,6 +10,7 @@ import blogRoutes from "./modules/blog/blog.routes.js";
 import adminBlogRoutes from "./modules/blog/admin.blog.routes.js";
 import uploadRoutes from "./modules/upload/upload.routes.js";
 import footerRoutes from './modules/footer/footer.routes.js';
+import testimonialsRoutes from './modules/testimonials/testimonials.routes.js';
 
 const app = express();
 
@@ -20,11 +21,19 @@ app.use("/api/pages", pagesRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/health", healthRoutes);
+app.get("/health", (req, res) => res.json({ status: "ok", timestamp: new Date().toISOString() }));
 app.use("/api/services", servicesRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/admin/blogs", adminBlogRoutes);
 app.use("/api/admin/upload", uploadRoutes);
 app.use('/api/footer', footerRoutes);
+app.use('/api/testimonials', testimonialsRoutes);
+
+import { errorHandler } from "./middlewares/error.middleware.js";
+import { notFoundHandler } from "./middlewares/notFound.middleware.js";
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 export default app;
