@@ -8,6 +8,7 @@ import {
     Plus, Edit, Trash2, Server, Loader2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'sonner';
 
 export default function ServicesManagement() {
     const navigate = useNavigate();
@@ -15,13 +16,20 @@ export default function ServicesManagement() {
     const [deleteService, { isLoading: isDeleting }] = useDeleteServiceMutation();
 
     const handleDelete = async (id: string) => {
-        if (confirm("Are you sure you want to delete this architectural service block?")) {
-            try {
-                await deleteService(id).unwrap();
-            } catch (error) {
-                console.error("Failed to delete service", error);
-            }
-        }
+        toast('Remove this service domain?', {
+            action: {
+                label: 'Delete',
+                onClick: async () => {
+                    try {
+                        await deleteService(id).unwrap();
+                        toast.success('Service domain removed.');
+                    } catch (error) {
+                        toast.error('Failed to delete service.');
+                    }
+                }
+            },
+            cancel: { label: 'Cancel', onClick: () => {} },
+        });
     };
 
     if (isLoading) return (

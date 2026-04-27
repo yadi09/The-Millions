@@ -14,6 +14,7 @@ import {
     useUpdateBlogPostMutation,
     useUploadImageMutation
 } from "../../features/api/apiSlice";
+import { toast } from 'sonner';
 
 const MenuBar = ({ editor }: { editor: any }) => {
     if (!editor) return null;
@@ -119,13 +120,23 @@ const BlogEditor = () => {
     }, [title, isEditing]);
 
     const handleSave = async (status: "draft" | "published") => {
-        if (!editor || !title || !category) { alert("Please complete core architectural fields (Title, Category, Content)."); return; }
+        if (!editor || !title || !category) {
+            toast.error('Please complete core architectural fields (Title, Category, Content).');
+            return;
+        }
         const postData = { title, slug, category, coverImage, excerpt, author: author || "Adnan", content: editor.getHTML(), status: status.toUpperCase() };
-        try {
-            if (isEditing && id) { await updatePost({ id, data: postData }).unwrap(); }
-            else { await createPost(postData).unwrap(); }
-            navigate("/admin/blog");
-        } catch (err: any) { alert(err?.data?.message || "Error syncing architectural note."); }
+        const promise = isEditing && id
+            ? updatePost({ id, data: postData }).unwrap()
+            : createPost(postData).unwrap();
+
+        toast.promise(promise, {
+            loading: 'Syncing architectural note...',
+            success: () => {
+                navigate('/admin/blog');
+                return isEditing ? 'Note updated successfully.' : 'Note published successfully.';
+            },
+            error: (err: any) => err?.data?.error || err?.data?.message || 'Error syncing architectural note.'
+        });
     };
 
     const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,7 +145,7 @@ const BlogEditor = () => {
         const formData = new FormData();
         formData.append('image', file);
         try { const result = await uploadImage(formData).unwrap(); setCoverImage(result.url); }
-        catch (err) { alert("Deployment of visual asset failed."); }
+        catch { toast.error('Deployment of visual asset failed.'); }
     };
 
     if (isInitialLoading) return (
