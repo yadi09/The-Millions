@@ -50,7 +50,7 @@ export async function updatePage(
             });
 
             await tx.section.createMany({
-                data: sections.map((s) => ({ ...s, pageId: id })),
+                data: sections.map(({ id: _oldId, ...s }: any) => ({ ...s, pageId: id })),
             });
         }
 

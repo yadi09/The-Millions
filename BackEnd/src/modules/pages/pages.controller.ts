@@ -3,12 +3,12 @@ import { Request, Response } from "express";
 import { getPageBySlug } from "./pages.service.js";
 
 export async function getPage(req: Request, res: Response) {
-  const { slug } = req.params;
+  let { slug } = req.params as { slug: string };
 
-  // FIX: Cast slug to string
+  // Fix route mismatch for about page
+  if (slug === "absense") slug = "about";
 
-  //check it
-  const page = await getPageBySlug(slug as string);
+  const page = await getPageBySlug(slug);
 
   if (!page) {
     return res.status(404).json({ message: "Page not found" });

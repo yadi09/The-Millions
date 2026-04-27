@@ -3,9 +3,9 @@ import app from "./app.js";
 
 const PORT = process.env.PORT || 4000;
 
-const server = app.listen(PORT, () => {
+const server = app.listen(Number(PORT), "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`📡 Health check: http://0.0.0.0:${PORT}/api/health`);
 
   // Log uptime periodically
   setInterval(() => {
