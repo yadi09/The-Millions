@@ -6,7 +6,7 @@ import type { Service } from '../../types/service';
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service'],
+  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer'],
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
     prepareHeaders: (headers) => {
@@ -193,6 +193,21 @@ export const apiSlice = createApi({
         body: data,
       }),
     }),
+    
+    // --- FOOTER ENDPOINTS ---
+    getFooter: builder.query<any, void>({
+      query: () => '/footer',
+      providesTags: ['Footer'],
+    }),
+    
+    updateFooter: builder.mutation<any, any>({
+      query: (data) => ({
+        url: '/footer',
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['Footer'],
+    }),
   }),
 });
 
@@ -218,4 +233,6 @@ export const {
   useDeleteServiceMutation,
   useGetContactServicesQuery,
   useSubmitContactMutation,
+  useGetFooterQuery,
+  useUpdateFooterMutation,
 } = apiSlice;

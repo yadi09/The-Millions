@@ -1,87 +1,75 @@
-import { useState, useEffect } from 'react';
-import { useGetPageQuery, useUpdatePageMutation } from '../../../features/api/apiSlice';
-import { Loader2, Info, Mail, MapPin, Globe, Phone, Monitor } from 'lucide-react';
-import { Button } from '../../../components/ui/button';
-import { toast } from 'sonner';
-import type { Page, Section } from '../../../types';
-import {
-    DarkInput,
-    DarkTextarea,
-    FieldGroup,
-    ListManager,
-    FormSectionHeader
-} from './EditorUI';
-import { landingContent } from '../../../data/landingContent';
+import { useState, useEffect } from "react";
+import { Mail, Phone, Globe, MapPin, Loader2, Info, Monitor } from "lucide-react";
+import { Button } from "../../../components/ui/button";
+import { toast } from "sonner";
+import { landingContent } from "../../../data/landingContent";
+import { useGetFooterQuery, useUpdateFooterMutation } from "../../../features/api/apiSlice";
+import { FormSectionHeader, FieldGroup, DarkInput, DarkTextarea, ListManager } from "./EditorUI";
 
 
 const FooterArchitectureEditor = () => {
-    const { data: pageData, isLoading } = useGetPageQuery('global-footer');
-    const [updatePage, { isLoading: isSaving }] = useUpdatePageMutation();
-    const [localPageData, setLocalPageData] = useState<Page | null>(null);
+    const { data: footerData, isLoading } = useGetFooterQuery();
+    const [updateFooter, { isLoading: isSaving }] = useUpdateFooterMutation();
+
+    const [localPageData, setLocalPageData] = useState<any | null>(null);
 
     useEffect(() => {
-        if (!localPageData) {
-            const mockPage: Page = {
-                id: pageData?.id || 'temp-footer-id',
-                slug: 'global-footer',
-                title: 'Global Footer',
-                sections: [
-                    {
-                        id: pageData?.sections?.find(s => s.type === 'contact')?.id || 'temp-contact',
-                        type: 'contact',
-                        content: pageData?.sections?.find(s => s.type === 'contact')?.content || (landingContent as any).contact || {}
-                    },
-                    {
-                        id: pageData?.sections?.find(s => s.type === 'footer')?.id || 'temp-footer',
-                        type: 'footer',
-                        content: pageData?.sections?.find(s => s.type === 'footer')?.content || (landingContent as any).footer || {}
-                    }
-                ]
+        if (!localPageData && footerData) {
+            setLocalPageData(footerData);
+        } else if (!localPageData && !isLoading && !footerData) {
+            // Fallback to landingContent if no backend record exists yet
+            const mockPage = {
+                contact: (landingContent as any).contact || {},
+                footer: (landingContent as any).footer || {},
+                showContactBlock: true
             };
             setLocalPageData(mockPage);
         }
-    }, [pageData, localPageData]);
+    }, [footerData, localPageData, isLoading]);
 
     const handleSave = async () => {
-        if (!localPageData?.id) {
-            toast.error('Missing Footer Architecture Identity.');
-            return;
-        }
+        if (!localPageData) return;
 
-        const promise = updatePage({
-            id: localPageData.id,
-            data: {
-                title: localPageData.title,
-                sections: localPageData.sections
-            }
-        }).unwrap();
+        const c = localPageData.contact;
+        const f = localPageData.footer;
+
+        // Flatten data to match Backend Prisma Footer model
+        const backendData = {
+            phone: Array.isArray(c.phones) ? c.phones.join(', ') : '',
+            email: c.email || '',
+            address: Array.isArray(c.address) ? c.address.join(', ') : '',
+            socialMedia: { whatsapp: c.whatsapp || '' },
+            copyright: f.copyright || '',
+            showContactBlock: localPageData.showContactBlock ?? true
+        };
+
+        const promise = updateFooter(backendData).unwrap();
 
         toast.promise(promise, {
             loading: 'Deploying Architecture...',
-            success: (result: Page) => {
-                setLocalPageData(result);
-                return 'Footer architecture successfully synchronized.';
-            },
+            success: 'Footer architecture successfully synchronized.',
             error: (err: any) => err?.data?.error || err?.data?.message || 'Archival Sync failed.'
         });
     };
 
     const handleDiscard = () => {
-        if (pageData) {
-            setLocalPageData(pageData);
+        if (footerData) {
+            setLocalPageData(footerData);
         }
     };
 
-    const updateSection = (type: string, newContent: Record<string, any>) => {
-        setLocalPageData((prev: Page | null) => {
-            if (!prev) return null;
-            return {
-                ...prev,
-                sections: prev.sections.map((s: Section) =>
-                    s.type === type ? { ...s, content: newContent } : s
-                )
-            };
-        });
+    const updateContact = (key: string, val: any) => {
+        setLocalPageData((prev: any) => ({
+            ...prev,
+            contact: { ...prev.contact, [key]: val }
+        }));
+    };
+
+    const updateFooterState = (key: string, val: any) => {
+        setLocalPageData((prev: any) => ({
+            ...prev,
+            footer: { ...prev.footer, [key]: val }
+        }));
     };
 
     if (isLoading) {
@@ -95,14 +83,8 @@ const FooterArchitectureEditor = () => {
 
     if (!localPageData) return null;
 
-    const contactSection = localPageData.sections?.find(s => s.type === 'contact') || { type: 'contact', content: {} };
-    const footerSection = localPageData.sections?.find(s => s.type === 'footer') || { type: 'footer', content: {} };
-
-    const c: any = contactSection.content || {};
-    const f: any = footerSection.content || {};
-
-    const updateContact = (key: string, val: any) => updateSection('contact', { ...c, [key]: val });
-    const updateFooter = (key: string, val: any) => updateSection('footer', { ...f, [key]: val });
+    const c = localPageData.contact || {};
+    const f = localPageData.footer || {};
 
     return (
         <div className="flex flex-col bg-millions-dark h-full animate-fade-in -m-6 md:-m-10">
@@ -178,9 +160,9 @@ const FooterArchitectureEditor = () => {
                     <div className="animate-fade-in pt-20 border-t border-white/5">
                         <FormSectionHeader title="Base Architecture" icon={Monitor} description="Copyright and legal placement." />
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <FieldGroup label="Logo Text"><DarkInput value={f.logo || ''} onChange={e => updateFooter('logo', e.target.value)} /></FieldGroup>
-                            <FieldGroup label="Copyright Notice (Year is Auto-Dynamic)"><DarkInput value={f.copyright || ''} onChange={e => updateFooter('copyright', e.target.value)} /></FieldGroup>
-                            <FieldGroup label="Operating Location"><DarkInput value={f.location || ''} onChange={e => updateFooter('location', e.target.value)} /></FieldGroup>
+                            <FieldGroup label="Logo Text"><DarkInput value={f.logo || ''} onChange={e => updateFooterState('logo', e.target.value)} /></FieldGroup>
+                            <FieldGroup label="Copyright Notice (Year is Auto-Dynamic)"><DarkInput value={f.copyright || ''} onChange={e => updateFooterState('copyright', e.target.value)} /></FieldGroup>
+                            <FieldGroup label="Operating Location"><DarkInput value={f.location || ''} onChange={e => updateFooterState('location', e.target.value)} /></FieldGroup>
                         </div>
                     </div>
 
