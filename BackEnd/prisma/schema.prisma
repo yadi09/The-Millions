@@ -28,6 +28,20 @@ model Section {
   createdAt DateTime @default(now())
 }
 
+model Footer {
+  id                String   @id @default(cuid())
+  phone             String
+  email             String
+  address           String
+  socialMedia       Json
+  copyright         String
+  showContactBlock  Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("footer")
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -36,11 +50,12 @@ model User {
 }
 
 model Service {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  messages  ContactMessage[]
+  id          String           @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  messages    ContactMessage[]
 }
 
 model ContactMessage {
@@ -56,6 +71,20 @@ model ContactMessage {
   createdAt DateTime @default(now())
 }
 
+model Testimonial {
+  id           String   @id @default(uuid())
+  clientName   String
+  company      String
+  role         String
+  text         String   @db.Text
+  imageUrl     String?
+  rating       Int      @default(5)
+  serviceUsed  String?
+  location     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model BlogPost {
   id           String   @id @default(uuid())
   title        String
@@ -63,10 +92,11 @@ model BlogPost {
   category     String
   coverImage   String?
   excerpt      String
-  content      String   // HTML from TipTap
+  content      String   @db.Text
   status       BlogStatus @default(DRAFT)
   author       String
   publishedAt  DateTime?
+  tags         String[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
