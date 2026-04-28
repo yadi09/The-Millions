@@ -39,7 +39,12 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
             id: localPageData.id,
             data: {
                 title: localPageData.title,
-                sections: localPageData.sections
+                sections: localPageData.sections.map((s, index) => ({
+                    id: s.id,
+                    type: s.type,
+                    order: index,
+                    content: s.content
+                }))
             }
         }).unwrap();
 
