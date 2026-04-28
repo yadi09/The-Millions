@@ -41,17 +41,15 @@ const HomeArchitectureEditor = () => {
     const [activeSectionType, setActiveSectionType] = useState<string>('hero');
 
     useEffect(() => {
-        if (!localPageData) {
-            // Force a full 11-section architecture record
-            const mockPage: Page = {
-                id: pageData?.id || 'temp-home-id',
-                slug: 'home',
-                title: 'Home',
+        // If data just arrived and we don't have local data yet OR we only have mock data
+        if (pageData && (!localPageData || localPageData.id === 'temp-home-id')) {
+            const mappedPage: Page = {
+                id: pageData.id,
+                slug: pageData.slug,
+                title: pageData.title,
                 sections: HOME_ARCHITECTURE_STRUCTURE.map((struct) => {
-                    // Find existing backend section or use landingContent fallback
-                    const existingSection = pageData?.sections?.find(s => s.type === struct.type);
+                    const existingSection = pageData.sections?.find(s => s.type === struct.type);
                     
-                    // Map camelCase landingContent keys to kebab-case section types
                     const contentKey = struct.type === 'mission-vision' ? 'missionVision' 
                                    : struct.type === 'impact-model' ? 'impactModel'
                                    : struct.type === 'social-impact' ? 'socialImpact'
@@ -65,9 +63,31 @@ const HomeArchitectureEditor = () => {
                     };
                 })
             };
+            setLocalPageData(mappedPage);
+        } 
+        // Initial fallback if backend is slow/offline
+        else if (!localPageData && !isLoading) {
+            const mockPage: Page = {
+                id: 'temp-home-id',
+                slug: 'home',
+                title: 'Home',
+                sections: HOME_ARCHITECTURE_STRUCTURE.map((struct) => {
+                    const contentKey = struct.type === 'mission-vision' ? 'missionVision' 
+                                   : struct.type === 'impact-model' ? 'impactModel'
+                                   : struct.type === 'social-impact' ? 'socialImpact'
+                                   : struct.type === 'future-vision' ? 'futureVision'
+                                   : struct.type;
+
+                    return {
+                        id: `temp-${struct.type}`,
+                        type: struct.type,
+                        content: (landingContent as any)[contentKey] || {}
+                    };
+                })
+            };
             setLocalPageData(mockPage);
         }
-    }, [pageData, localPageData]);
+    }, [pageData, localPageData, isLoading]);
 
     const handleSave = async () => {
         if (!localPageData?.id) {
@@ -79,7 +99,12 @@ const HomeArchitectureEditor = () => {
             id: localPageData.id,
             data: {
                 title: localPageData.title,
-                sections: localPageData.sections
+                sections: localPageData.sections.map((s, index) => ({
+                    id: s.id,
+                    type: s.type,
+                    order: index,
+                    content: s.content
+                }))
             }
         }).unwrap();
 
