@@ -5,8 +5,29 @@ export async function getFooter(req: Request, res: Response) {
   try {
     const footer = await getGlobalFooter();
     
+    // If no footer exists, return default data instead of 404
     if (!footer) {
-      return res.status(404).json({ error: 'Footer not found' });
+      const defaultFooter = {
+        contact: {
+          label: "Ready to Start Your Journey?",
+          title: "Let's Build Something Great Together",
+          subTitle: "Our expert team is here to provide the professional advisory and learning services you need to succeed in global markets.",
+          phones: [],
+          email: "",
+          website: "www.themillions.com",
+          address: [],
+          whatsapp: "",
+          buttonText: "WhatsApp Us"
+        },
+        footer: {
+          logo: "/logo.svg",
+          copyright: "© 2026 The Millions. All rights reserved.",
+          location: "London / Global"
+        },
+        showContactBlock: true
+      };
+      
+      return res.json(defaultFooter);
     }
 
     // Transform response to match frontend FooterData interface
