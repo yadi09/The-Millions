@@ -1,62 +1,105 @@
+/// <reference types="node" />
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import "dotenv/config";
 
-const prisma = new PrismaClient();
+/* -----------------------------
+   Prisma Client
+   ✅ Use DATABASE_URL explicitly so it connects to Neon
+------------------------------*/
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+    },
+  },
+});
 
-declare const process: any;
-
-async function seedGlobalFooter() {
-  const existing = await prisma.footer.findFirst();
-  if (existing) {
-    console.log("ℹ️ Global footer already exists, skipping creation");
-    return;
-  }
-
-  await prisma.footer.create({
-    data: {
-      phone: "+44 7951 7965 92, +44 7960 412 427",
-      email: "info@themillions.com",
-      address: "Terminus Terrace, Southampton, SO14 3FD, United Kingdom",
-      socialMedia: { whatsapp: "https://wa.me/447951796592" },
-      copyright: "© 2026 The MILLIONS. Setting You Up For Success. All rights reserved.",
-      showContactBlock: true
-    } as any
+/* -----------------------------
+   Seed Home Page
+------------------------------*/
+async function seedHomePage() {
+  await prisma.page.upsert({
+    where: { slug: "home" },
+    update: {},
+    create: {
+      slug: "home",
+      title: "Home",
+      sections: {
+        create: [
+          {
+            type: "hero",
+            order: 1,
+            content: {
+              badge: "ACCA Certified Professionals",
+              headlineBlack: "Beyond Compliance.",
+              headlineBlue: "Forward With Confidence.",
+              description:
+                "At The Millions Chartered Certified Accountants, we go beyond compliance. Trusted financial partner helping you stay on top of numbers, minimize tax, improve cash flow, and make confident decisions.",
+              ctas: [
+                { label: "Book Free Consultation", action: "book_consultation" },
+                { label: "WhatsApp Us Instantly", action: "whatsapp" },
+              ],
+              features: [
+                "Fixed Fees",
+                "Cloud Accounting Experts",
+                "Jargon-Free Service",
+                "Support across all stages",
+              ],
+            },
+          },
+          {
+            type: "services",
+            order: 2,
+            content: {
+              title: "Our Services at a Glance",
+              subtitle: "Comprehensive financial services tailored to your needs.",
+              cards: [
+                {
+                  id: "year_end_accounts",
+                  icon: "tax",
+                  title: "Year-End Accounts & Tax Returns",
+                  description:
+                    "Annual statutory accounts, corporation tax returns (CT600), and self-assessment tax returns.",
+                },
+                {
+                  id: "payroll",
+                  icon: "payroll",
+                  title: "Payroll & Bookkeeping",
+                  description:
+                    "RTI-compliant payroll processing, auto-enrolment pension support, and cloud software setup.",
+                },
+                {
+                  id: "vat",
+                  icon: "vat",
+                  title: "VAT & Making Tax Digital",
+                  description:
+                    "VAT returns and MTD compliance to keep your business fully compliant.",
+                },
+                {
+                  id: "startup",
+                  icon: "startup",
+                  title: "Business Start-Up Support",
+                  description: "Company formation, HMRC registration, business structure advice.",
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
   });
-  console.log("🌍 Global footer seeded");
+
+  console.log("🌱 Home page seeded");
 }
 
-async function seedServiceRecords() {
-  const services = [
-    { name: "Accountancy & Financial Advisory", description: "Comprehensive financial reporting and bookkeeping..." },
-    { name: "Tax Advisory & Compliance", description: "Corporate and individual tax planning..." },
-    { name: "Payroll & Bookkeeping", description: "Expertly managed financial records and efficient payroll solutions." },
-    { name: "VAT & Making Tax Digital", description: "Stay compliant with HMRC's digital requirements and VAT regulations." },
-    { name: "Business Start-Up Support", description: "Everything you need to get your new venture off to a flying start." },
-    { name: "Strategic Growth & Advisory", description: "Insights and strategies to scale your business and increase profitability." },
-    { name: "Landlord & Property Tax", description: "Specialist tax advice for property investors and buy-to-let owners." },
-    { name: "CIS & Contractor Accounting", description: "Tailored accountancy for construction industry professionals and IR35 contractors." },
-    { name: "Charities & Not-for-Profits", description: "Specialist accounting and compliance for the third sector." }
-  ];
-
-  for (const s of services) {
-    const existing = await prisma.service.findFirst({ where: { name: s.name } });
-    if (existing) {
-      await prisma.service.update({
-        where: { id: existing.id },
-        data: { description: s.description }
-      });
-    } else {
-      await prisma.service.create({
-        data: { name: s.name, description: s.description }
-      });
-    }
-  }
-  console.log("💼 Service records seeded");
-}
-
+/* -----------------------------
+   Seed Admin User
+------------------------------*/
 async function seedAdminUser() {
   const email = "admin@themillions.com";
   const password = "adminpassword123";
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   await prisma.user.upsert({
@@ -67,328 +110,249 @@ async function seedAdminUser() {
       password: hashedPassword,
     },
   });
+
   console.log("👤 Admin user seeded");
 }
 
-async function seedHomeGaps() {
+/* -----------------------------
+   Seed About Page
+------------------------------*/
+async function seedAboutPage() {
   await prisma.page.upsert({
-    where: { slug: "home" },
+    where: { slug: "about" },
     update: {},
     create: {
-      slug: "home",
-      title: "The MILLIONS | Professional Advisory & Learning",
+      slug: "about",
+      title: "About Us",
       sections: {
         create: [
+          // 1. Hero
           {
             type: "hero",
-            order: 0,
-            content: {
-              badge: "Setting You Up For Success",
-              headlineBlack: "Professional Advisory & ",
-              headlineBlue: "Learning.",
-              description: "A family-founded platform integrating accountancy, tax advisory, business consulting, and accredited professional learning — across the UK and East Africa.",
-              backgroundImageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1714170000/pages/home/hero-bg.jpg",
-              ctas: [
-                { label: "Our Services", action: "/#services" },
-                { label: "Our Story", action: "/#philosophy" }
-              ],
-              stats: [
-                { num: "UK", label: "London Headquarters · Global Standards" },
-                { num: "East Africa", label: "Strategic Regional Focus · Enterprise Growth" },
-                { num: "4 Pillars", label: "Advisory · Learning · Ventures · Impact" }
-              ]
-            }
-          },
-          {
-            type: "philosophy",
             order: 1,
             content: {
-              label: "Our Story",
-              title: "Founding Philosophy",
-              paragraphs: [
-                "At its core, THE MILLIONS was established on a simple yet powerful conviction: access to trusted professional guidance, high-quality learning, and ethical opportunity should never be constrained by geography, background, or circumstance.",
-                "Across global markets, organisations at every stage of development require reliable expertise to navigate complexity, manage risk, and achieve sustainable growth...",
-                "The name THE MILLIONS reflects scale, inclusion, and transformative reach. It represents an ambition to expand opportunity beyond individual organisations, impacting professions, institutions, economies, and communities."
+              badge: "About The Millions",
+              headlineBlack: "Building Trust",
+              headlineBlue: "Through Excellence.",
+              description:
+                "A client-first, future-focused accountancy firm dedicated to helping individuals and businesses navigate the complexities of finance with confidence.",
+              ctas: [
+                { label: "Book Free Consultation", action: "book_consultation" },
+                { label: "View Our Services", action: "services" },
               ],
-              quote: "THE MILLIONS was founded on the conviction that every level of enterprise requires trusted expert guidance and that professional knowledge carries a responsibility: to act with integrity, empower others, and create opportunities that endure far beyond ourselves.",
-              attr: "The Millions · Founding Principle"
-            }
+            },
           },
+          // 2. Who We Are
           {
-            type: "overview",
+            type: "who_we_are",
             order: 2,
             content: {
-              label: "Who We Are",
-              title: "Company Overview",
-              paragraphs: [
-                "THE MILLIONS is a family-founded professional services and learning organisation delivering accountancy, tax advisory, business consulting, and professional capability development.",
-                "The organisation operates through an integrated institutional model combining professional advisory expertise, accredited learning and training, structured venture development, enterprise incubation and scaling support, digital enablement, and knowledge platforms..."
-              ]
-            }
+              title: "Who We Are",
+              description:
+                "The Millions Chartered Certified Accountants is the 2 brothers Mark and Sleshi Million who are dedicated to helping individuals and businesses navigate the complexities of finance with confidence. They are based in London, UK. and they are the founders of the company. They have been in the business for 10 years and they have a team of 10 people.\n\nThe company is dedicated to helping individuals and businesses navigate the complexities of finance with confidence. They have big dreams and they are working hard to achieve them. they are also working on a project to help people with their financial needs.",
+            },
           },
+          // 3. Stats
           {
-            type: "missionVision",
+            type: "stats",
             order: 3,
             content: {
-              label: "Purpose",
-              title: "Mission & Vision",
-              mission: {
-                label: "Our Mission",
-                title: "Trusted Advisory. Accredited Learning.",
-                text: "To deliver trusted professional advisory services and accredited learning that strengthen organisations, develop highly skilled professionals, and enable the creation of resilient and sustainable enterprises."
-              },
-              vision: {
-                label: "Our Vision",
-                title: "A Global Professional Platform.",
-                text: "To become a globally respected professional platform that integrates advisory, learning, and venture development—expanding opportunity, strengthening institutions, and generating lasting economic and societal impact."
-              }
-            }
+              stats: [
+                { value: "2014", label: "Founded" },
+                { value: "500+", label: "Clients Served" },
+                { value: "15+", label: "Team Members" },
+              ],
+            },
           },
+          // 4. Values (Vision, Mission, Values)
           {
             type: "values",
             order: 4,
             content: {
-              label: "What We Stand For",
-              title: "Core Values",
-              subTitle: "The MILLIONS Values Framework",
-              items: [
-                { name: "Meaningful Impact", text: "We exist to create large-scale, lasting change—strengthening institutions, advancing professional capability, and expanding access to opportunity across communities and markets." },
-                { name: "Integrity", text: "We uphold rigorous ethical standards, professional independence, and responsible judgement in every engagement and decision." },
-                { name: "Leadership through Excellence", text: "We pursue technical rigour, innovation, and continuous improvement." }
-              ]
-            }
+              vision:
+                "To be recognised as a trusted financial partner that empowers our clients through clarity, compliance, and strategic advice.",
+              mission:
+                "To deliver personalised, professional, and proactive accountancy services that support long-term success and financial peace of mind.",
+              values: [
+                {
+                  title: "Integrity",
+                  description:
+                    "We act with honesty, transparency, and professionalism in everything we do.",
+                },
+                {
+                  title: "Clarity",
+                  description:
+                    "We simplify the complex and speak your language, making finance accessible to all.",
+                },
+                {
+                  title: "Proactivity",
+                  description:
+                    "We anticipate, advise, and act—before the deadline, keeping you ahead of the curve.",
+                },
+                {
+                  title: "Partnership",
+                  description:
+                    "We work with you, not just for you, building lasting relationships based on trust.",
+                },
+                {
+                  title: "Excellence",
+                  description:
+                    "We stay current, qualified, and committed to your growth and success.",
+                },
+              ],
+            },
           },
+          // 5. Team
           {
-            type: "impactModel",
+            type: "team",
             order: 5,
             content: {
-              label: "Our Framework",
-              title: "The MILLIONS Impact Model",
-              subTitle: "THE MILLIONS operates through an integrated institutional framework founded on four complementary pillars.",
-              pillars: [
-                { num: "01", title: "Professional Advisory", text: "Providing accountancy, tax advisory, and business consulting services in accordance with international professional standards." },
-                { num: "02", title: "Professional Learning", text: "Delivering accredited learning programmes and professional certification preparation." },
-                { num: "03", title: "Venture Development Platform", text: "A structured ecosystem that nurtures independent yet aligned ventures." },
-                { num: "04", title: "Social Impact Commitment", text: "Through YeMillions Charity, THE MILLIONS invests in knowledge access and mentorship." }
-              ]
-            }
+              title: "Meet Our Team",
+              subtitle:
+                "Our experienced team of ACCA certified professionals combines expertise with a personal touch, showcasing both our credentials and our human side.",
+              members: [
+                {
+                  name: "Sleshi Million",
+                  role: "Accountant",
+                  qualifications: "ACCA, MBA",
+                  bio: "Sleshi is an Certified Accountant who helps clients with their financial needs. and also a tax expert.",
+                },
+                {
+                  name: "Mark Million",
+                  role: "Accountant",
+                  qualifications: "ACCA, MBA",
+                  bio: "Mark provides strategic business advice and growth planning, helping entrepreneurs and established businesses achieve their goals.",
+                },
+                {
+                  name: "Sarah Abera",
+                  role: "Social Media Manager",
+                  qualifications: "Certified Social Media Manager",
+                  bio: "Sarah is a Social Media Manager who helps the company with their social media presence. and also a graphic designer.",
+                },
+                {
+                  name: "Yadamzer Terefe",
+                  role: "Software Engineer",
+                  qualifications: "Certified Software Engineer",
+                  bio: "Yadamzer is a Software Engineer who helps the company with their software development needs.",
+                },
+              ],
+            },
           },
+          // 6. CTA
           {
-            type: "geography",
+            type: "cta",
             order: 6,
             content: {
-              label: "Global Reach",
-              title: "Strategy Across Borders",
-              subTitle: "Bridging markets through localized expertise and global standards.",
-              regions: [
-                { 
-                  label: "United Kingdom", 
-                  title: "London Headquarters", 
-                  subTitle: "Global Governance", 
-                  text: "Our Southampton and London offices lead global strategy and professional compliance.", 
-                  tags: ["Accountancy", "Tax Planning", "Institutional Strategy"] 
-                },
-                { 
-                  label: "East Africa", 
-                  title: "Strategic Regional Focus", 
-                  subTitle: "Enterprise Growth", 
-                  text: "Developing high-impact solutions for businesses and professionals across East Africa.", 
-                  tags: ["Cross-border Advisory", "Certified Learning", "Venture Support"] 
-                }
-              ]
-            }
-          },
-          {
-            type: "socialImpact",
-            order: 7,
-            content: {
-              label: "Our Responsibility",
-              title: "Impact & Sustainability",
-              subTitle: "Investing in the future of professions and communities.",
-              tiers: [
-                { badge: "Knowledge Access", title: "Educational Philanthropy", text: "Providing scholarship and mentorship to the next generation of professional leaders." },
-                { badge: "Economic Resilience", title: "Enterprise Incubation", text: "Supporting local businesses through accessible advisory and capability building." }
+              title: "Ready to Work Together?",
+              description:
+                "Let's discuss how our team can help you achieve your financial goals with confidence and clarity.",
+              actions: [
+                { label: "Book Free Consultation", action: "book_consultation" },
+                { label: "View Our Services", action: "services" },
               ],
-              governance: {
-                title: "Institutional Integrity",
-                paragraphs: ["Governance is the foundation of our impact. We maintain strict professional standards across all regions."],
-                list: ["Universal Ethical Practice", "Professional Independence", "Data Transparency"],
-                footer: "Official Partner of Global Professional Bodies"
-              }
-            }
+            },
           },
-          {
-            type: "leadership",
-            order: 8,
-            content: {
-              label: "Our People",
-              title: "Leadership & Commitment",
-              subTitle: "A team of experts dedicated to institutional excellence.",
-              commitments: ["Technical Rugour", "Continuous Capability Development", "Strategic Integrity"],
-              leaders: [
-                { name: "Expert Leadership", creds: "ACCA, FCCA", role: "Founding Partner", initials: "EL" },
-                { name: "Strategic Advisory", creds: "MBA, PhD", role: "Managing Director", initials: "SA" }
-              ]
-            }
-          },
-          {
-            type: "futureVision",
-            order: 9,
-            content: {
-              label: "Our Path",
-              title: "The Future Vision",
-              subTitle: "Scaling impact and innovation over the next decade.",
-              points: [
-                "Digital-First Advisory Evolution",
-                "Pan-African Learning Expansion",
-                "Global Knowledge Network Growth"
-              ],
-              footer: "Setting You Up For Success · 2026 and Beyond"
-            }
-          },
-          {
-            type: "testimonials",
-            order: 10,
-            content: {
-              title: "Client Success Stories",
-              subtitle: "We take pride in the success of our clients.",
-              stats: {
-                satisfaction: "99%",
-                relationship: "8+ Years",
-                clients: "1000+"
-              },
-              testimonials: [
-                {
-                  clientName: "Samuel Bekele",
-                  company: "East Africa Tech Hub",
-                  role: "Founder",
-                  text: "The Millions helped us navigate the tax complexities of cross-border operations perfectly. Their advisory is world-class.",
-                  imageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922334/testimonials/samuel.jpg",
-                  rating: 5
-                },
-                {
-                  clientName: "Sarah Jenkins",
-                  company: "UK Logistics Ltd",
-                  role: "Finance Director",
-                  text: "Professional, timely, and insightful. They are more than just accountants; they are strategic partners.",
-                  imageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1771922388/testimonials/sarah.jpg",
-                  rating: 5
-                }
-              ]
-            }
-          }
-        ]
-      }
-    }
+        ],
+      },
+    },
   });
-  console.log("🌱 Home page gaps seeded");
+
+  console.log("🌱 About page seeded");
 }
 
+/* -----------------------------
+   Run All Seeds
+------------------------------*/
 async function seedBlogPage() {
   await prisma.page.upsert({
     where: { slug: "blog" },
     update: {},
     create: {
       slug: "blog",
-      title: "Blog | The MILLIONS",
+      title: "Our Blog",
       sections: {
         create: [
           {
             type: "hero",
-            order: 0,
+            order: 1,
             content: {
-              badge: "Knowledge Base",
-              headlineBlack: "Insights & ",
-              headlineBlue: "Resources.",
-              description: "Professional insights, industry updates, and learning resources from The MILLIONS team.",
-              backgroundImageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1714170000/pages/blog/hero-bg.jpg",
-              ctas: [
-                { label: "Browse Articles", action: "/blog" }
-              ]
-            }
-          }
-        ]
-      }
-    }
+              badge: "Financial Insights",
+              headlineBlack: "The Latest",
+              headlineBlue: "Tips & News.",
+              description: "Stay informed with expert financial advice, tax tips, and business growth strategies from our Chartered Accountants.",
+            },
+          },
+          {
+            type: "featured-posts",
+            order: 2,
+            content: {
+              title: "Editor's Pick",
+              featuredPostId: "", // Will default to most recent if empty
+            },
+          },
+          {
+            type: "popular-posts",
+            order: 3,
+            content: {
+              title: "Popular This Month",
+              show: true,
+              mode: "auto",
+            },
+          },
+        ],
+      },
+    },
   });
+
   console.log("🌱 Blog page seeded");
 }
 
-async function seedContactPage() {
-  await prisma.page.upsert({
-    where: { slug: "contact" },
-    update: {},
-    create: {
-      slug: "contact",
-      title: "Contact Us | The MILLIONS",
-      sections: {
-        create: [
-          {
-            type: "hero",
-            order: 0,
-            content: {
-              badge: "Ready to Start Your Journey?",
-              headlineBlack: "Get In ",
-              headlineBlue: "Touch.",
-              description: "Our expert team is here to provide the professional advisory and learning services you need to succeed in global markets.",
-              backgroundImageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1714170000/pages/contact/hero-bg.jpg"
-            }
-          }
-        ]
-      }
-    }
-  });
-  console.log("🌱 Contact page seeded");
-}
+async function seedContactMessages() {
+  // First, ensure we have at least one service to reference
+  const service = await prisma.service.findFirst();
+  if (!service) {
+    // Create a default service if none exists
+    await prisma.service.create({
+      data: {
+        name: "General Inquiry",
+        description: "General contact form submission",
+      },
+    });
+  }
 
-async function seedTestimonialsPage() {
-  await prisma.page.upsert({
-    where: { slug: "testimonials" },
+  // Get the service to reference
+  const generalService = await prisma.service.findFirst({
+    where: { name: "General Inquiry" },
+  });
+
+  // Seed a sample contact message
+  await prisma.contactMessage.upsert({
+    where: { id: "sample-contact-message-1" },
     update: {},
     create: {
-      slug: "testimonials",
-      title: "Testimonials | The MILLIONS",
-      sections: {
-        create: [
-          {
-            type: "hero",
-            order: 0,
-            content: {
-              badge: "Client Trust",
-              headlineBlack: "What Our ",
-              headlineBlue: "Clients Say.",
-              description: "Real stories from businesses and professionals who have transformed their financial future with The Millions.",
-              backgroundImageUrl: "https://res.cloudinary.com/dwuyfw7mf/image/upload/v1714170000/pages/testimonials/hero-bg.jpg"
-            }
-          }
-        ]
-      }
-    }
+      id: "sample-contact-message-1",
+      fullName: "John Doe",
+      email: "john.doe@example.com",
+      phone: "+1234567890",
+      message: "This is a sample contact message for testing purposes.",
+      serviceId: generalService.id,
+      status: "NEW",
+    },
   });
-  console.log("🌱 Testimonials page seeded");
+
+  console.log("📧 Contact messages seeded");
 }
 
 async function main() {
-  console.log("🧹 Cleaning database...");
-  await prisma.section.deleteMany();
-  // await prisma.footer.deleteMany(); // Removed as per instructions
-  await prisma.page.deleteMany();
-  console.log("🌱 Starting database seeding...");
-  await seedServiceRecords();
-  await seedAdminUser();
-  await seedGlobalFooter(); // Added after admin user
-  await seedHomeGaps();
+  await seedHomePage();
+  await seedAboutPage();
   await seedBlogPage();
-  await seedContactPage();
-  await seedTestimonialsPage();
-  console.log("✅ Database seeding completed successfully!");
+  await seedAdminUser();
+  await seedContactMessages();
 }
 
 main()
-  .catch((error) => {
-    console.error("❌ Seeding failed with error:", error);
-    process.exit(1);
-  })
+  .catch(console.error)
   .finally(async () => {
     await prisma.$disconnect();
   });

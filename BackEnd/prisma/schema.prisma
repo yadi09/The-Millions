@@ -47,15 +47,59 @@ model User {
   email     String   @unique
   password  String
   createdAt DateTime @default(now())
+  roles     UserRole[]
 }
 
-model Service {
-  id          String           @id @default(uuid())
-  name        String
-  description String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  messages    ContactMessage[]
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id])
+  role   Role @relation(fields: [roleId], references: [id])
+  @@id([userId, roleId])
+}
+
+model Role {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  permissions Json   // Array of permission strings like ["pages:create", "pages:edit"]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     UserRole[]
+}
+
+model SidebarItem {
+  id        String   @id @default(uuid())
+  label     String
+  icon      String
+  route     String
+  roles     Json   // Array of role names that can see this item
+  order     Int
+  parentId  String?
+  children  SidebarItem[] @relation("SidebarChildren")
+  parent    SidebarItem? @relation("SidebarChildren", fields: [parentId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Widget {
+  id        String   @id @default(uuid())
+  type      String   // e.g., "stat", "list", "chart"
+  title     String
+  endpoint  String   // Backend endpoint to fetch data for this widget
+  refreshInterval Int   // in seconds
+  roles     Json   // Array of role names
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json   // Can be string, number, boolean, object
+  type      String   // "string", "number", "boolean", "object"
+  group     String   // e.g., "general", "seo", "contact"
+  updatedAt DateTime @updatedAt
 }
 
 model ContactMessage {
@@ -65,10 +109,20 @@ model ContactMessage {
   phone     String?
   message   String
   serviceId String
+  status    String   @default("NEW") // NEW, READ, REPLIED
 
   service   Service  @relation(fields: [serviceId], references: [id])
-  
+   
   createdAt DateTime @default(now())
+}
+
+model Service {
+  id          String           @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  messages    ContactMessage[]
 }
 
 model Testimonial {

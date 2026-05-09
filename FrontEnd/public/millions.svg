@@ -1,6 +1,6 @@
 <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-  <rect width="64" height="64" rx="12" fill="#2563EB"/>
-  <text x="50%" y="60%" font-family="Arial, sans-serif" font-size="62" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="middle">
+  <rect width="64" height="64" rx="16" fill="#0d2420"/>
+  <text x="52%" y="58%" font-family="Cormorant Garamond, serif" font-size="48" font-weight="600" fill="#c9a84c" text-anchor="middle" dominant-baseline="middle">
     M
   </text>
 </svg>

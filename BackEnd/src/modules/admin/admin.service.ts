@@ -33,7 +33,7 @@ export async function updatePage(
 ) {
     const { slug, title, sections } = data;
 
-    return prisma.$transaction(async (tx) => {  // ✅ Remove manual type annotation
+    return prisma.$transaction(async (tx) => {
         // Update Page details
         const page = await tx.page.update({
             where: { id },
@@ -44,21 +44,28 @@ export async function updatePage(
         });
 
         // If sections are provided, replace them
-        if (sections) {
+        if (sections !== undefined) {
             await tx.section.deleteMany({
                 where: { pageId: id },
             });
 
-            await tx.section.createMany({
-                data: sections.map(({ id: _oldId, ...s }: any) => ({ ...s, pageId: id })),
-            });
+            if (sections.length > 0) {
+                await tx.section.createMany({
+                    data: sections.map(section => ({
+                        type: section.type,
+                        order: section.order,
+                        content: section.content,
+                        pageId: id,
+                    })),
+                });
+            }
         }
 
         return tx.page.findUnique({
             where: { id },
             include: {
                 sections: {
-                    orderBy: { order: "asc" },  // ✅ Prisma will infer correct type
+                    orderBy: { order: "asc" },
                 },
             },
         });

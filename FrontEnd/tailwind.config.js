@@ -10,6 +10,12 @@ export default {
   theme: {
     extend: {
       colors: {
+        'millions-dark': '#0d2420',
+        'millions-mid': '#163a33',
+        'millions-accent': '#c9a84c',
+        'millions-light': '#f4f0e8',
+        'millions-muted': '#8a9e97',
+        'millions-body': '#4a6260',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -61,6 +67,10 @@ export default {
           ring: 'hsl(var(--sidebar-ring))',
         },
       },
+      fontFamily: {
+        cormorant: ['"Cormorant Garamond"', 'serif'],
+        jost: ['"Jost"', 'sans-serif'],
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
@@ -82,5 +92,5 @@ export default {
       },
     },
   },
-  plugins: [animate],
+  plugins: [animate, require('@tailwindcss/typography')],
 };

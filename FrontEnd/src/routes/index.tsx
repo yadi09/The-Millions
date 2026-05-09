@@ -1,12 +1,73 @@
-import { Routes, Route } from "react-router-dom";
-import Home from "../pages/Home";
-import About from "../pages/about/page";
-import ContactPage from "../pages/contact/page"
+import { Routes, Route, Outlet, Navigate } from "react-router-dom";
+import ContactPage from "../pages/contact/page";
+import Layout from "../components/Layout";
+import BlogPage from "../pages/blog/page";
+import BlogPost from "../pages/blog/BlogPost";
+import ComingSoonPage from "../pages/comingSoon/page";
+import AdminLayout from "../components/AdminLayout";
+import AdminDashboard from "../pages/admin/Dashboard";
+import AdminPageEditor from "../pages/admin/PageEditor";
+import AdminPagesList from "../pages/admin/PagesList";
+import AdminSettings from "../pages/admin/Settings";
+import AdminLogin from "../pages/admin/Login";
+import BlogManagement from "../pages/admin/BlogManagement";
+import BlogEditor from "../pages/admin/BlogEditor";
+import HomeArchitectureEditor from '../pages/admin/home-editor/HomeArchitectureEditor';
+import FooterArchitectureEditor from '../pages/admin/home-editor/FooterArchitectureEditor';
+import ProtectedRoute from "../components/ProtectedRoute";
+import TestimonialsPage from "../pages/testimonials/page";
+import SubmitTestimonial from "../pages/testimonials/submit";
+// Admin Testimonials
+import TestimonialsManagement from "../pages/admin/TestimonialsManagement";
+import ServicesManagement from "../pages/admin/ServicesManagement";
+import ServiceEditor from "../pages/admin/ServiceEditor";
+import Landing from "../pages/Landing";
+
+const PublicLayout = () => (
+    <Layout>
+        <Outlet />
+    </Layout>
+);
 
 export const AppRoutes = () => (
     <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<ContactPage />} />
+        {/* Public Routes */}
+        <Route element={<PublicLayout />}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/testimonials" element={<TestimonialsPage />} />
+            <Route path="/submit-testimonial" element={<SubmitTestimonial />} />
+            <Route path="*" element={<ComingSoonPage />} />
+        </Route>
+
+        {/* Admin Login Route (Public) */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+
+        {/* Protected Admin Routes */}
+        <Route path="/admin" element={
+            <ProtectedRoute>
+                <AdminLayout>
+                    <Outlet />
+                </AdminLayout>
+            </ProtectedRoute>
+        }>
+            <Route index element={<Navigate to="/admin/landing" replace />} />
+            <Route path="pages" element={<AdminPagesList />} />
+            <Route path="pages/:slug" element={<AdminPageEditor />} />
+            <Route path="landing" element={<HomeArchitectureEditor />} />
+            <Route path="footer" element={<FooterArchitectureEditor />} />
+            <Route path="blog" element={<BlogManagement />} />
+            <Route path="blog/new" element={<BlogEditor />} />
+            <Route path="blog/edit/:id" element={<BlogEditor />} />
+            <Route path="testimonials" element={<TestimonialsManagement />} />
+            <Route path="services" element={<ServicesManagement />} />
+            <Route path="services/new" element={<ServiceEditor />} />
+            <Route path="services/edit/:id" element={<ServiceEditor />} />
+            {/* Dashboard and Settings routes are kept for legacy but mapped to disabled components */}
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="settings" element={<AdminSettings />} />
+        </Route>
     </Routes>
 );
