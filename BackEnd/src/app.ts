@@ -24,6 +24,7 @@ app.use("/api/health", healthRoutes);
 app.get("/health", (req, res) => res.json({ status: "ok", timestamp: new Date().toISOString() }));
 app.use("/api/services", servicesRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/admin/contact-messages", contactAdminRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/admin/blogs", adminBlogRoutes);
 app.use("/api/admin/upload", uploadRoutes);

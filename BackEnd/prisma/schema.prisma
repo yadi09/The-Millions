@@ -65,9 +65,10 @@ model ContactMessage {
   phone     String?
   message   String
   serviceId String
+  status    String   @default("NEW")
 
   service   Service  @relation(fields: [serviceId], references: [id])
-  
+   
   createdAt DateTime @default(now())
 }
 

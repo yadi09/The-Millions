@@ -307,11 +307,48 @@ async function seedBlogPage() {
   console.log("🌱 Blog page seeded");
 }
 
+async function seedContactMessages() {
+  // First, ensure we have at least one service to reference
+  const service = await prisma.service.findFirst();
+  if (!service) {
+    // Create a default service if none exists
+    await prisma.service.create({
+      data: {
+        name: "General Inquiry",
+        description: "General contact form submission",
+      },
+    });
+  }
+
+  // Get the service to reference
+  const generalService = await prisma.service.findFirst({
+    where: { name: "General Inquiry" },
+  });
+
+  // Seed a sample contact message
+  await prisma.contactMessage.upsert({
+    where: { id: "sample-contact-message-1" },
+    update: {},
+    create: {
+      id: "sample-contact-message-1",
+      fullName: "John Doe",
+      email: "john.doe@example.com",
+      phone: "+1234567890",
+      message: "This is a sample contact message for testing purposes.",
+      serviceId: generalService.id,
+      status: "NEW",
+    },
+  });
+
+  console.log("📧 Contact messages seeded");
+}
+
 async function main() {
   await seedHomePage();
   await seedAboutPage();
   await seedBlogPage();
   await seedAdminUser();
+  await seedContactMessages();
 }
 
 main()
