@@ -309,10 +309,10 @@ async function seedBlogPage() {
 
 async function seedContactMessages() {
   // First, ensure we have at least one service to reference
-  const service = await prisma.service.findFirst();
+  let service = await prisma.service.findFirst();
   if (!service) {
     // Create a default service if none exists
-    await prisma.service.create({
+    service = await prisma.service.create({
       data: {
         name: "General Inquiry",
         description: "General contact form submission",
@@ -326,7 +326,7 @@ async function seedContactMessages() {
   });
 
   // Seed a sample contact message
-  await prisma.contactMessage.upsert({
+ await prisma.contactMessage.upsert({
     where: { id: "sample-contact-message-1" },
     update: {},
     create: {
@@ -335,7 +335,7 @@ async function seedContactMessages() {
       email: "john.doe@example.com",
       phone: "+1234567890",
       message: "This is a sample contact message for testing purposes.",
-      serviceId: generalService.id,
+      serviceId: service.id, // ✅ Now guaranteed non-null
       status: "NEW",
     },
   });
