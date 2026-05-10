@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import pagesRoutes from "./modules/pages/pages.routes.js";
 import adminRoutes from "./modules/admin/admin.routes.js";
+import contactAdminRoutes from './modules/contact/contact.admin.routes.js';
 import authRoutes from "./modules/auth/auth.routes.js";
 import healthRoutes from "./modules/health/health.routes.js";
 import servicesRoutes from "./modules/services/services.routes.js";
