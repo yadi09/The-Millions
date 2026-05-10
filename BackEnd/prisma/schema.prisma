@@ -103,17 +103,17 @@ model Setting {
 }
 
 model ContactMessage {
-  id        String   @id @default(uuid())
-  fullName  String
-  email     String
-  phone     String?
-  message   String
-  serviceId String
-  status    String   @default("NEW") // NEW, READ, REPLIED
+    id        String   @id @default(uuid())
+    fullName  String
+    email     String
+    phone     String?
+    message   String
+    serviceId String
+    status    ContactStatus @default(NEW)
 
-  service   Service  @relation(fields: [serviceId], references: [id])
-   
-  createdAt DateTime @default(now())
+    service   Service  @relation(fields: [serviceId], references: [id])
+    
+    createdAt DateTime @default(now())
 }
 
 model Service {
@@ -160,4 +160,10 @@ model BlogPost {
 enum BlogStatus {
   DRAFT
   PUBLISHED
+}
+
+enum ContactStatus {
+  NEW
+  READ
+  REPLIED
 }
