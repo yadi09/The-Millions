@@ -8,22 +8,40 @@ interface Tier {
 
 interface SocialImpactProps {
   content: {
-    label: string;
-    title: string;
-    subTitle: string;
-    tiers: Tier[];
-    governance: {
-      title: string;
-      paragraphs: string[];
-      list: string[];
-      footer: string;
+    label?: string;
+    title?: string;
+    subTitle?: string;
+    tiers?: Tier[];
+    governance?: {
+      title?: string;
+      paragraphs?: any[]; // Changed to any[] to handle string or object
+      list?: any[];       // Changed to any[] to handle string or object
+      footer?: string;
     };
   };
 }
 
 export const SocialImpactSection: React.FC<SocialImpactProps> = ({ content }) => {
-  const { label, title, subTitle, tiers, governance } = content;
-  const isSlider = tiers.length > 3;
+  if (!content) return null;
+  
+  const { 
+    label = "", 
+    title = "", 
+    subTitle = "", 
+    tiers = [], 
+    governance = { title: "", paragraphs: [], list: [], footer: "" } 
+  } = content;
+  
+  const isSlider = (tiers?.length || 0) > 3;
+
+  // Helper to extract text from a potentially object-based list item
+  const renderText = (item: any) => {
+    if (typeof item === 'string') return item;
+    if (typeof item === 'object' && item !== null) {
+      return item.text || item.title || item.label || "";
+    }
+    return "";
+  };
 
   return (
     <section id="impact" className="bg-millions-dark py-[7rem] px-[5%] overflow-hidden">
@@ -49,24 +67,24 @@ export const SocialImpactSection: React.FC<SocialImpactProps> = ({ content }) =>
         {/* Governance Box - Always Static */}
         <div className="bg-white/5 border border-white/10 p-10 mt-10 animate-fade-in-up md:animation-delay-300">
           <h3 className="font-cormorant text-white text-[1.5rem] font-light mb-6">
-            {governance.title}
+            {governance?.title}
           </h3>
           <div className="space-y-4 mb-6">
-            {governance.paragraphs.map((p, idx) => (
+            {(governance?.paragraphs || []).map((p, idx) => (
               <p key={idx} className="text-white/45 text-[0.83rem] leading-[1.8] font-light">
-                {p}
+                {renderText(p)}
               </p>
             ))}
           </div>
           <ul className="space-y-3 mb-6">
-            {governance.list.map((item, idx) => (
+            {(governance?.list || []).map((item, idx) => (
               <li key={idx} className="flex gap-3 text-white/45 text-[0.95rem] font-light">
-                <span className="text-millions-accent">—</span> {item}
+                <span className="text-millions-accent">—</span> {renderText(item)}
               </li>
             ))}
           </ul>
           <p className="text-white/45 text-[0.83rem] leading-[1.8] font-light">
-            {governance.footer}
+            {renderText(governance?.footer)}
           </p>
         </div>
       </div>
@@ -77,7 +95,7 @@ export const SocialImpactSection: React.FC<SocialImpactProps> = ({ content }) =>
 const StaticTiersGrid = ({ tiers }: { tiers: Tier[] }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up">
-      {tiers.map((tier, idx) => (
+      {(tiers || []).map((tier, idx) => (
         <TierCard key={idx} tier={tier} />
       ))}
     </div>
@@ -88,8 +106,8 @@ const ScrollingTiersSlider = ({ tiers }: { tiers: Tier[] }) => {
   const PX_PER_SEC = 50; 
   const ESTIMATED_CARD_WIDTH = window.innerWidth < 1024 ? window.innerWidth : 435.2;
 
-  const duplicatedItems = [...tiers, ...tiers];
-  const duration = (tiers.length * ESTIMATED_CARD_WIDTH) / PX_PER_SEC;
+  const duplicatedItems = [...(tiers || []), ...(tiers || [])];
+  const duration = ((tiers?.length || 0) * ESTIMATED_CARD_WIDTH) / PX_PER_SEC;
 
   return (
     <div className="overflow-hidden marquee-mask py-2 animate-fade-in-up">
@@ -113,13 +131,13 @@ const ScrollingTiersSlider = ({ tiers }: { tiers: Tier[] }) => {
 const TierCard = ({ tier }: { tier: Tier }) => (
   <div className="bg-white/5 border border-white/10 p-10 border-t-2 border-t-millions-accent h-full">
     <div className="inline-block bg-millions-accent text-millions-dark text-[0.68rem] tracking-[0.2em] uppercase px-3 py-1 mb-6 font-medium">
-      {tier.badge}
+      {tier?.badge}
     </div>
     <h3 className="font-cormorant text-white text-[1.15rem] font-light mb-4 leading-snug">
-      {tier.title}
+      {tier?.title}
     </h3>
     <p className="text-white/45 text-[0.83rem] leading-[1.8] font-light">
-      {tier.text}
+      {tier?.text}
     </p>
   </div>
 );
