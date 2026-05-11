@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+
 import {
   PrismaClient,
   ContactStatus,
@@ -33,11 +34,13 @@ export async function getContactMessages(
         : undefined;
 
     const pageNum = parseInt(page, 10) || 1;
+
     const limitNum = parseInt(limit, 10) || 20;
 
     const skip = (pageNum - 1) * limitNum;
 
-    const whereClause: Prisma.ContactMessageWhereInput = {};
+    const whereClause: Prisma.ContactMessageWhereInput =
+      {};
 
     if (status) {
       whereClause.status = status;
@@ -75,8 +78,8 @@ export async function getContactMessages(
       ];
     }
 
-    const [messages, total] = await prisma.$transaction([
-      prisma.contactMessage.findMany({
+    const messages =
+      await prisma.contactMessage.findMany({
         where: whereClause,
 
         include: {
@@ -94,14 +97,14 @@ export async function getContactMessages(
 
         skip,
         take: limitNum,
-      }),
+      });
 
-      prisma.contactMessage.count({
+    const total =
+      await prisma.contactMessage.count({
         where: whereClause,
-      }),
-    ]);
+      });
 
-    const data = (messages as any[]).map((msg) => ({
+    const data = messages.map((msg: any) => ({
       id: msg.id,
       fullName: msg.fullName,
       email: msg.email,
@@ -119,8 +122,6 @@ export async function getContactMessages(
       createdAt: msg.createdAt,
     }));
 
-    const totalPages = Math.ceil(total / limitNum);
-
     return res.status(200).json({
       data,
 
@@ -128,11 +129,11 @@ export async function getContactMessages(
         page: pageNum,
         limit: limitNum,
         total,
-        totalPages,
+        totalPages: Math.ceil(total / limitNum),
       },
     });
-  } catch (error: any) {
-    console.error('Error fetching contact messages:', error);
+  } catch (error) {
+    console.error(error);
 
     return res.status(500).json({
       message: 'Internal server error',
@@ -145,10 +146,14 @@ export async function updateContactMessageStatus(
   res: Response,
 ) {
   try {
+    const rawId = req.params.id;
+
     const id =
-      typeof req.params.id === 'string'
-        ? req.params.id
-        : req.params.id?.[0];
+      typeof rawId === 'string'
+        ? rawId
+        : Array.isArray(rawId)
+        ? rawId[0]
+        : undefined;
 
     if (!id) {
       return res.status(400).json({
@@ -156,7 +161,7 @@ export async function updateContactMessageStatus(
       });
     }
 
-    const status = req.body.status;
+    const status = req.body.status as ContactStatus;
 
     if (
       !status ||
@@ -200,27 +205,27 @@ export async function updateContactMessageStatus(
         },
       });
 
-    const messageWithService = updatedMessage as any;
+    const msg: any = updatedMessage;
 
     return res.status(200).json({
-      id: messageWithService.id,
-      fullName: messageWithService.fullName,
-      email: messageWithService.email,
-      phone: messageWithService.phone ?? undefined,
-      message: messageWithService.message,
+      id: msg.id,
+      fullName: msg.fullName,
+      email: msg.email,
+      phone: msg.phone ?? undefined,
+      message: msg.message,
 
-      service: messageWithService.service
+      service: msg.service
         ? {
-            id: messageWithService.service.id,
-            name: messageWithService.service.name,
+            id: msg.service.id,
+            name: msg.service.name,
           }
         : undefined,
 
-      status: messageWithService.status,
-      createdAt: messageWithService.createdAt,
+      status: msg.status,
+      createdAt: msg.createdAt,
     });
-  } catch (error: any) {
-    console.error('Error updating contact message:', error);
+  } catch (error) {
+    console.error(error);
 
     return res.status(500).json({
       message: 'Internal server error',

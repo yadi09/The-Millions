@@ -3,7 +3,10 @@ import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function getAdminSettings(req: Request, res: Response) {
+export async function getAdminSettings(
+  req: Request,
+  res: Response,
+) {
   try {
     const settings = await prisma.setting.findMany({
       orderBy: {
@@ -28,8 +31,8 @@ export async function getAdminSettings(req: Request, res: Response) {
     });
 
     return res.status(200).json(groupedSettings);
-  } catch (error: any) {
-    console.error('Error fetching settings:', error);
+  } catch (error) {
+    console.error(error);
 
     return res.status(500).json({
       message: 'Internal server error',
@@ -37,12 +40,19 @@ export async function getAdminSettings(req: Request, res: Response) {
   }
 }
 
-export async function updateAdminSetting(req: Request, res: Response) {
+export async function updateAdminSetting(
+  req: Request,
+  res: Response,
+) {
   try {
+    const rawKey = req.params.key;
+
     const key =
-      typeof req.params.key === 'string'
-        ? req.params.key
-        : req.params.key?.[0];
+      typeof rawKey === 'string'
+        ? rawKey
+        : Array.isArray(rawKey)
+        ? rawKey[0]
+        : undefined;
 
     if (!key) {
       return res.status(400).json({
@@ -51,15 +61,24 @@ export async function updateAdminSetting(req: Request, res: Response) {
     }
 
     const value = req.body.value;
-    const type = req.body.type;
 
-    if (typeof type !== 'string') {
+    const type =
+      typeof req.body.type === 'string'
+        ? req.body.type
+        : undefined;
+
+    if (!type) {
       return res.status(400).json({
-        message: 'type must be a string',
+        message: 'type is required',
       });
     }
 
-    const validTypes = ['string', 'number', 'boolean', 'object'];
+    const validTypes = [
+      'string',
+      'number',
+      'boolean',
+      'object',
+    ];
 
     if (!validTypes.includes(type)) {
       return res.status(400).json({
@@ -67,11 +86,12 @@ export async function updateAdminSetting(req: Request, res: Response) {
       });
     }
 
-    const existingSetting = await prisma.setting.findUnique({
-      where: {
-        key,
-      },
-    });
+    const existingSetting =
+      await prisma.setting.findUnique({
+        where: {
+          key,
+        },
+      });
 
     if (!existingSetting) {
       return res.status(404).json({
@@ -79,27 +99,21 @@ export async function updateAdminSetting(req: Request, res: Response) {
       });
     }
 
-    const updatedSetting = await prisma.setting.update({
-      where: {
-        key,
-      },
+    const updatedSetting =
+      await prisma.setting.update({
+        where: {
+          key,
+        },
 
-      data: {
-        value: value as Prisma.InputJsonValue,
-        type,
-      },
-    });
+        data: {
+          value: value as Prisma.InputJsonValue,
+          type,
+        },
+      });
 
-    return res.status(200).json({
-      id: updatedSetting.id,
-      key: updatedSetting.key,
-      value: updatedSetting.value,
-      type: updatedSetting.type,
-      group: updatedSetting.group,
-      updatedAt: updatedSetting.updatedAt,
-    });
-  } catch (error: any) {
-    console.error('Error updating setting:', error);
+    return res.status(200).json(updatedSetting);
+  } catch (error) {
+    console.error(error);
 
     return res.status(500).json({
       message: 'Internal server error',
