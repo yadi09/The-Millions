@@ -24,34 +24,36 @@ export const FutureVisionSection: React.FC<FutureVisionProps> = ({ content }) =>
   };
 
   return (
-    <section id="future" className="bg-millions-mid py-[7rem] px-[5%]">
+    <section id="vision" className="bg-millions-mid py-[7rem] px-[5%]">
       <div className="max-w-[1200px] w-[90%] mx-auto">
-        <div className="text-center mb-20 animate-fade-in-up">
-          <div className="flex items-center justify-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
+        <div className="animate-fade-in-up mb-12">
+          <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
             {label}
           </div>
-          <h2 className="font-cormorant text-white text-[clamp(2.4rem,5vw,3.8rem)] font-light leading-tight mb-6">
+          <h2 className="font-cormorant text-white text-[clamp(2rem,4vw,3rem)] font-light leading-tight">
             {title}
           </h2>
-          <p className="text-white/55 text-[0.95rem] leading-[1.8] font-light max-w-2xl mx-auto italic">
+          <p className="text-white/50 text-[0.9rem] leading-[1.9] font-light mt-4 lg:max-w-2xl">
             {subTitle}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="flex flex-col gap-px mt-10 animate-fade-in-up">
           {(goals || []).map((goal, idx) => (
-            <div 
-              key={idx} 
-              className="bg-millions-dark/30 p-10 border border-white/5 hover:border-millions-accent/30 transition-all duration-300 group animate-fade-in-up"
-              style={{ animationDelay: `${0.2 * idx}s` }}
-            >
-              <div className="w-12 h-[1px] bg-millions-accent mb-8 group-hover:w-20 transition-all duration-500"></div>
-              <p className="text-white/70 text-[0.9rem] leading-[1.9] font-light">
+            <div key={idx} className="bg-white/5 p-8 flex items-start gap-10 hover:bg-white/10 transition-colors group">
+              <div className="font-cormorant text-millions-accent/40 text-[3rem] font-light leading-none group-hover:text-millions-accent transition-colors">
+                {String(idx + 1).padStart(2, '0')}
+              </div>
+              <p className="text-white/55 text-[0.9rem] leading-[1.9] font-light pt-1">
                 {renderText(goal)}
               </p>
             </div>
           ))}
         </div>
+
+        <p className="text-white/45 text-[0.9rem] leading-[1.9] font-light mt-12 lg:max-w-xl animate-fade-in-up md:animation-delay-300">
+          This strategic vision positions The MILLIONS as a lasting professional and social institution, capable of inspiring and empowering communities across generations.
+        </p>
       </div>
     </section>
   );
