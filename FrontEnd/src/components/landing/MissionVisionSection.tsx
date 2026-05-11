@@ -14,40 +14,42 @@ export const MissionVisionSection: React.FC<MissionVisionProps> = ({ content }) 
   const { label = "", title = "", mission = "", vision = "" } = content;
 
   return (
-    <section id="vision" className="bg-millions-light py-[7rem] px-[5%] overflow-hidden">
-      <div className="max-w-[1200px] w-[90%] mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-32 items-center">
-        <div className="animate-fade-in-up">
-          <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
+    <section id="mission" className="bg-millions-light py-[7rem] px-[5%]">
+      <div className="max-w-[1200px] w-[90%] mx-auto">
+        <div className="animate-fade-in-up mb-12">
+          <div className="flex items-center gap-4 text-millions-accent text-[0.75rem] tracking-[0.25em] uppercase mb-4 sec-label-before">
             {label}
           </div>
-          <h2 className="font-cormorant text-millions-dark text-[clamp(2.4rem,5vw,3.8rem)] font-light leading-none mb-10">
+          <h2 className="font-cormorant text-millions-dark text-[clamp(2rem,4vw,3rem)] font-light leading-tight">
             {title}
           </h2>
-          
-          <div className="space-y-12">
-            <div className="relative pl-10 border-l border-millions-dark/10">
-              <span className="absolute -left-[1px] top-0 w-[2px] h-10 bg-millions-accent"></span>
-              <h3 className="font-cormorant text-millions-dark text-[1.4rem] font-light mb-3 italic">Our Mission</h3>
-              <p className="text-millions-body text-[0.9rem] leading-[1.8] font-light">
-                {typeof mission === 'string' ? mission : (mission as any)?.text}
-              </p>
-            </div>
-            <div className="relative pl-10 border-l border-millions-dark/10">
-              <span className="absolute -left-[1px] top-0 w-[2px] h-10 bg-millions-accent"></span>
-              <h3 className="font-cormorant text-millions-dark text-[1.4rem] font-light mb-3 italic">Our Vision</h3>
-              <p className="text-millions-body text-[0.9rem] leading-[1.8] font-light">
-                {typeof vision === 'string' ? vision : (vision as any)?.text}
-              </p>
-            </div>
-          </div>
         </div>
 
-        <div className="relative aspect-square animate-fade-in-up md:animation-delay-300">
-          <div className="absolute inset-0 bg-millions-dark/5 border border-millions-dark/10"></div>
-          <div className="absolute inset-10 border border-millions-accent/20 flex items-center justify-center">
-            <div className="w-20 h-20 border border-millions-accent/40 flex items-center justify-center font-cormorant text-3xl text-millions-accent/60">
-              M
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-[1px] animate-fade-in-up md:animation-delay-300">
+          {/* Mission Card */}
+          <div className="bg-millions-dark p-12 border-t-2 border-t-millions-accent">
+            <div className="text-millions-accent text-[0.75rem] tracking-[0.25em] uppercase mb-4 font-light">
+              {typeof mission === 'string' ? 'Our Mission' : (mission as any)?.label || 'Our Mission'}
             </div>
+            <h3 className="font-cormorant text-white text-[1.6rem] font-light mb-4 leading-snug">
+              {typeof mission === 'string' ? mission : (mission as any)?.title || "Trusted Advisory. Accredited Learning."}
+            </h3>
+            <p className="text-white/55 text-[0.9rem] leading-[1.9] font-light">
+              {typeof mission === 'string' ? mission : (mission as any)?.text}
+            </p>
+          </div>
+
+          {/* Vision Card */}
+          <div className="bg-white p-12 border-t-2 border-t-millions-mid">
+            <div className="text-millions-mid text-[0.75rem] tracking-[0.25em] uppercase mb-4 font-light">
+              {typeof vision === 'string' ? 'Our Vision' : (vision as any)?.label || 'Our Vision'}
+            </div>
+            <h3 className="font-cormorant text-millions-dark text-[1.6rem] font-light mb-4 leading-snug">
+              {typeof vision === 'string' ? vision : (vision as any)?.title || "A Global Professional Platform."}
+            </h3>
+            <p className="text-millions-body text-[0.9rem] leading-[1.9] font-light">
+              {typeof vision === 'string' ? vision : (vision as any)?.text}
+            </p>
           </div>
         </div>
       </div>
