@@ -14,9 +14,9 @@ const options = {
         description: 'Development server',
       },
       {
-        url: 'https://the-millions-backend.onrender.com', // Replace with your actual Render URL
-        description: 'Production server',
-      },
+  url: 'https://the-millions-7vwt.onrender.com',
+  description: 'Production server',
+},
     ],
     components: {
       securitySchemes: {
