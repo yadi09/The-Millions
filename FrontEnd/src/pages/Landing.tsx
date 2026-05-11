@@ -43,7 +43,7 @@ const Landing = () => {
         items: content.cards || content.items || landingContent.services.items,
         footer: {
           title: content.footerTitle || content.subtitle || landingContent.services.footer.title,
-          text: content.footerText || content.subtitle || landingContent.services.footer.text,
+          text: content.footerText || (content.footerTitle && !content.subtitle ? "" : (content.subtitle ? "" : landingContent.services.footer.text)),
         }
       };
     }
