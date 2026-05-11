@@ -18,7 +18,37 @@ const Landing = () => {
 
   const getSectionContent = (type: string, fallbackKey: keyof typeof landingContent): any => {
     const section = pageData?.sections?.find(s => s.type === type);
-    return section?.content || landingContent[fallbackKey];
+    if (!section?.content) return landingContent[fallbackKey];
+
+    // MAPPING LOGIC: Translate backend fields to component props
+    const content = { ...section.content };
+
+    if (type === 'hero') {
+      return {
+        ...landingContent.hero, // Keep defaults for missing fields
+        label: content.badge || landingContent.hero.label,
+        title: content.headlineBlack || landingContent.hero.title,
+        titleEm: content.headlineBlue || landingContent.hero.titleEm,
+        subText: content.description || landingContent.hero.subText,
+        primaryCta: (typeof content.ctas?.[0] === 'object' ? content.ctas[0].label : content.ctas?.[0]) || landingContent.hero.primaryCta,
+        ghostCta: (typeof content.ctas?.[1] === 'object' ? content.ctas[1].label : content.ctas?.[1]) || landingContent.hero.ghostCta,
+        stats: content.stats || landingContent.hero.stats,
+      };
+    }
+
+    if (type === 'services') {
+      return {
+        ...landingContent.services,
+        title: content.title || landingContent.services.title,
+        items: content.cards || content.items || landingContent.services.items,
+        footer: {
+          title: content.footerTitle || content.subtitle || landingContent.services.footer.title,
+          text: content.footerText || content.subtitle || landingContent.services.footer.text,
+        }
+      };
+    }
+
+    return { ...landingContent[fallbackKey], ...content };
   };
 
   // Extract base Services architecture (Header/Footer)

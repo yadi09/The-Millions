@@ -18,8 +18,9 @@ interface ServicesProps {
 }
 
 export const ServicesSection: React.FC<ServicesProps> = ({ content }) => {
-  const { label, title, items, footer } = content;
-  const isSlider = items.length > 4;
+  if (!content) return null;
+  const { label = "", title = "", items = [], footer = { title: "", text: "" } } = content;
+  const isSlider = (items?.length || 0) > 4;
 
   return (
     <section id="services" className="bg-millions-mid py-[7rem] px-[5%] overflow-hidden">

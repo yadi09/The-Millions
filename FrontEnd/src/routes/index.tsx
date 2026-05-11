@@ -22,6 +22,7 @@ import TestimonialsManagement from "../pages/admin/TestimonialsManagement";
 import ServicesManagement from "../pages/admin/ServicesManagement";
 import ServiceEditor from "../pages/admin/ServiceEditor";
 import Landing from "../pages/Landing";
+import InboxManagement from "../pages/admin/InboxManagement";
 
 const PublicLayout = () => (
     <Layout>
@@ -65,6 +66,7 @@ export const AppRoutes = () => (
             <Route path="services" element={<ServicesManagement />} />
             <Route path="services/new" element={<ServiceEditor />} />
             <Route path="services/edit/:id" element={<ServiceEditor />} />
+            <Route path="inbox" element={<InboxManagement />} />
             {/* Dashboard and Settings routes are kept for legacy but mapped to disabled components */}
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="settings" element={<AdminSettings />} />
