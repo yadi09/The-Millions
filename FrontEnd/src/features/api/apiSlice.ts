@@ -3,10 +3,10 @@ import { getToken } from '../../utils/authUtils';
 import type { Page, UpdatePageRequest } from '../../types';
 import { type Testimonial, type SubmitTestimonialRequest, type TestimonialStatus } from '../../types/testimonial';
 import type { Service } from '../../types/service';
-
+import type { ContactMessage, GetContactMessagesResponse, ContactStatus } from '../../types/contact';
 export const apiSlice = createApi({
   reducerPath: 'api',
-  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer'],
+  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage'],
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
     prepareHeaders: (headers) => {
@@ -193,6 +193,29 @@ export const apiSlice = createApi({
         body: data,
       }),
     }),
+
+    // --- ADMIN CONTACT MESSAGES ENDPOINTS ---
+    getContactMessages: builder.query<GetContactMessagesResponse, { page?: number; limit?: number; status?: ContactStatus; search?: string }>({
+      query: (params) => {
+        const query = new URLSearchParams();
+        if (params.page) query.append('page', params.page.toString());
+        if (params.limit) query.append('limit', params.limit.toString());
+        if (params.status) query.append('status', params.status);
+        if (params.search) query.append('search', params.search);
+        
+        return `/admin/contact-messages?${query.toString()}`;
+      },
+      providesTags: ['ContactMessage'],
+    }),
+
+    updateContactMessageStatus: builder.mutation<ContactMessage, { id: string; status: ContactStatus }>({
+      query: ({ id, status }) => ({
+        url: `/admin/contact-messages/${id}/status`,
+        method: 'PUT',
+        body: { status },
+      }),
+      invalidatesTags: ['ContactMessage'],
+    }),
     
     // --- FOOTER ENDPOINTS ---
     getFooter: builder.query<any, void>({
@@ -233,6 +256,8 @@ export const {
   useDeleteServiceMutation,
   useGetContactServicesQuery,
   useSubmitContactMutation,
+  useGetContactMessagesQuery,
+  useUpdateContactMessageStatusMutation,
   useGetFooterQuery,
   useUpdateFooterMutation,
 } = apiSlice;
