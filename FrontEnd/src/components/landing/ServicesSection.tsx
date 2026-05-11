@@ -105,7 +105,7 @@ const ScrollingServicesSlider = ({ items }: { items: ServiceItem[] }) => {
 
 const ServiceCard = ({ item }: { item: ServiceItem }) => (
   <div className="bg-white/5 border border-white/10 p-10 border-t-2 border-t-transparent hover:border-t-millions-accent hover:bg-white/10 transition-all duration-350 h-full">
-    <h3 className="font-cormorant text-white text-[1.5rem] font-light mb-4">
+    <h3 className="font-cormorant text-white text-[1.25rem] font-light mb-4">
       {item.title}
     </h3>
     <p className="text-white/45 text-[0.83rem] leading-[1.8] font-light">
