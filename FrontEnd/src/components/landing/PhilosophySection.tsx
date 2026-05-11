@@ -2,16 +2,17 @@ import React from 'react';
 
 interface PhilosophyProps {
   content: {
-    label: string;
-    title: string;
-    paragraphs: string[];
-    quote: string;
-    attr: string;
+    label?: string;
+    title?: string;
+    paragraphs?: any[];
+    quote?: any; // Changed to any for dynamic objects
+    attr?: any;  // Changed to any for dynamic objects
   };
 }
 
 export const PhilosophySection: React.FC<PhilosophyProps> = ({ content }) => {
-  const { label, title, paragraphs, quote, attr } = content;
+  if (!content) return null;
+  const { label = "", title = "", paragraphs = [], quote = "", attr = "" } = content;
 
   return (
     <section id="philosophy" className="bg-millions-light py-[7rem] px-[5%]">
@@ -25,12 +26,15 @@ export const PhilosophySection: React.FC<PhilosophyProps> = ({ content }) => {
             {title}
           </h2>
           <div className="space-y-4">
-            {paragraphs.map((p, idx) => {
+            {(paragraphs || []).map((p, idx) => {
+              // Extract text safely
+              const text = typeof p === 'string' ? p : (p?.text || p?.title || p?.label || "");
+              
               // Robust bold parsing for **text**
-              const parts = p.split(/(\*\*.*?\*\*)/);
+              const parts = text.split(/(\*\*.*?\*\*)/);
               return (
                 <p key={idx} className="text-millions-body text-[0.9rem] leading-[1.9] font-light">
-                  {parts.map((part, i) => {
+                  {parts.map((part: string, i: number) => {
                     if (part.startsWith('**') && part.endsWith('**')) {
                       return (
                         <strong key={i} className="text-millions-dark font-semibold">
@@ -50,10 +54,10 @@ export const PhilosophySection: React.FC<PhilosophyProps> = ({ content }) => {
         <div className="animate-fade-in-up md:animation-delay-300">
           <div className="bg-millions-dark p-12 border-t-2 border-t-millions-accent">
             <p className="font-cormorant text-white italic text-[1.1rem] leading-[1.7] mb-6 font-light">
-              "{quote}"
+              "{typeof quote === 'string' ? quote : (quote?.text || quote?.title || "")}"
             </p>
             <p className="text-millions-accent text-[0.72rem] tracking-[0.15em] uppercase font-light">
-              — {attr}
+              — {typeof attr === 'string' ? attr : (attr?.text || attr?.title || attr?.label || "")}
             </p>
           </div>
         </div>

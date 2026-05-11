@@ -2,14 +2,15 @@ import React from 'react';
 
 interface OverviewProps {
   content: {
-    label: string;
-    title: string;
-    paragraphs: string[];
+    label?: string;
+    title?: string;
+    paragraphs?: any[];
   };
 }
 
 export const OverviewSection: React.FC<OverviewProps> = ({ content }) => {
-  const { label, title, paragraphs } = content;
+  if (!content) return null;
+  const { label = "", title = "", paragraphs = [] } = content;
 
   return (
     <section id="overview" className="bg-millions-mid py-[7rem] px-[5%]">
@@ -24,9 +25,9 @@ export const OverviewSection: React.FC<OverviewProps> = ({ content }) => {
         </div>
         <div className="animate-fade-in-up md:animation-delay-300">
           <div className="space-y-6">
-            {paragraphs.map((p, idx) => (
+            {(paragraphs || []).map((p, idx) => (
               <p key={idx} className="text-white/55 text-[0.9rem] leading-[1.9] font-light">
-                {p}
+                {typeof p === 'string' ? p : (p?.text || p?.title || p?.label || "")}
               </p>
             ))}
           </div>
