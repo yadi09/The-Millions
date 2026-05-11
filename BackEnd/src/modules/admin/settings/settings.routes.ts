@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate } from '../../middlewares/auth.middleware.js';
+import { authenticate } from '../../../middlewares/auth.middleware.js';
 import { getAdminSettings, updateAdminSetting } from './settings.controller.js';
 
 /**
