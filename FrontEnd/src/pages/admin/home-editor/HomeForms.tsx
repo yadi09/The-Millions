@@ -7,7 +7,8 @@ import {
     FormLabel 
 } from "./EditorUI";
 import { useNavigate } from 'react-router-dom';
-import { Monitor, Quote, Target, Star, Layers, Map, Users, Heart, FastForward } from "lucide-react";
+import { useGetServicesQuery } from '../../../features/api/apiSlice';
+import { Monitor, Quote, Target, Star, Layers, Map, Users, Heart, FastForward, Loader2 } from "lucide-react";
 
 // 1. HERO FORM
 export function HeroForm({ content, onChange }: { content: any, onChange: (c: any) => void }) {
@@ -24,28 +25,50 @@ export function HeroForm({ content, onChange }: { content: any, onChange: (c: an
             <FormSectionHeader title="Hero Experience" icon={Monitor} description="The first architectural point of contact." />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <FieldGroup label="Header Label">
-                    <DarkInput value={c.label || ''} onChange={e => update('label', e.target.value)} />
+                <FieldGroup label="Header Label (Badge)">
+                    <DarkInput value={c.badge || c.label || ''} onChange={e => update('badge', e.target.value)} />
                 </FieldGroup>
-                <FieldGroup label="Emphasized Title End">
-                    <DarkInput value={c.titleEm || ''} onChange={e => update('titleEm', e.target.value)} />
+                <FieldGroup label="Emphasized Title (Gold)">
+                    <DarkInput value={c.headlineBlue || c.titleEm || ''} onChange={e => update('headlineBlue', e.target.value)} />
                 </FieldGroup>
             </div>
 
-            <FieldGroup label="Primary Headline">
-                <DarkInput value={c.title || ''} onChange={e => update('title', e.target.value)} />
+            <FieldGroup label="Primary Headline (Black)">
+                <DarkInput value={c.headlineBlack || c.title || ''} onChange={e => update('headlineBlack', e.target.value)} />
             </FieldGroup>
 
             <FieldGroup label="Subtext / Narrative">
-                <DarkTextarea value={c.subText || ''} onChange={e => update('subText', e.target.value)} />
+                <DarkTextarea value={c.description || c.subText || ''} onChange={e => update('description', e.target.value)} />
             </FieldGroup>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FieldGroup label="Primary CTA Label">
-                    <DarkInput value={c.primaryCta || ''} onChange={e => update('primaryCta', e.target.value)} />
+                    <DarkInput 
+                        value={typeof c.ctas?.[0] === 'object' ? c.ctas[0].label : (c.ctas?.[0] || c.primaryCta || '')} 
+                        onChange={e => {
+                            const newCtas = [...(c.ctas || [])];
+                            if (typeof newCtas[0] === 'object') {
+                                newCtas[0] = { ...newCtas[0], label: e.target.value };
+                            } else {
+                                newCtas[0] = e.target.value;
+                            }
+                            update('ctas', newCtas);
+                        }} 
+                    />
                 </FieldGroup>
                 <FieldGroup label="Ghost CTA Label">
-                    <DarkInput value={c.ghostCta || ''} onChange={e => update('ghostCta', e.target.value)} />
+                    <DarkInput 
+                        value={typeof c.ctas?.[1] === 'object' ? c.ctas[1].label : (c.ctas?.[1] || c.ghostCta || '')} 
+                        onChange={e => {
+                            const newCtas = [...(c.ctas || [])];
+                            if (typeof newCtas[1] === 'object') {
+                                newCtas[1] = { ...newCtas[1], label: e.target.value };
+                            } else {
+                                newCtas[1] = e.target.value;
+                            }
+                            update('ctas', newCtas);
+                        }} 
+                    />
                 </FieldGroup>
             </div>
 
@@ -423,12 +446,14 @@ export function MissionVisionForm({ content, onChange }: { content: any, onChang
 }
 
 // 9. SERVICES PLATFORM FORM
+// 9. SERVICES PLATFORM FORM
 export function ServicesForm({ content, onChange }: { content: any, onChange: (c: any) => void }) {
     const c = content || {};
     const update = (key: string, val: any) => onChange({ ...c, [key]: val });
     const navigate = useNavigate();
-    // Individual items are managed globally in ServicesManagement.tsx
-    // to ensure architectural consistency across the platform.
+    
+    // Fetch LIVE services from the database to show exactly what's on the public site
+    const { data: liveServices, isLoading } = useGetServicesQuery();
 
     return (
         <div className="animate-fade-in">
@@ -445,7 +470,7 @@ export function ServicesForm({ content, onChange }: { content: any, onChange: (c
 
             <div className="mb-10 bg-black/20 border border-white/5 p-8">
                 <div className="flex items-center justify-between mb-6">
-                    <FormLabel>Service Architecture (Global)</FormLabel>
+                    <FormLabel>Service Architecture (LIVE Preview)</FormLabel>
                     <button 
                         onClick={() => navigate('/admin/services')}
                         className="text-[0.55rem] font-jost text-millions-accent uppercase tracking-widest bg-millions-accent/10 px-4 py-2 border border-millions-accent/20 hover:bg-millions-accent hover:text-millions-dark transition-all"
@@ -454,30 +479,50 @@ export function ServicesForm({ content, onChange }: { content: any, onChange: (c
                     </button>
                 </div>
                 
-                <div className="grid grid-cols-1 gap-4">
-                    {(c.items || []).map((item: any, i: number) => (
-                        <div key={i} className="flex flex-col gap-1 p-4 bg-white/[0.02] border border-white/5">
-                            <span className="text-white/60 font-cormorant text-lg italic">{item.title}</span>
-                            <span className="text-white/20 font-jost text-[0.65rem] uppercase tracking-widest truncate">{item.text}</span>
-                        </div>
-                    ))}
-                </div>
+                {isLoading ? (
+                    <div className="flex items-center gap-3 p-4 bg-white/[0.02] border border-white/5">
+                        <Loader2 className="w-4 h-4 text-millions-accent animate-spin" />
+                        <span className="text-white/20 font-jost text-[0.65rem] uppercase tracking-widest">Syncing Live Data...</span>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 gap-4">
+                        {(liveServices || []).map((item: any, i: number) => (
+                            <div key={i} className="flex flex-col gap-1 p-4 bg-white/[0.02] border border-white/5">
+                                <span className="text-white/60 font-cormorant text-lg italic">{item.name}</span>
+                                <span className="text-white/20 font-jost text-[0.65rem] uppercase tracking-widest truncate">{item.description}</span>
+                            </div>
+                        ))}
+                        {(liveServices || []).length === 0 && (
+                            <div className="p-4 bg-white/[0.02] border border-white/5 text-center">
+                                <span className="text-white/20 font-jost text-[0.65rem] uppercase tracking-widest">No active domains in database.</span>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 <div className="mt-8 pt-6 border-t border-white/5">
                     <p className="text-[0.6rem] font-jost text-white/30 leading-relaxed italic">
                         <span className="text-millions-accent not-italic font-bold mr-2">ARCHITECTURE CONTROL:</span>
                         Service Pillars are managed exclusively via the 
                         <span className="text-white mx-1 font-bold">Services Management</span> 
-                        interface to maintain global data integrity. The view below is a local blueprint used for landing page rendering.
+                        interface. The view above is a live reflection of your public-facing architecture.
                     </p>
                 </div>
             </div>
 
             <div className="mt-12 p-8 border border-millions-accent/10 bg-millions-accent/[0.02]">
-                <FormLabel>Strategic Footer</FormLabel>
+                <FormLabel>Strategic Footer (Integrated Impact)</FormLabel>
                 <div className="space-y-4">
-                    <DarkInput value={c.footer?.title || ''} onChange={e => update('footer', { ...c.footer, title: e.target.value })} placeholder="Footer Title" />
-                    <DarkTextarea value={c.footer?.text || ''} onChange={e => update('footer', { ...c.footer, text: e.target.value })} placeholder="Impact Summary" />
+                    <DarkInput 
+                        value={c.footerTitle || c.subtitle || ''} 
+                        onChange={e => update('footerTitle', e.target.value)} 
+                        placeholder="Footer Title (Integrated Impact)" 
+                    />
+                    <DarkTextarea 
+                        value={c.footerText || (c.footerTitle ? "" : (c.subtitle ? "" : ""))} 
+                        onChange={e => update('footerText', e.target.value)} 
+                        placeholder="Impact Narrative Summary" 
+                    />
                 </div>
             </div>
         </div>
