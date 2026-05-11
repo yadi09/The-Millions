@@ -1,23 +1,26 @@
 import React from 'react';
 
-interface Pillar {
-  num: string;
-  title: string;
-  text: string;
-}
-
 interface ImpactModelProps {
   content: {
-    label: string;
-    title: string;
-    subTitle: string;
-    pillars: Pillar[];
+    label?: string;
+    title?: string;
+    subTitle?: string;
+    pillars?: any[];
   };
 }
 
 export const ImpactModelSection: React.FC<ImpactModelProps> = ({ content }) => {
-  const { label, title, subTitle, pillars } = content;
-  const isSlider = pillars.length > 4;
+  if (!content) return null;
+  const { label = "", title = "", subTitle = "", pillars = [] } = content;
+  const isSlider = (pillars?.length || 0) > 4;
+
+  const renderText = (item: any, field: 'text' | 'title' | 'num' = 'text') => {
+    if (typeof item === 'string') return item;
+    if (typeof item === 'object' && item !== null) {
+      return item[field] || item.text || item.title || item.label || "";
+    }
+    return "";
+  };
 
   return (
     <section id="model" className="bg-millions-light py-[7rem] px-[5%] overflow-hidden">
@@ -37,43 +40,34 @@ export const ImpactModelSection: React.FC<ImpactModelProps> = ({ content }) => {
         </div>
 
         {isSlider ? (
-          <ScrollingImpactSlider pillars={pillars} />
+          <ScrollingImpactSlider pillars={pillars} renderText={renderText} />
         ) : (
-          <StaticImpactGrid pillars={pillars} />
+          <StaticImpactGrid pillars={pillars} renderText={renderText} />
         )}
       </div>
     </section>
   );
 };
 
-const StaticImpactGrid = ({ pillars }: { pillars: Pillar[] }) => {
-  const getGridClass = () => {
-    if (pillars.length <= 2) return "grid-cols-1 md:grid-cols-2";
-    return "grid-cols-1 md:grid-cols-2"; // 3 and 4 items stay with 2 columns
-  };
-
+const StaticImpactGrid = ({ pillars, renderText }: { pillars: any[], renderText: any }) => {
   return (
-    <div className={`grid ${getGridClass()} gap-0.5 bg-millions-dark/5 animate-fade-in-up md:animation-delay-300`}>
+    <div className={`grid grid-cols-1 md:grid-cols-2 gap-0.5 bg-millions-dark/5 animate-fade-in-up md:animation-delay-300`}>
       {pillars.map((pillar, idx) => (
-        <PillarCard key={idx} pillar={pillar} />
+        <PillarCard key={idx} pillar={pillar} renderText={renderText} />
       ))}
     </div>
   );
 };
 
-const ScrollingImpactSlider = ({ pillars }: { pillars: Pillar[] }) => {
+const ScrollingImpactSlider = ({ pillars, renderText }: { pillars: any[], renderText: any }) => {
   const topPillars = pillars.filter((_, i) => i % 2 === 0);
   const bottomPillars = pillars.filter((_, i) => i % 2 !== 0);
 
-  // Speed Synchronization: Calculate duration based on item count to ensure constant velocity
-  // Pixels per second target (approx)
   const PX_PER_SEC = 50; 
-  // Estimated card width in pixels (matches md:w-[47vw] approx)
   const ESTIMATED_CARD_WIDTH = window.innerWidth < 768 ? window.innerWidth * 0.94 : window.innerWidth * 0.47;
 
-  const MarqueeRow = ({ items, reverse = false }: { items: Pillar[], reverse?: boolean }) => {
+  const MarqueeRow = ({ items, reverse = false }: { items: any[], reverse?: boolean }) => {
     const displayItems = [...items, ...items];
-    // Duration = Total distance to move (half the container) / Speed
     const duration = (items.length * ESTIMATED_CARD_WIDTH) / PX_PER_SEC;
     
     return (
@@ -84,10 +78,10 @@ const ScrollingImpactSlider = ({ pillars }: { pillars: Pillar[] }) => {
         >
           {displayItems.map((pillar, idx) => (
             <div 
-              key={`${pillar.num}-${idx}`} 
+              key={`${pillar?.num || idx}-${idx}`} 
               className="w-[94vw] md:w-[47vw] lg:w-[676.8px] shrink-0"
             >
-              <PillarCard pillar={pillar} />
+              <PillarCard pillar={pillar} renderText={renderText} />
             </div>
           ))}
         </div>
@@ -103,18 +97,18 @@ const ScrollingImpactSlider = ({ pillars }: { pillars: Pillar[] }) => {
   );
 };
 
-const PillarCard = ({ pillar, className = "" }: { pillar: Pillar; className?: string }) => (
+const PillarCard = ({ pillar, renderText, className = "" }: { pillar: any; renderText: any; className?: string }) => (
   <div 
     className={`bg-white p-10 border-b-2 border-b-transparent hover:border-b-millions-accent hover:-translate-y-1 transition-all duration-300 group hover:shadow-[0_16px_36px_rgba(13,36,32,0.08)] ${className}`}
   >
     <div className="font-cormorant text-millions-accent/20 text-[3rem] font-light leading-none mb-4 group-hover:text-millions-accent/40 transition-colors">
-      {pillar.num}
+      {renderText(pillar, 'num')}
     </div>
     <h3 className="font-cormorant text-millions-dark text-[1.5rem] font-light mb-3">
-      {pillar.title}
+      {renderText(pillar, 'title')}
     </h3>
     <p className="text-millions-body text-[0.83rem] leading-[1.8] font-light">
-      {pillar.text}
+      {renderText(pillar, 'text')}
     </p>
   </div>
 );
