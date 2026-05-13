@@ -48,6 +48,7 @@ export default function BlogPage() {
       <SubPageHero
         label={heroSection?.content?.badge || "Financial Insights"}
         title={heroSection?.content?.headlineBlack || "Our Knowledge Base"}
+        titleEm={heroSection?.content?.headlineBlue || ""}
         subText={heroSection?.content?.description || "Stay informed with the latest updates and strategies from our expert team."}
       />
 
