@@ -224,28 +224,37 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Interactive Map Card */}
-            <div className="bg-[#f8f6f2] p-8 border border-millions-dark/5 transition-all">
-              <h4 className="font-cormorant text-millions-dark mb-4 uppercase tracking-widest text-sm">Finding Our Location</h4>
-              <p className="text-xs text-millions-body font-light leading-relaxed mb-6">
-                We are strategically positioned in the heart of Southampton, facilitating our global connections to East African markets.
-              </p>
-              <div className="aspect-video bg-millions-dark/5 border border-millions-dark/10 overflow-hidden group hover:border-millions-accent/30 transition-all">
-                <iframe
-                  title="The Millions Southampton Office"
-                  src="https://maps.google.com/maps?q=Terminus+Terrace,+Southampton+SO14+3FD,+UK&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                  className="w-full h-full grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
-                  frameBorder="0"
-                  scrolling="no"
-                  marginHeight={0}
-                  marginWidth={0}
-                  loading="lazy"
-                />
-              </div>
-            </div>
           </div>
         </div>
       </div>
+
+      {/* Boxed Interactive Map Section */}
+      <section className="bg-white py-20 border-t border-millions-dark/5">
+        <div className="max-w-7xl mx-auto px-4 md:px-20">
+          <div className="text-center mb-12">
+            <h2 className="font-cormorant text-millions-dark text-3xl font-light mb-4 uppercase tracking-widest">Our Global Headquarters</h2>
+            <p className="text-millions-body font-light text-sm max-w-2xl mx-auto italic">
+              Strategically positioned in Southampton, United Kingdom, serving as the central hub for our international advisory operations and regional market integrations.
+            </p>
+          </div>
+          
+          <div className="h-[500px] bg-millions-dark/5 border border-millions-dark/10 overflow-hidden relative group shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)]">
+            <iframe
+              title="The Millions Southampton Office"
+              src="https://maps.google.com/maps?q=Terminus+Terrace,+Southampton+SO14+3FD,+UK&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              className="w-full h-full grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000"
+              frameBorder="0"
+              scrolling="no"
+              marginHeight={0}
+              marginWidth={0}
+              loading="lazy"
+            />
+            {/* Decorative Corner Overlays */}
+            <div className="absolute top-0 left-0 w-20 h-20 border-l border-t border-millions-accent/20 m-6 pointer-events-none" />
+            <div className="absolute bottom-0 right-0 w-20 h-20 border-r border-b border-millions-accent/20 m-6 pointer-events-none" />
+          </div>
+        </div>
+      </section>
     </main>
   )
 }
