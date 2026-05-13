@@ -12,34 +12,34 @@ const ICON_MAP: Record<string, any> = {
 };
 
 const managedPages = [
-    { 
-        name: "Testimonials", 
-        slug: "testimonials", 
-        description: "Success stories and client feedback architectural management.",
-        status: "Architecture"
-    },
-    { 
-        name: "Contact Gateway", 
-        slug: "contact", 
-        description: "Inquiry interfaces and engagement structural components.",
-        status: "Architecture"
-    },
-    { 
-        name: "Insights & Blog", 
-        slug: "blog", 
-        description: "Editorial platform and knowledge sharing architecture.",
-        status: "Architecture"
-    }
+  {
+    name: "Testimonials",
+    slug: "testimonials",
+    description: "Success stories and client feedback architectural management.",
+    status: "Architecture"
+  },
+  {
+    name: "Contact Gateway",
+    slug: "contact",
+    description: "Inquiry interfaces and engagement structural components.",
+    status: "Architecture"
+  },
+  {
+    name: "Insights & Blog",
+    slug: "blog",
+    description: "Editorial platform and knowledge sharing architecture.",
+    status: "Architecture"
+  }
 ];
 
 const AdminPagesList = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    return (
+  return (
     <div className="space-y-10 max-w-6xl mx-auto pb-20">
       <div className="animate-fade-in">
         <h1 className="font-cormorant text-[clamp(2.2rem,5vw,3.5rem)] font-light text-white mb-4 leading-tight">
-          Site <em className="italic text-millions-accent not-italic">Architecture</em>
+          Site <em className="italic text-millions-accent">Architecture</em>
         </h1>
         <div className="flex items-center gap-4 text-millions-accent text-[0.7rem] tracking-[0.2em] uppercase mb-8">
           <div className="w-8 h-[1px] bg-millions-accent/40" />
