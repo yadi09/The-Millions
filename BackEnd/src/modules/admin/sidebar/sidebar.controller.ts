@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
+import { prisma } from "../../../lib/prisma.js";
 
 // Query validation for GET /api/admin/sidebar
 const sidebarQuerySchema = z.object({

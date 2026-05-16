@@ -1,12 +1,6 @@
 import { Request, Response } from 'express';
-
-import {
-  PrismaClient,
-  ContactStatus,
-  Prisma,
-} from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { ContactStatus, Prisma } from '@prisma/client';
+import { prisma } from "../../lib/prisma.js";
 
 export async function getContactMessages(
   req: Request,

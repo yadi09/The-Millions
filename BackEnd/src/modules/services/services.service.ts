@@ -1,7 +1,5 @@
 // backend/src/modules/services/services.service.ts
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../lib/prisma.js";
 
 export async function getAllServices() {
   return prisma.service.findMany({
@@ -13,21 +11,28 @@ export async function getAllServices() {
   });
 }
 
-export async function createService(name: string, description: string) {
+export async function createService(name: string, description?: string) {
   return prisma.service.create({
     data: {
       name,
-      description
-    }
+      ...(description !== undefined && { description }),
+    },
   });
 }
 
 export async function getServiceById(id: string) {
+  // Do not include ContactMessage here. Messages contain PII (name, email,
+  // phone) and have their own authenticated endpoint at
+  // /api/admin/contact-messages.
   return prisma.service.findUnique({
     where: { id },
-    include: {
-      messages: true
-    }
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   });
 }
 
