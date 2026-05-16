@@ -1,0 +1,17 @@
+node_modules
+dist
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+.history
+.vscode
+.idea
+ISSUES.md
+JOURNEY.md
+README.md
+check_prisma.ts
+verify_admin.ts

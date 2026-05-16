@@ -193,8 +193,21 @@ async function seedHomePage() {
    Seed Admin User
 ------------------------------*/
 async function seedAdminUser() {
-  const email = "admin@themillions.com";
-  const password = "adminpassword123";
+  const email = process.env.ADMIN_EMAIL ?? "admin@themillions.com";
+  const password = process.env.ADMIN_PASSWORD ?? "adminpassword123";
+
+  if (!process.env.ADMIN_PASSWORD && process.env.NODE_ENV === "production") {
+    console.error(
+      "❌ ADMIN_PASSWORD env var is required when seeding in production. " +
+        "Refusing to seed the default 'adminpassword123' into a production database."
+    );
+    process.exit(1);
+  }
+  if (!process.env.ADMIN_PASSWORD) {
+    console.warn(
+      "⚠️  ADMIN_PASSWORD not set — seeding the dev default. Do NOT run this in production."
+    );
+  }
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -207,7 +220,7 @@ async function seedAdminUser() {
     },
   });
 
-  console.log("👤 Admin user seeded");
+  console.log(`👤 Admin user seeded (${email})`);
 }
 
 /* -----------------------------
