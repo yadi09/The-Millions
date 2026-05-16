@@ -89,12 +89,12 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
       {/* Main Footer */}
       <footer className="bg-[#080f0e] py-[1.8rem] px-[5%] text-white/25 flex flex-wrap gap-4 items-center justify-between border-t border-white/5">
         <div className="font-cormorant text-[1rem]">
-          {footer.logo}
+          {footer.logo === '/logo.svg' ? 'the MILLIONS.' : footer.logo}
         </div>
-        <div className="text-[0.7rem] font-light text-white/20">
-          {footer.copyright}
+        <div className="text-[0.7rem] font-light text-white/20 text-center flex-1 md:flex-none">
+          {footer.copyright?.includes('©') ? '' : `© ${new Date().getFullYear()} `}{footer.copyright}
         </div>
-        <div className="text-[0.7rem] font-light text-white/20">
+        <div className="text-[0.7rem] font-light text-white/20 uppercase tracking-[0.15em]">
           {footer.location}
         </div>
       </footer>

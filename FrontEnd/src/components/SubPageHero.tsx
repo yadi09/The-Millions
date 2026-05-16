@@ -3,10 +3,11 @@ import React from 'react';
 interface SubPageHeroProps {
   label: string;
   title: string;
+  titleEm?: string;
   subText: string;
 }
 
-export const SubPageHero: React.FC<SubPageHeroProps> = ({ label, title, subText }) => {
+export const SubPageHero: React.FC<SubPageHeroProps> = ({ label, title, titleEm, subText }) => {
   return (
     <section className="bg-millions-dark relative pt-32 pb-20 px-4 md:px-20 overflow-hidden">
       {/* Background Gradients (Same as Landing Hero) */}
@@ -21,7 +22,7 @@ export const SubPageHero: React.FC<SubPageHeroProps> = ({ label, title, subText 
         </div>
 
         <h1 className="font-cormorant text-white text-[clamp(2.5rem,5vw,4rem)] font-light leading-tight mb-6 animate-fade-in-up md:animation-delay-200">
-          {title}
+          {title} {titleEm && <em className="text-millions-accent italic">{titleEm}</em>}
         </h1>
 
         <p className="text-white/50 font-light text-[0.9rem] leading-[1.9] max-w-2xl mx-auto animate-fade-in-up md:animation-delay-300">

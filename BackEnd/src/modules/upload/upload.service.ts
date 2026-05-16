@@ -1,33 +1,47 @@
 // backend/src/modules/upload/upload.service.ts
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary } from "cloudinary";
+import { env } from "../../config/env.js";
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: env.CLOUDINARY_CLOUD_NAME,
+  api_key: env.CLOUDINARY_API_KEY,
+  api_secret: env.CLOUDINARY_API_SECRET,
 });
 
-export async function saveImage(file: Express.Multer.File): Promise<string> {
-    try {
-        const base64Image = file.buffer.toString('base64');
-        const mimeType = file.mimetype;
+// Cloudinary folder paths are slash-delimited namespaces, not filesystem paths,
+// but we still constrain them to avoid surprising hierarchies via user input.
+const FOLDER_PATTERN = /^[a-zA-Z0-9_\-/]+$/;
+const MAX_FOLDER_LENGTH = 100;
 
-        // FIX: Add 'data:' prefix for proper base64 format
-        const base64DataUri = `data:${mimeType};base64,${base64Image}`;
+export function sanitizeFolder(input: string | undefined): string {
+  if (!input) return "uploads";
+  const trimmed = input.replace(/^\/+|\/+$/g, "");
+  if (
+    trimmed.length === 0 ||
+    trimmed.length > MAX_FOLDER_LENGTH ||
+    !FOLDER_PATTERN.test(trimmed) ||
+    trimmed.includes("..")
+  ) {
+    return "uploads";
+  }
+  return trimmed;
+}
 
-        const result = await cloudinary.uploader.upload(
-            base64DataUri,  // ✅ Correct format
-            {
-                folder: 'blog-covers',
-                resource_type: 'auto',
-                public_id: file.originalname.split('.')[0],
-                overwrite: false,
-            }
-        );
+export async function saveImage(
+  file: Express.Multer.File,
+  folder: string = "uploads"
+): Promise<string> {
+  const safeFolder = sanitizeFolder(folder);
+  const base64Image = file.buffer.toString("base64");
+  const mimeType = file.mimetype;
+  const base64DataUri = `data:${mimeType};base64,${base64Image}`;
 
-        return result.secure_url;
-    } catch (error) {
-        console.error('Cloudinary upload error:', error);
-        throw new Error('Failed to upload image to Cloudinary');
-    }
+  const result = await cloudinary.uploader.upload(base64DataUri, {
+    folder: safeFolder,
+    resource_type: "auto",
+    public_id: file.originalname.replace(/\.[^/.]+$/, ""),
+    overwrite: false,
+  });
+
+  return result.secure_url;
 }

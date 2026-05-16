@@ -1,0 +1,77 @@
+# Production compose stack for The Millions.
+#
+# Three services on a private docker network:
+#   - postgres : data layer, port 5432 NOT published (only reachable on the
+#                internal network)
+#   - backend  : node app, port 4000 NOT published (nginx reaches it on the
+#                internal network)
+#   - nginx    : public face, ports 80 + 443 published. Serves the SPA and
+#                reverse-proxies /api to backend.
+#
+# Secrets and per-host values come from deploy/.env. See deploy/init-secrets.sh.
+
+name: themillions
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    # No `ports:` — Postgres is internal-only. Use `docker compose exec postgres psql`.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../BackEnd
+      dockerfile: Dockerfile
+    image: themillions-backend:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+    # No `ports:` — only nginx talks to backend, over the internal network.
+
+  nginx:
+    build:
+      context: ..
+      dockerfile: deploy/nginx/Dockerfile
+    image: themillions-nginx:latest
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+    environment:
+      SERVER_NAME: ${SERVER_NAME}
+      BACKEND_UPSTREAM: backend:4000
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # TLS material lives on the host. issue-cert.sh writes here.
+      - ${CERTS_DIR:-./certs}:/etc/nginx/certs:ro
+      # webroot for Let's Encrypt http-01 challenges.
+      - certbot-webroot:/var/www/certbot
+
+volumes:
+  postgres-data:
+    driver: local
+  certbot-webroot:
+    driver: local

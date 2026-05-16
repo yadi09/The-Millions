@@ -2,16 +2,26 @@ import React from 'react';
 
 interface FutureVisionProps {
   content: {
-    label: string;
-    title: string;
-    subTitle: string;
-    points: string[];
-    footer: string;
+    label?: string;
+    title?: string;
+    subTitle?: string;
+    goals?: any[];
+    points?: any[]; // Fallback for static data mismatch
   };
 }
 
 export const FutureVisionSection: React.FC<FutureVisionProps> = ({ content }) => {
-  const { label, title, subTitle, points, footer } = content;
+  if (!content) return null;
+  const { label = "", title = "", subTitle = "", goals: rawGoals = [], points = [] } = content;
+  const goals = rawGoals.length > 0 ? rawGoals : points;
+
+  const renderText = (item: any) => {
+    if (typeof item === 'string') return item;
+    if (typeof item === 'object' && item !== null) {
+      return item.text || item.title || item.label || "";
+    }
+    return "";
+  };
 
   return (
     <section id="vision" className="bg-millions-mid py-[7rem] px-[5%]">
@@ -29,20 +39,20 @@ export const FutureVisionSection: React.FC<FutureVisionProps> = ({ content }) =>
         </div>
 
         <div className="flex flex-col gap-px mt-10 animate-fade-in-up">
-          {points.map((point, idx) => (
+          {(goals || []).map((goal, idx) => (
             <div key={idx} className="bg-white/5 p-8 flex items-start gap-10 hover:bg-white/10 transition-colors group">
               <div className="font-cormorant text-millions-accent/40 text-[3rem] font-light leading-none group-hover:text-millions-accent transition-colors">
                 {String(idx + 1).padStart(2, '0')}
               </div>
               <p className="text-white/55 text-[0.9rem] leading-[1.9] font-light pt-1">
-                {point}
+                {renderText(goal)}
               </p>
             </div>
           ))}
         </div>
 
         <p className="text-white/45 text-[0.9rem] leading-[1.9] font-light mt-12 lg:max-w-xl animate-fade-in-up md:animation-delay-300">
-          {footer}
+          This strategic vision positions The MILLIONS as a lasting professional and social institution, capable of inspiring and empowering communities across generations.
         </p>
       </div>
     </section>

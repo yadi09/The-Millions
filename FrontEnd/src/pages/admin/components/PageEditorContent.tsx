@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useGetPageQuery, useUpdatePageMutation } from '../../../features/api/apiSlice';
 import EditorSidebar from './EditorSidebar';
 import SectionForm from './SectionForm';
-import { Loader2, Save, CheckCircle2, AlertCircle, Layout } from 'lucide-react';
+import { Loader2, Save, Layout } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { toast } from 'sonner';
 import type { Page, Section } from '../../../types';
 
 interface PageEditorContentProps {
@@ -14,12 +15,10 @@ interface PageEditorContentProps {
 
 const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContentProps) => {
     const { data: pageData, isLoading, error } = useGetPageQuery(slug || '');
-    const [updatePage, { isLoading: isSaving, isSuccess }] = useUpdatePageMutation();
+    const [updatePage, { isLoading: isSaving }] = useUpdatePageMutation();
 
     const [localPageData, setLocalPageData] = useState<Page | null>(null);
     const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
-    const [showSuccess, setShowSuccess] = useState(false);
-    const [saveError, setSaveError] = useState<string | null>(null);
 
     useEffect(() => {
         if (pageData && !localPageData) {
@@ -30,34 +29,33 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
         }
     }, [pageData, localPageData, activeSectionId]);
 
-    useEffect(() => {
-        if (isSuccess) {
-            setShowSuccess(true);
-            setSaveError(null);
-            const timer = setTimeout(() => setShowSuccess(false), 2000);
-            return () => clearTimeout(timer);
-        }
-    }, [isSuccess]);
-
     const handleSave = async () => {
-        setSaveError(null);
         if (!localPageData?.id) {
-            setSaveError('Missing Page Identity. Please refresh.');
+            toast.error('Missing Page Identity. Please refresh.');
             return;
         }
 
-        try {
-            const result = await updatePage({
-                id: localPageData.id,
-                data: {
-                    title: localPageData.title,
-                    sections: localPageData.sections
-                }
-            }).unwrap();
-            setLocalPageData(result);
-        } catch (err: any) {
-            setSaveError(err?.data?.message || 'Sync failed.');
-        }
+        const promise = updatePage({
+            id: localPageData.id,
+            data: {
+                title: localPageData.title,
+                sections: localPageData.sections.map((s, index) => ({
+                    id: s.id,
+                    type: s.type,
+                    order: index,
+                    content: s.content
+                }))
+            }
+        }).unwrap();
+
+        toast.promise(promise, {
+            loading: 'Syncing Architecture...',
+            success: (result: Page) => {
+                setLocalPageData(result);
+                return 'Architecture successfully synchronized.';
+            },
+            error: (err: any) => err?.data?.error || err?.data?.message || 'Sync failed.'
+        });
     };
 
     const handleSectionUpdate = (sectionId: string, newContent: Record<string, any>) => {
@@ -116,20 +114,6 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
                 </div>
                 
                 <div className="flex items-center gap-4">
-                    {showSuccess && (
-                        <div className="hidden sm:flex items-center gap-2 text-millions-accent text-[0.65rem] font-jost uppercase tracking-[0.15em] mr-4 animate-in fade-in slide-in-from-right-2">
-                            <CheckCircle2 className="w-3 h-3" />
-                            Sync Confirmed
-                        </div>
-                    )}
-
-                    {saveError && (
-                        <div className="flex items-center gap-2 text-red-400 text-[0.65rem] font-jost uppercase tracking-[0.15em] mr-2 animate-in fade-in slide-in-from-right-2">
-                            <AlertCircle className="w-4 h-4" />
-                            {saveError}
-                        </div>
-                    )}
-
                     {onClose && (
                         <Button 
                             variant="ghost" 

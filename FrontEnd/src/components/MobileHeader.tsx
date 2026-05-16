@@ -18,16 +18,16 @@ export const MobileHeader = ({ onMenuClick }: MobileHeaderProps) => {
     };
 
     return (
-        <header className="lg:hidden flex items-center justify-between p-4 bg-millions-dark border-b border-white/10 sticky top-0 z-30">
+        <header className="lg:hidden flex items-center justify-between p-4 bg-millions-dark border-b border-white/10 sticky top-0 z-[100]">
             <button
                 onClick={onMenuClick}
-                className="p-2 -ml-2 text-white/70 hover:text-millions-accent transition-colors focus:outline-none"
+                className="p-2 -ml-2 text-white/70 hover:text-millions-accent transition-colors focus:outline-none z-10"
                 aria-label="Open menu"
             >
                 <Menu size={24} />
             </button>
 
-            <h1 className="text-xl font-cormorant font-light text-white tracking-widest uppercase">
+            <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-cormorant font-light text-white tracking-widest uppercase truncate max-w-[60%]">
                 {getPageTitle()}
             </h1>
 

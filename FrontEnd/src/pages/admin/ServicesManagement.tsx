@@ -1,75 +1,35 @@
-import { useState } from "react";
 import {
     useGetServicesQuery,
-    useCreateServiceMutation,
-    useUpdateServiceMutation,
     useDeleteServiceMutation,
 } from "../../features/api/apiSlice";
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import {
-    Plus, Edit, Trash2, X, Save, Server, Loader2
+    Plus, Edit, Trash2, Server, Loader2
 } from "lucide-react";
-import type { Service } from "../../types/service";
-
-const emptyService = (): Omit<Service, "id"> => ({
-    name: "",
-    description: "",
-});
+import { useNavigate } from "react-router-dom";
+import { toast } from 'sonner';
 
 export default function ServicesManagement() {
+    const navigate = useNavigate();
     const { data: services, isLoading } = useGetServicesQuery();
-    const [createService, { isLoading: isCreating }] = useCreateServiceMutation();
-    const [updateService, { isLoading: isUpdating }] = useUpdateServiceMutation();
     const [deleteService, { isLoading: isDeleting }] = useDeleteServiceMutation();
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingService, setEditingService] = useState<Service | null>(null);
-    const [formData, setFormData] = useState<Omit<Service, "id">>(emptyService());
-
-    const openCreate = () => {
-        setEditingService(null);
-        setFormData(emptyService());
-        setIsModalOpen(true);
-    };
-
-    const openEdit = (service: Service) => {
-        setEditingService(service);
-        setFormData({
-            name: service.name,
-            description: service.description || "",
-        });
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setEditingService(null);
-        setFormData(emptyService());
-    };
-
-    const handleSave = async () => {
-        if (!formData.name.trim()) return;
-        try {
-            if (editingService) {
-                await updateService({ ...formData, id: editingService.id }).unwrap();
-            } else {
-                await createService(formData).unwrap();
-            }
-            closeModal();
-        } catch (error) {
-            console.error("Failed to save service", error);
-        }
-    };
-
     const handleDelete = async (id: string) => {
-        if (confirm("Are you sure you want to delete this architectural service block?")) {
-            try {
-                await deleteService(id).unwrap();
-            } catch (error) {
-                console.error("Failed to delete service", error);
-            }
-        }
+        toast('Remove this service domain?', {
+            action: {
+                label: 'Delete',
+                onClick: async () => {
+                    try {
+                        await deleteService(id).unwrap();
+                        toast.success('Service domain removed.');
+                    } catch (error) {
+                        toast.error('Failed to delete service.');
+                    }
+                }
+            },
+            cancel: { label: 'Cancel', onClick: () => {} },
+        });
     };
 
     if (isLoading) return (
@@ -78,8 +38,6 @@ export default function ServicesManagement() {
             <span className="text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.25em]">Syncing Architecture...</span>
         </div>
     );
-
-    const isProcessing = isCreating || isUpdating;
 
     return (
         <div className="space-y-10 max-w-6xl mx-auto pb-20">
@@ -94,7 +52,7 @@ export default function ServicesManagement() {
                     </div>
                 </div>
                 <Button
-                    onClick={openCreate}
+                    onClick={() => navigate("/admin/services/new")}
                     className="bg-millions-accent text-millions-dark hover:bg-white rounded-none h-14 px-8 uppercase font-jost text-[0.7rem] tracking-[0.2em] font-bold transition-all shadow-lg shrink-0"
                 >
                     <Plus className="w-4 h-4 mr-3" /> Add Domain
@@ -120,7 +78,7 @@ export default function ServicesManagement() {
                             <div className="flex items-center gap-3 mt-auto border-t border-white/5 pt-6">
                                 <Button
                                     variant="ghost"
-                                    onClick={() => openEdit(service)}
+                                    onClick={() => navigate(`/admin/services/edit/${service.id}`)}
                                     className="flex-1 rounded-none hover:bg-millions-accent/10 hover:text-millions-accent text-white/40 tracking-[0.2em] uppercase text-[0.65rem] font-bold h-12 border border-transparent transition-all"
                                 >
                                     <Edit className="w-4 h-4 mr-2" /> Modify
@@ -147,60 +105,6 @@ export default function ServicesManagement() {
                     </div>
                 )}
             </div>
-
-            {/* Modal */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-millions-dark/95 backdrop-blur-md" onClick={closeModal} />
-                    <div className="relative bg-millions-dark border border-white/10 w-full max-w-lg shadow-2xl p-10 animate-fade-in-up">
-                        <button
-                            onClick={closeModal}
-                            className="absolute top-6 right-6 text-white/30 hover:text-millions-accent transition-colors"
-                        >
-                            <X className="w-6 h-6" />
-                        </button>
-                        
-                        <div className="mb-10 border-b border-white/5 pb-6">
-                            <h2 className="font-cormorant text-[2rem] text-white font-light leading-none">
-                                {editingService ? <>Refine <em className="italic text-millions-accent not-italic">Domain</em></> : <>New <em className="italic text-millions-accent not-italic">Domain</em></>}
-                            </h2>
-                            <p className="text-white/30 text-[0.65rem] tracking-[0.2em] uppercase mt-4">
-                                {editingService ? "Update Architectural Parameters" : "Provision Core Offering"}
-                            </p>
-                        </div>
-
-                        <div className="space-y-8">
-                            <div className="space-y-3">
-                                <label className="text-[0.65rem] tracking-[0.2em] uppercase text-white/40 block">Domain Nomenclature *</label>
-                                <input
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/5 text-white p-4 h-14 font-cormorant text-xl focus:outline-none focus:border-millions-accent/40 focus:bg-white/10 transition-all placeholder:text-white/20"
-                                    placeholder="Enter service name..."
-                                />
-                            </div>
-                            <div className="space-y-3">
-                                <label className="text-[0.65rem] tracking-[0.2em] uppercase text-white/40 block">Architectural Summary</label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/5 text-white/80 p-5 font-jost text-sm font-light focus:outline-none focus:border-millions-accent/40 focus:bg-white/10 transition-all min-h-[140px] resize-none placeholder:text-white/20"
-                                    placeholder="Brief technical or public descriptor..."
-                                />
-                            </div>
-
-                            <Button
-                                onClick={handleSave}
-                                disabled={isProcessing || !formData.name.trim()}
-                                className="w-full h-14 rounded-none bg-millions-accent text-millions-dark hover:bg-white tracking-[0.2em] uppercase text-[0.75rem] font-bold mt-4"
-                            >
-                                {isProcessing ? <Loader2 className="w-5 h-5 mr-3 animate-spin" /> : <Save className="w-5 h-5 mr-3" />}
-                                {editingService ? "Deploy Refinement" : "Provision Domain"}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

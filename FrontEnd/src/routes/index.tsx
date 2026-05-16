@@ -12,13 +12,17 @@ import AdminSettings from "../pages/admin/Settings";
 import AdminLogin from "../pages/admin/Login";
 import BlogManagement from "../pages/admin/BlogManagement";
 import BlogEditor from "../pages/admin/BlogEditor";
+import HomeArchitectureEditor from '../pages/admin/home-editor/HomeArchitectureEditor';
+import FooterArchitectureEditor from '../pages/admin/home-editor/FooterArchitectureEditor';
 import ProtectedRoute from "../components/ProtectedRoute";
 import TestimonialsPage from "../pages/testimonials/page";
 import SubmitTestimonial from "../pages/testimonials/submit";
 // Admin Testimonials
 import TestimonialsManagement from "../pages/admin/TestimonialsManagement";
 import ServicesManagement from "../pages/admin/ServicesManagement";
+import ServiceEditor from "../pages/admin/ServiceEditor";
 import Landing from "../pages/Landing";
+import InboxManagement from "../pages/admin/InboxManagement";
 
 const PublicLayout = () => (
     <Layout>
@@ -50,14 +54,19 @@ export const AppRoutes = () => (
                 </AdminLayout>
             </ProtectedRoute>
         }>
-            <Route index element={<Navigate to="/admin/pages" replace />} />
+            <Route index element={<Navigate to="/admin/landing" replace />} />
             <Route path="pages" element={<AdminPagesList />} />
             <Route path="pages/:slug" element={<AdminPageEditor />} />
+            <Route path="landing" element={<HomeArchitectureEditor />} />
+            <Route path="footer" element={<FooterArchitectureEditor />} />
             <Route path="blog" element={<BlogManagement />} />
             <Route path="blog/new" element={<BlogEditor />} />
             <Route path="blog/edit/:id" element={<BlogEditor />} />
             <Route path="testimonials" element={<TestimonialsManagement />} />
             <Route path="services" element={<ServicesManagement />} />
+            <Route path="services/new" element={<ServiceEditor />} />
+            <Route path="services/edit/:id" element={<ServiceEditor />} />
+            <Route path="inbox" element={<InboxManagement />} />
             {/* Dashboard and Settings routes are kept for legacy but mapped to disabled components */}
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="settings" element={<AdminSettings />} />

@@ -1,22 +1,29 @@
 import React from 'react';
 
-interface ValueItem {
-  name: string;
-  text: string;
-}
-
 interface ValuesProps {
   content: {
-    label: string;
-    title: string;
-    subTitle: string;
-    items: ValueItem[];
+    label?: string;
+    title?: string;
+    subTitle?: string;
+    values?: any[];
+    items?: any[]; // Fallback for static data mismatch
   };
 }
 
 export const ValuesSection: React.FC<ValuesProps> = ({ content }) => {
-  const { label, title, subTitle, items } = content;
-  const isSlider = items.length > 7;
+  if (!content) return null;
+  const { label = "", title = "", subTitle = "The MILLIONS Values Framework", values: rawValues = [], items = [] } = content;
+  const values = rawValues.length > 0 ? rawValues : items;
+
+  const renderText = (item: any, field: 'text' | 'name' | 'title' = 'text') => {
+    if (typeof item === 'string') return item;
+    if (typeof item === 'object' && item !== null) {
+      return item[field] || item.text || item.title || item.name || "";
+    }
+    return "";
+  };
+
+  const isSlider = values.length > 7;
 
   return (
     <section id="values" className="bg-millions-dark py-[7rem] px-[5%] overflow-hidden border-t border-white/5">
@@ -34,16 +41,16 @@ export const ValuesSection: React.FC<ValuesProps> = ({ content }) => {
         </div>
 
         {isSlider ? (
-          <ScrollingValuesSlider items={items} />
+          <ScrollingValuesSlider items={values} renderText={renderText} />
         ) : (
-          <StaticValuesGrid items={items} />
+          <StaticValuesGrid items={values} renderText={renderText} />
         )}
       </div>
     </section>
   );
 };
 
-const StaticValuesGrid = ({ items }: { items: ValueItem[] }) => {
+const StaticValuesGrid = ({ items, renderText }: { items: any[], renderText: any }) => {
   // If exactly 7 items, use the custom 4+3 layout
   if (items.length === 7) {
     const row1 = items.slice(0, 4);
@@ -54,13 +61,13 @@ const StaticValuesGrid = ({ items }: { items: ValueItem[] }) => {
         {/* Row 1: 4-column grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[1px] bg-white/5 animate-fade-in-up">
           {row1.map((item, idx) => (
-            <ValueCard key={idx} name={item.name} text={item.text} />
+            <ValueCard key={idx} name={renderText(item, 'name')} text={renderText(item, 'text')} />
           ))}
         </div>
         {/* Row 2: Custom grid 2fr 1fr 1fr */}
         <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-[2fr_1fr_1fr] gap-[1px] bg-white/5 animate-fade-in-up">
           {row2.map((item, idx) => (
-            <ValueCard key={idx} name={item.name} text={item.text} />
+            <ValueCard key={idx} name={renderText(item, 'name')} text={renderText(item, 'text')} />
           ))}
         </div>
       </div>
@@ -77,13 +84,13 @@ const StaticValuesGrid = ({ items }: { items: ValueItem[] }) => {
   return (
     <div className={`grid grid-cols-1 md:grid-cols-2 ${getGridCols()} gap-[1px] bg-white/5 animate-fade-in-up`}>
       {items.map((item, idx) => (
-        <ValueCard key={idx} name={item.name} text={item.text} />
+        <ValueCard key={idx} name={renderText(item, 'name')} text={renderText(item, 'text')} />
       ))}
     </div>
   );
 };
 
-const ScrollingValuesSlider = ({ items }: { items: ValueItem[] }) => {
+const ScrollingValuesSlider = ({ items, renderText }: { items: any[], renderText: any }) => {
   // We duplicate the items to create a seamless "circle" effect
   const duplicatedItems = [...items, ...items];
 
@@ -97,8 +104,8 @@ const ScrollingValuesSlider = ({ items }: { items: ValueItem[] }) => {
               className="w-[300px] md:w-[400px] shrink-0 p-[0.5px]"
             >
               <ValueCard 
-                name={item.name} 
-                text={item.text} 
+                name={renderText(item, 'name')} 
+                text={renderText(item, 'text')} 
                 className="h-full border-r border-white/5" 
               />
             </div>
@@ -114,7 +121,7 @@ const ScrollingValuesSlider = ({ items }: { items: ValueItem[] }) => {
   );
 };
 
-const ValueCard = ({ name, text, className = "" }: ValueItem & { className?: string }) => (
+const ValueCard = ({ name, text, className = "" }: { name: string, text: string, className?: string }) => (
   <div className={`bg-millions-dark p-10 border-t-2 border-t-transparent hover:border-t-millions-accent hover:bg-millions-accent/5 transition-all duration-300 group ${className}`}>
     <h4 className="font-cormorant text-white text-[1.4rem] font-semibold mb-3 group-hover:text-millions-accent transition-colors">
       {name}

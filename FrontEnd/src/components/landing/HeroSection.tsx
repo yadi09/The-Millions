@@ -13,10 +13,13 @@ interface HeroProps {
 }
 
 export const HeroSection: React.FC<HeroProps> = ({ content }) => {
-  const { label, title, titleEm, subText, primaryCta, ghostCta, stats } = content;
+  // Defensive check for missing content
+  if (!content) return null;
+
+  const { label = "", title = "", titleEm = "", subText = "", primaryCta = "", ghostCta = "", stats = [] } = content;
 
   // Splitting title to italicize the "titleEm" portion if it matches
-  const titleParts = title.split(titleEm);
+  const titleParts = titleEm ? title.split(titleEm) : [title, ""];
 
   return (
     <section id="hero" className="bg-millions-dark relative overflow-hidden pt-[7rem] px-[5%] pb-[10rem]">

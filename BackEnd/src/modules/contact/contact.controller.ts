@@ -1,13 +1,30 @@
 import { Request, Response } from 'express';
 import { contactService } from './contact.service.js';
+import { contactSchema } from './contact.validation.js';
+import { prisma } from "../../lib/prisma.js";
 
 export const submitContactForm = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { fullName, email, phone, message, serviceId } = req.body;
+        // Validation with Zod
+        const validation = contactSchema.safeParse(req.body);
+        
+        if (!validation.success) {
+            res.status(400).json({ 
+                error: 'Validation failed', 
+                details: validation.error.issues.map((err: any) => ({ field: err.path[0], message: err.message }))
+            });
+            return;
+        }
 
-        // Basic Validation
-        if (!fullName || !email || !message || !serviceId) {
-            res.status(400).json({ error: 'Missing required fields: fullName, email, message, serviceId are required' });
+        const { fullName, email, phone, message, serviceId } = validation.data;
+
+        // Verify serviceId exists
+        const service = await prisma.service.findUnique({
+            where: { id: serviceId }
+        });
+
+        if (!service) {
+            res.status(404).json({ error: 'Service not found', details: [{ field: 'serviceId', message: 'The selected service does not exist.' }] });
             return;
         }
 
@@ -19,7 +36,10 @@ export const submitContactForm = async (req: Request, res: Response): Promise<vo
             serviceId,
         });
 
-        res.status(201).json({ message: 'Message sent successfully', data: newMessage });
+        res.status(201).json({ 
+            message: 'Contact message received', 
+            id: newMessage.id 
+        });
     } catch (error) {
         console.error('Error submitting contact form:', error);
         res.status(500).json({ error: 'Failed to send message' });

@@ -172,7 +172,7 @@ export const landingContent = {
   },
   footer: {
     logo: "the MILLIONS.",
-    copyright: `© ${new Date().getFullYear()} The MILLIONS. Setting You Up For Success. All rights reserved.`,
+    copyright: "The MILLIONS. Setting You Up For Success. All rights reserved.",
     location: "Southampton, United Kingdom"
   }
 };

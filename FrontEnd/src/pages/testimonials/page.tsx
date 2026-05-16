@@ -40,9 +40,10 @@ export default function TestimonialsPage() {
     return (
         <main className="min-h-screen bg-millions-light">
             <SubPageHero
-                label="Success Stories"
-                title={heroContent.title}
-                subText={heroContent.subtitle}
+                label={heroContent.badge || "Success Stories"}
+                title={heroContent.headlineBlack || heroContent.title || "Client Success Stories"}
+                titleEm={heroContent.headlineBlue || ""}
+                subText={heroContent.description || heroContent.subtitle || "Discover how we've helped businesses achieve their financial goals through expert accounting and strategic advisory."}
             />
 
             <section className="max-w-7xl mx-auto px-4 md:px-20 -mt-10 mb-16 relative z-20">

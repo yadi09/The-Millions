@@ -2,19 +2,11 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { getToken } from '../../utils/authUtils';
 import type { Page, UpdatePageRequest } from '../../types';
 import { type Testimonial, type SubmitTestimonialRequest, type TestimonialStatus } from '../../types/testimonial';
-import { dummyTestimonials } from '../../data/testimonials';
 import type { Service } from '../../types/service';
-
-const getMockTestimonials = (): Testimonial[] => {
-  const stored = localStorage.getItem('mock_testimonials');
-  if (stored) return JSON.parse(stored);
-  localStorage.setItem('mock_testimonials', JSON.stringify(dummyTestimonials));
-  return dummyTestimonials;
-};
-
+import type { ContactMessage, GetContactMessagesResponse, ContactStatus } from '../../types/contact';
 export const apiSlice = createApi({
   reducerPath: 'api',
-  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service'],
+  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage'],
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
     prepareHeaders: (headers) => {
@@ -129,59 +121,33 @@ export const apiSlice = createApi({
 
     // --- TESTIMONIAL ENDPOINTS (Mocked) ---
     getTestimonials: builder.query<Testimonial[], { role: 'admin' | 'public' }>({
-      queryFn: ({ role }) => {
-        const all = getMockTestimonials();
-        if (role === 'admin') return { data: all };
-        // Public only sees approved testimonials
-        const approved = all.filter(t => t.status === 'approved');
-        return { data: approved };
-      },
+      query: ({ role }) => (role === 'admin' ? '/admin/testimonials' : '/testimonials'),
       providesTags: ['Testimonial'],
     }),
+
     submitTestimonial: builder.mutation<Testimonial, SubmitTestimonialRequest>({
-      queryFn: (newTestimonial) => {
-        const all = getMockTestimonials();
-        const testimonial: Testimonial = {
-          name: newTestimonial.name,
-          email: newTestimonial.email,
-          role: newTestimonial.role,
-          company: newTestimonial.company,
-          rating: newTestimonial.rating,
-          category: newTestimonial.category,
-          content: newTestimonial.content,
-          results: newTestimonial.results,
-          location: newTestimonial.location,
-          id: `t-${Date.now()}`,
-          status: 'pending',
-          order: 0,
-          createdAt: new Date().toISOString(),
-          image: newTestimonial.image || '/placeholder.svg',
-          videoTestimonial: newTestimonial.videoTestimonial ?? false
-        };
-        const updated = [testimonial, ...all];
-        localStorage.setItem('mock_testimonials', JSON.stringify(updated));
-        return { data: testimonial };
-      },
+      query: (data) => ({
+        url: '/testimonials',
+        method: 'POST',
+        body: data,
+      }),
       invalidatesTags: ['Testimonial'],
     }),
+
     updateTestimonialStatus: builder.mutation<Testimonial, { id: string, status: TestimonialStatus, order: number }>({
-      queryFn: ({ id, status, order }) => {
-        const all = getMockTestimonials();
-        const index = all.findIndex(t => t.id === id);
-        if (index === -1) return { error: { status: 404, data: 'Not found' } as any };
-        all[index] = { ...all[index], status, order };
-        localStorage.setItem('mock_testimonials', JSON.stringify(all));
-        return { data: all[index] };
-      },
+      query: ({ id, ...data }) => ({
+        url: `/admin/testimonials/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
       invalidatesTags: ['Testimonial'],
     }),
+
     deleteTestimonial: builder.mutation<void, string>({
-      queryFn: (id) => {
-        const all = getMockTestimonials();
-        const updated = all.filter(t => t.id !== id);
-        localStorage.setItem('mock_testimonials', JSON.stringify(updated));
-        return { data: undefined };
-      },
+      query: (id) => ({
+        url: `/admin/testimonials/${id}`,
+        method: 'DELETE',
+      }),
       invalidatesTags: ['Testimonial'],
     }),
 
@@ -227,6 +193,44 @@ export const apiSlice = createApi({
         body: data,
       }),
     }),
+
+    // --- ADMIN CONTACT MESSAGES ENDPOINTS ---
+    getContactMessages: builder.query<GetContactMessagesResponse, { page?: number; limit?: number; status?: ContactStatus; search?: string }>({
+      query: (params) => {
+        const query = new URLSearchParams();
+        if (params.page) query.append('page', params.page.toString());
+        if (params.limit) query.append('limit', params.limit.toString());
+        if (params.status) query.append('status', params.status);
+        if (params.search) query.append('search', params.search);
+        
+        return `/admin/contact-messages?${query.toString()}`;
+      },
+      providesTags: ['ContactMessage'],
+    }),
+
+    updateContactMessageStatus: builder.mutation<ContactMessage, { id: string; status: ContactStatus }>({
+      query: ({ id, status }) => ({
+        url: `/admin/contact-messages/${id}/status`,
+        method: 'PUT',
+        body: { status },
+      }),
+      invalidatesTags: ['ContactMessage'],
+    }),
+    
+    // --- FOOTER ENDPOINTS ---
+    getFooter: builder.query<any, void>({
+      query: () => '/footer',
+      providesTags: ['Footer'],
+    }),
+    
+    updateFooter: builder.mutation<any, any>({
+      query: (data) => ({
+        url: '/footer',
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['Footer'],
+    }),
   }),
 });
 
@@ -252,4 +256,8 @@ export const {
   useDeleteServiceMutation,
   useGetContactServicesQuery,
   useSubmitContactMutation,
+  useGetContactMessagesQuery,
+  useUpdateContactMessageStatusMutation,
+  useGetFooterQuery,
+  useUpdateFooterMutation,
 } = apiSlice;

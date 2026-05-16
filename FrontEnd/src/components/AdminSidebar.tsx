@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, LogOut, BookOpen, Star, Briefcase, User } from 'lucide-react';
+import { FileText, LogOut, BookOpen, Star, Briefcase, User, Monitor, Info, Mail } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import type { RootState } from '../app/store';
@@ -32,10 +32,13 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
     };
 
     const navLinks = [
-        { to: "/admin/pages", icon: FileText, label: "Pages" },
+        { to: "/admin/landing", icon: Monitor, label: "Landing Page" },
+        { to: "/admin/inbox", icon: Mail, label: "Contact Inbox" },
         { to: "/admin/blog", icon: BookOpen, label: "Blog" },
         { to: "/admin/services", icon: Briefcase, label: "Services" },
         { to: "/admin/testimonials", icon: Star, label: "Testimonials" },
+        { to: "/admin/footer", icon: Info, label: "Global Footer" },
+        { to: "/admin/pages", icon: FileText, label: "Site Architecture" },
     ];
 
     return (
