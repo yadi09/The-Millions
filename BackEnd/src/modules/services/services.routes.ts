@@ -1,12 +1,13 @@
 // backend/src/modules/services/services.routes.ts
 import { Router } from 'express';
-import { 
-  getServices, 
-  createServiceController, 
-  getServiceByIdController, 
-  updateServiceController, 
-  deleteServiceController 
+import {
+  getServices,
+  createServiceController,
+  getServiceByIdController,
+  updateServiceController,
+  deleteServiceController,
 } from './services.controller.js';
+import { authenticate } from '../../middlewares/auth.middleware.js';
 
 /**
  * @swagger
@@ -157,10 +158,13 @@ import {
  */
 const router = Router();
 
+// Public list is intentionally unauthenticated — used by the contact form and
+// testimonial submission. Single-item GET is admin-only because the editor is
+// the only legitimate caller.
 router.get('/', getServices);
-router.post('/', createServiceController);
-router.get('/:id', getServiceByIdController);
-router.put('/:id', updateServiceController);
-router.delete('/:id', deleteServiceController);
+router.post('/', authenticate, createServiceController);
+router.get('/:id', authenticate, getServiceByIdController);
+router.put('/:id', authenticate, updateServiceController);
+router.delete('/:id', authenticate, deleteServiceController);
 
 export default router;
