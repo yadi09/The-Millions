@@ -1,0 +1,4 @@
+# Never commit the populated env or the cert material.
+.env
+certs/
+backups/
