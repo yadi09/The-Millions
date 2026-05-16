@@ -1,6 +1,7 @@
 // backend/src/modules/contact/contact.routes.ts
 import { Router } from 'express';
 import { submitContactForm } from './contact.controller.js';
+import { contactRateLimiter } from '../../middlewares/rateLimit.middleware.js';
 
 /**
  * @swagger
@@ -47,6 +48,6 @@ import { submitContactForm } from './contact.controller.js';
  */
 const router = Router();
 
-router.post('/', submitContactForm);
+router.post('/', contactRateLimiter, submitContactForm);
 
 export default router;

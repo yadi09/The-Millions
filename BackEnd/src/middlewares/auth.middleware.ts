@@ -1,30 +1,39 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
+import { env } from "../config/env.js";
+import { UnauthorizedError } from "../utils/errors.js";
+import type { JwtPayload } from "../modules/auth/auth.service.js";
 
 export interface AuthRequest extends Request {
-    user?: any;
+    user?: JwtPayload;
 }
 
-export function authenticate(req: AuthRequest, res: Response, next: NextFunction) {
+export function authenticate(req: AuthRequest, _res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-        return res.status(401).json({ message: "Authorization header missing" });
+        return next(new UnauthorizedError("Authorization header missing"));
     }
 
-    const token = authHeader.split(" ")[1];
+    const [scheme, token] = authHeader.split(" ");
 
-    if (!token) {
-        return res.status(401).json({ message: "Token missing" });
+    if (scheme !== "Bearer" || !token) {
+        return next(new UnauthorizedError("Invalid authorization header format"));
     }
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
+        const decoded = jwt.verify(token, env.JWT_SECRET);
+        if (
+            typeof decoded !== "object" ||
+            decoded === null ||
+            typeof (decoded as JwtPayload).userId !== "string" ||
+            typeof (decoded as JwtPayload).email !== "string"
+        ) {
+            return next(new UnauthorizedError("Invalid token payload"));
+        }
+        req.user = decoded as JwtPayload;
         next();
-    } catch (error) {
-        return res.status(401).json({ message: "Invalid token" });
+    } catch {
+        return next(new UnauthorizedError("Invalid or expired token"));
     }
 }

@@ -1,22 +1,9 @@
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import dotenv from 'dotenv'
+import { prisma } from "../../lib/prisma.js";
+import { env } from "../../config/env.js";
 
-dotenv.config();
-
-const prisma = new PrismaClient();
-
-
-
-if (!process.env.JWT_SECRET) {
-    throw new Error("JWT_SECRET is not defined");
-}
-
-const JWT_SECRET = process.env.JWT_SECRET;
-
-
-interface JwtPayload {
+export interface JwtPayload {
     userId: string;
     email: string;
 }
@@ -41,10 +28,9 @@ export async function validateUser(email: string, password: string) {
         email: user.email,
     };
 
-    const token = jwt.sign(payload, JWT_SECRET, {
+    const token = jwt.sign(payload, env.JWT_SECRET, {
         expiresIn: "1h",
     });
-
 
     return {
         token,

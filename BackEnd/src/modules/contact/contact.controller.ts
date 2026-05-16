@@ -1,10 +1,7 @@
 import { Request, Response } from 'express';
 import { contactService } from './contact.service.js';
-
 import { contactSchema } from './contact.validation.js';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from "../../lib/prisma.js";
 
 export const submitContactForm = async (req: Request, res: Response): Promise<void> => {
     try {

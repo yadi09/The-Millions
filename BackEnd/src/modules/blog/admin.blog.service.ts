@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-import { sanitizeHtmlContent } from '../../utils/sanitize.js'
-
-const prisma = new PrismaClient();
+import { prisma } from "../../lib/prisma.js";
+import { sanitizeHtmlContent } from "../../utils/sanitize.js";
 
 export async function createBlogPost(data: any) {
     // Sanitize HTML content

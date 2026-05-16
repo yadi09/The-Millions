@@ -1,6 +1,4 @@
-import { PrismaClient, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from "../../lib/prisma.js";
 
 export async function getAllPublishedBlogs(page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;

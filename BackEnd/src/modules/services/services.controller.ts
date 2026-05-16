@@ -19,14 +19,18 @@ export const getServices = async (req: Request, res: Response): Promise<void> =>
 
 export const createServiceController = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, description } = req.body;
-    
-    if (!name || !description) {
-      res.status(400).json({ error: 'Name and description are required' });
+    const { name, description } = (req.body ?? {}) as { name?: unknown; description?: unknown };
+
+    if (typeof name !== 'string' || name.trim().length === 0) {
+      res.status(400).json({ error: 'Name is required' });
       return;
     }
-    
-    const service = await createService(name, description);
+    if (description !== undefined && typeof description !== 'string') {
+      res.status(400).json({ error: 'Description must be a string' });
+      return;
+    }
+
+    const service = await createService(name.trim(), description?.trim() || undefined);
     res.status(201).json(service);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create service' });
