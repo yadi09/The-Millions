@@ -1,0 +1,92 @@
+# nginx config rendered at container start via envsubst.
+# Knobs (set in docker-compose):
+#   $SERVER_NAME            — primary hostname for vhost matching (e.g. themillions.co.uk or _ for IP)
+#   $BACKEND_UPSTREAM       — host:port of the backend container (default: backend:4000)
+#
+# The cert path is fixed at /etc/nginx/certs/ — see issue-cert.sh for how the
+# files get there (Let's Encrypt for a real domain, self-signed for the IP-only
+# EC2 dry-run).
+
+# ----- HTTP → redirect to HTTPS (and serve ACME challenge during cert issuance)
+server {
+    listen 80;
+    server_name ${SERVER_NAME};
+
+    # Used by certbot in webroot mode. Empty on first boot; populated during
+    # cert issuance. Safe to keep always.
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# ----- HTTPS
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${SERVER_NAME};
+
+    ssl_certificate     /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+
+    # Modern TLS only. Browsers from the last ~5 years are all covered.
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    # Security headers
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    # Permissive CSP — tighten later. Cloudinary images, inline styles from tailwind, ws/wss for vite (dev only).
+    add_header Content-Security-Policy "default-src 'self'; img-src 'self' data: https://res.cloudinary.com https://via.placeholder.com; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; font-src 'self' data:;" always;
+
+    # Body size matches express body limit. Mismatch silently rejects uploads.
+    client_max_body_size 10m;
+
+    # ----- Reverse proxy /api to the backend container -----
+    location /api/ {
+        proxy_pass http://${BACKEND_UPSTREAM};
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Connection        "";
+        proxy_read_timeout 60s;
+    }
+
+    # ----- Swagger docs (optional — keep behind /api-docs as in app.ts) -----
+    location /api-docs {
+        proxy_pass http://${BACKEND_UPSTREAM};
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # ----- Static SPA -----
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Long cache for hashed bundles, short cache for index.html.
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable" always;
+        try_files $uri =404;
+    }
+
+    location / {
+        # SPA fallback: any unknown route serves index.html so client-side
+        # routing handles it.
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-cache" always;
+    }
+}
