@@ -16,7 +16,6 @@ set -euo pipefail
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 ENV_FILE="$DIR/.env"
-CERTS_DIR="$DIR/certs"
 WEBROOT="$DIR/certbot-webroot"
 
 if [[ ! -f "$ENV_FILE" ]]; then
@@ -26,6 +25,12 @@ fi
 
 # shellcheck disable=SC1090
 set -a; source "$ENV_FILE"; set +a
+
+# Set CERTS_DIR AFTER sourcing .env so a stray relative `CERTS_DIR=./certs`
+# in the env file can't redirect cert output to the wrong place. This script
+# always writes to deploy/certs/ regardless of where it's invoked from, and
+# docker-compose mounts the same directory.
+CERTS_DIR="$DIR/certs"
 
 mkdir -p "$CERTS_DIR" "$WEBROOT"
 
