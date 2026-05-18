@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
     useGetServicesQuery,
     useDeleteServiceMutation,
@@ -9,27 +10,27 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'sonner';
+import { ConfirmModal } from "../../components/ui/ConfirmModal";
 
 export default function ServicesManagement() {
     const navigate = useNavigate();
     const { data: services, isLoading } = useGetServicesQuery();
     const [deleteService, { isLoading: isDeleting }] = useDeleteServiceMutation();
 
-    const handleDelete = async (id: string) => {
-        toast('Remove this service domain?', {
-            action: {
-                label: 'Delete',
-                onClick: async () => {
-                    try {
-                        await deleteService(id).unwrap();
-                        toast.success('Service domain removed.');
-                    } catch (error) {
-                        toast.error('Failed to delete service.');
-                    }
-                }
-            },
-            cancel: { label: 'Cancel', onClick: () => {} },
-        });
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+
+    const handleDelete = (id: string) => {
+        setDeleteId(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteId) return;
+        try {
+            await deleteService(deleteId).unwrap();
+            toast.success('Service domain removed.');
+        } catch (error) {
+            toast.error('Failed to delete service.');
+        }
     };
 
     if (isLoading) return (
@@ -105,6 +106,15 @@ export default function ServicesManagement() {
                     </div>
                 )}
             </div>
+
+            <ConfirmModal
+                isOpen={deleteId !== null}
+                onClose={() => setDeleteId(null)}
+                onConfirm={confirmDelete}
+                title="Delete Service Domain"
+                message="Are you sure you want to permanently delete this service domain? This action cannot be undone."
+                confirmText="Delete Domain"
+            />
         </div>
     );
 }
