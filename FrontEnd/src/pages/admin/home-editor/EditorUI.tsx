@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Input } from "../../../components/ui/input";
 import { Textarea } from "../../../components/ui/textarea";
 import { Plus, Trash2, GripVertical } from "lucide-react";
+import { ConfirmModal } from "../../../components/ui/ConfirmModal";
 
 export const FormLabel = ({ children }: { children: React.ReactNode }) => (
     <label className="text-[0.6rem] font-jost text-white/30 uppercase tracking-[0.2em] mb-2.5 block ml-1 font-medium">{children}</label>
@@ -44,7 +46,8 @@ export const FieldGroup = ({ label, children }: { label: string, children: React
 export const ListManager = ({ 
     items, 
     onAdd, 
-    onRemove, 
+    onRemove,
+    onReorder,
     renderItem, 
     label,
     addButtonLabel = "Add Entry"
@@ -52,42 +55,111 @@ export const ListManager = ({
     items: any[], 
     onAdd?: () => void, 
     onRemove?: (index: number) => void, 
+    onReorder?: (newItems: any[]) => void,
     renderItem: (item: any, index: number) => React.ReactNode,
     label: string,
     addButtonLabel?: string
-}) => (
-    <div className="space-y-6 mb-12">
-        <div className="flex items-center justify-between mb-4">
-            <FormLabel>{label}</FormLabel>
-            {onAdd && (
-                <button 
-                    onClick={(e) => { e.preventDefault(); onAdd(); }}
-                    className="flex items-center gap-2 text-[0.6rem] font-jost text-millions-accent border border-millions-accent/20 px-4 py-2 hover:bg-millions-accent hover:text-millions-dark transition-all uppercase tracking-widest"
-                >
-                    <Plus size={12} />
-                    {addButtonLabel}
-                </button>
-            )}
+}) => {
+    const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+    const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+    const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+    const handleDragStart = (e: React.DragEvent, index: number) => {
+        setDraggedIndex(index);
+        e.dataTransfer.effectAllowed = "move";
+        // To hide the default drag ghost slightly
+        e.dataTransfer.setDragImage(e.currentTarget, 20, 20);
+    };
+
+    const handleDragOver = (e: React.DragEvent, index: number) => {
+        e.preventDefault();
+        if (draggedIndex === null || draggedIndex === index) return;
+        setDragOverIndex(index);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        setDragOverIndex(null);
+    };
+
+    const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+        e.preventDefault();
+        setDragOverIndex(null);
+        if (draggedIndex === null || draggedIndex === dropIndex || !onReorder) return;
+
+        const newItems = [...items];
+        const draggedItem = newItems[draggedIndex];
+        newItems.splice(draggedIndex, 1);
+        newItems.splice(dropIndex, 0, draggedItem);
+        onReorder(newItems);
+        setDraggedIndex(null);
+    };
+
+    return (
+        <div className="space-y-6 mb-12">
+            <div className="flex items-center justify-between mb-4">
+                <FormLabel>{label}</FormLabel>
+                {onAdd && (
+                    <button 
+                        onClick={(e) => { e.preventDefault(); onAdd(); }}
+                        className="flex items-center gap-2 text-[0.6rem] font-jost text-millions-accent border border-millions-accent/20 px-4 py-2 hover:bg-millions-accent hover:text-millions-dark transition-all uppercase tracking-widest"
+                    >
+                        <Plus size={12} />
+                        {addButtonLabel}
+                    </button>
+                )}
+            </div>
+            <div className="space-y-4">
+                {items.map((item, index) => {
+                    const isDragging = draggedIndex === index;
+                    const isDragOver = dragOverIndex === index;
+
+                    return (
+                        <div 
+                            key={index} 
+                            draggable={!!onReorder}
+                            onDragStart={(e) => handleDragStart(e, index)}
+                            onDragOver={(e) => handleDragOver(e, index)}
+                            onDragLeave={handleDragLeave}
+                            onDrop={(e) => handleDrop(e, index)}
+                            onDragEnd={() => { setDraggedIndex(null); setDragOverIndex(null); }}
+                            className={`flex gap-4 group p-4 bg-white/[0.02] border transition-all ${
+                                isDragging ? 'opacity-50 border-millions-accent/50' : 
+                                isDragOver ? 'border-millions-accent translate-y-1 shadow-[0_-2px_10px_rgba(201,168,76,0.2)]' : 
+                                'border-white/5 hover:border-white/10'
+                            }`}
+                        >
+                            <div className={`flex flex-col gap-2 mt-1 shrink-0 ${onReorder ? 'cursor-grab active:cursor-grabbing' : ''}`}>
+                                <GripVertical size={14} className={onReorder ? "text-white/20 group-hover:text-white/60 transition-colors" : "text-white/5"} />
+                                {onRemove && (
+                                    <button 
+                                        onClick={(e) => { e.preventDefault(); setDeleteIndex(index); }}
+                                        className="text-white/10 hover:text-red-400/60 transition-colors"
+                                    >
+                                        <Trash2 size={14} />
+                                    </button>
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                {renderItem(item, index)}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <ConfirmModal
+                isOpen={deleteIndex !== null}
+                onClose={() => setDeleteIndex(null)}
+                onConfirm={() => {
+                    if (deleteIndex !== null && onRemove) {
+                        onRemove(deleteIndex);
+                    }
+                }}
+                title="Delete Confirmation"
+                message="Are you sure you want to delete this entry? This action cannot be undone."
+                confirmText="Delete Entry"
+            />
         </div>
-        <div className="space-y-4">
-            {items.map((item, index) => (
-                <div key={index} className="flex gap-4 group p-4 bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all">
-                    <div className="flex flex-col gap-2 mt-1 shrink-0">
-                        <GripVertical size={14} className="text-white/5" />
-                        {onRemove && (
-                            <button 
-                                onClick={(e) => { e.preventDefault(); onRemove(index); }}
-                                className="text-white/10 hover:text-red-400/60 transition-colors"
-                            >
-                                <Trash2 size={14} />
-                            </button>
-                        )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        {renderItem(item, index)}
-                    </div>
-                </div>
-            ))}
-        </div>
-    </div>
-);
+    );
+};

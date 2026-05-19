@@ -44,6 +44,8 @@ export function HeroForm({ content, onChange }: { content: any, onChange: (c: an
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <FieldGroup label="Primary CTA Label">
                     <DarkInput 
+                        disabled
+                        className="opacity-50 cursor-not-allowed"
                         value={typeof c.ctas?.[0] === 'object' ? c.ctas[0].label : (c.ctas?.[0] || c.primaryCta || '')} 
                         onChange={e => {
                             const newCtas = [...(c.ctas || [])];
@@ -58,6 +60,8 @@ export function HeroForm({ content, onChange }: { content: any, onChange: (c: an
                 </FieldGroup>
                 <FieldGroup label="Ghost CTA Label">
                     <DarkInput 
+                        disabled
+                        className="opacity-50 cursor-not-allowed"
                         value={typeof c.ctas?.[1] === 'object' ? c.ctas[1].label : (c.ctas?.[1] || c.ghostCta || '')} 
                         onChange={e => {
                             const newCtas = [...(c.ctas || [])];
@@ -73,8 +77,12 @@ export function HeroForm({ content, onChange }: { content: any, onChange: (c: an
             </div>
 
             <ListManager 
-                label="Summary Statistics"
+                label="Strategic Highlights (Locations & Pillars)"
                 items={c.stats || []}
+                addButtonLabel="Add Highlight"
+                onAdd={(c.stats || []).length < 3 ? () => update('stats', [...(c.stats || []), { num: '', label: '' }]) : undefined}
+                onRemove={(i) => update('stats', c.stats.filter((_: any, idx: number) => idx !== i))}
+                onReorder={(newItems) => update('stats', newItems)}
                 renderItem={(item, i) => (
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div className="sm:col-span-1">
@@ -116,6 +124,7 @@ export function PhilosophyForm({ content, onChange }: { content: any, onChange: 
                 addButtonLabel="Add Paragraph"
                 onAdd={() => update('paragraphs', [...(c.paragraphs || []), ""])}
                 onRemove={(i) => update('paragraphs', c.paragraphs.filter((_: any, idx: number) => idx !== i))}
+                onReorder={(newItems) => update('paragraphs', newItems)}
                 renderItem={(item, i) => (
                     <DarkTextarea 
                         value={item} 
@@ -171,6 +180,7 @@ export function ValuesForm({ content, onChange }: { content: any, onChange: (c: 
                 items={c.items || []}
                 onAdd={() => update('items', [...(c.items || []), { name: '', text: '' }])}
                 onRemove={(i) => update('items', c.items.filter((_: any, idx: number) => idx !== i))}
+                onReorder={(newItems) => update('items', newItems)}
                 renderItem={(item, i) => (
                     <div className="space-y-4">
                         <FieldGroup label="Value Name">
@@ -217,6 +227,7 @@ export function ImpactModelForm({ content, onChange }: { content: any, onChange:
             <ListManager 
                 label="Strategic Pillars"
                 items={c.pillars || []}
+                onReorder={(newItems) => update('pillars', newItems)}
                 renderItem={(item, i) => (
                     <div className="grid grid-cols-1 sm:grid-cols-6 gap-6">
                         <div className="sm:col-span-1">
@@ -270,6 +281,7 @@ export function LeadershipForm({ content, onChange }: { content: any, onChange: 
                 addButtonLabel="Add Commitment"
                 onAdd={() => update('commitments', [...(c.commitments || []), ""])}
                 onRemove={(i) => update('commitments', c.commitments.filter((_: any, idx: number) => idx !== i))}
+                onReorder={(newItems) => update('commitments', newItems)}
                 renderItem={(item, i) => (
                     <DarkInput 
                         value={item} 
@@ -288,6 +300,7 @@ export function LeadershipForm({ content, onChange }: { content: any, onChange: 
                 addButtonLabel="Add Leader"
                 onAdd={() => update('leaders', [...(c.leaders || []), { name: '', role: '', creds: '', initials: '' }])}
                 onRemove={(i) => update('leaders', c.leaders.filter((_: any, idx: number) => idx !== i))}
+                onReorder={(newItems) => update('leaders', newItems)}
                 renderItem={(item, i) => (
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div className="sm:col-span-1">
@@ -342,6 +355,7 @@ export function FutureVisionForm({ content, onChange }: { content: any, onChange
                 addButtonLabel="Add Strategic Point"
                 onAdd={() => update('points', [...(c.points || []), ""])}
                 onRemove={(i) => update('points', c.points.filter((_: any, idx: number) => idx !== i))}
+                onReorder={(newItems) => update('points', newItems)}
                 renderItem={(item, i) => (
                     <DarkTextarea 
                         value={item} 
@@ -385,6 +399,7 @@ export function OverviewForm({ content, onChange }: { content: any, onChange: (c
                 addButtonLabel="Add Paragraph"
                 onAdd={() => update('paragraphs', [...(c.paragraphs || []), ""])}
                 onRemove={(i) => update('paragraphs', c.paragraphs.filter((_: any, idx: number) => idx !== i))}
+                onReorder={(newItems) => update('paragraphs', newItems)}
                 renderItem={(item, i) => (
                     <DarkTextarea 
                         value={item} 
@@ -560,6 +575,7 @@ export function GeographyForm({ content, onChange }: { content: any, onChange: (
                 items={c.regions || []}
                 onAdd={() => update('regions', [...(c.regions || []), { label: '', title: '', subTitle: '', text: '', tags: [] }])}
                 onRemove={(i) => update('regions', c.regions.filter((_: any, idx: number) => idx !== i))}
+                onReorder={(newItems) => update('regions', newItems)}
                 renderItem={(item, i) => (
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -612,6 +628,7 @@ export function SocialImpactForm({ content, onChange }: { content: any, onChange
             <ListManager 
                 label="Impact Tiers"
                 items={c.tiers || []}
+                onReorder={(newItems) => update('tiers', newItems)}
                 renderItem={(item, i) => (
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div className="sm:col-span-1">
@@ -635,6 +652,7 @@ export function SocialImpactForm({ content, onChange }: { content: any, onChange
                         items={c.governance?.list || []}
                         onAdd={() => update('governance', { ...c.governance, list: [...(c.governance?.list || []), ""] })}
                         onRemove={(i) => update('governance', { ...c.governance, list: c.governance.list.filter((_: any, idx: number) => idx !== i) })}
+                        onReorder={(newItems) => update('governance', { ...c.governance, list: newItems })}
                         renderItem={(item, i) => (
                             <DarkInput 
                                 value={item} 
