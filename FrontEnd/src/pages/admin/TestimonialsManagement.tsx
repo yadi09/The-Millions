@@ -10,6 +10,7 @@ import { Badge } from "../../components/ui/badge";
 import { Check, Trash2, ArrowUp, Link2, Copy, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Testimonial } from "../../types/testimonial";
 import { toast } from 'sonner';
+import { ConfirmModal } from "../../components/ui/ConfirmModal";
 
 const ITEMS_PER_PAGE = 4;
 
@@ -19,6 +20,7 @@ export default function TestimonialsManagement() {
     const [deleteTestimonial] = useDeleteTestimonialMutation();
     const [activeView, setActiveView] = useState<'pending' | 'approved'>('pending');
     const [currentPage, setCurrentPage] = useState(1);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
 
     const pendingTestimonials = (testimonials || []).filter(t => t.status === 'pending');
     const approvedTestimonials = (testimonials || []).filter(t => t.status === 'approved')
@@ -52,21 +54,18 @@ export default function TestimonialsManagement() {
         });
     };
 
-    const handleDelete = async (id: string) => {
-        toast('Remove this testimonial?', {
-            action: {
-                label: 'Delete',
-                onClick: async () => {
-                    try {
-                        await deleteTestimonial(id).unwrap();
-                        toast.success('Testimonial removed.');
-                    } catch {
-                        toast.error('Failed to delete testimonial.');
-                    }
-                }
-            },
-            cancel: { label: 'Cancel', onClick: () => {} },
-        });
+    const handleDelete = (id: string) => {
+        setDeleteId(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteId) return;
+        try {
+            await deleteTestimonial(deleteId).unwrap();
+            toast.success('Testimonial removed.');
+        } catch {
+            toast.error('Failed to delete testimonial.');
+        }
     };
 
     const handleFeature = async (id: string, currentOrder: number) => {
@@ -278,6 +277,15 @@ export default function TestimonialsManagement() {
                     </div>
                 )}
             </div>
+
+            <ConfirmModal
+                isOpen={deleteId !== null}
+                onClose={() => setDeleteId(null)}
+                onConfirm={confirmDelete}
+                title="Delete Testimonial"
+                message="Are you sure you want to permanently delete this testimonial? This action cannot be undone."
+                confirmText="Delete Testimonial"
+            />
         </div>
     );
 }

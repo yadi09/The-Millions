@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { useGetBlogPostsQuery, useDeleteBlogPostMutation } from '../../features/api/apiSlice';
 import { toast } from 'sonner';
+import { ConfirmModal } from '../../components/ui/ConfirmModal';
 
 export default function BlogManagement() {
     const navigate = useNavigate();
@@ -25,21 +26,20 @@ export default function BlogManagement() {
         post.category.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const handleDelete = async (id: string) => {
-        toast('Delete this architectural note?', {
-            action: {
-                label: 'Delete',
-                onClick: async () => {
-                    try {
-                        await deletePost(id).unwrap();
-                        toast.success('Architectural note removed.');
-                    } catch (err) {
-                        toast.error(err instanceof Error ? err.message : 'Error deleting post');
-                    }
-                }
-            },
-            cancel: { label: 'Cancel', onClick: () => {} },
-        });
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+
+    const handleDelete = (id: string) => {
+        setDeleteId(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!deleteId) return;
+        try {
+            await deletePost(deleteId).unwrap();
+            toast.success('Architectural note removed.');
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : 'Error deleting post');
+        }
     };
 
     return (
@@ -113,6 +113,15 @@ export default function BlogManagement() {
                     )}
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={deleteId !== null}
+                onClose={() => setDeleteId(null)}
+                onConfirm={confirmDelete}
+                title="Delete Architectural Note"
+                message="Are you sure you want to permanently delete this post? This action cannot be undone."
+                confirmText="Delete Post"
+            />
         </div>
     );
 }
