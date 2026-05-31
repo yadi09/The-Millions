@@ -1,0 +1,19 @@
+# Root-level .gitignore — catches cross-cutting artifacts.
+# Per-subproject ignores live in BackEnd/.gitignore and FrontEnd/.gitignore.
+
+# OS + editor artifacts
+.DS_Store
+.history/
+*.swp
+*~
+
+# Stray Node artifacts at the repo root (the real ones live in BackEnd/ and FrontEnd/)
+/node_modules/
+/package.json
+/package-lock.json
+
+# TypeScript incremental build cache (anywhere in the tree)
+*.tsbuildinfo
+
+# Local logs
+*.log

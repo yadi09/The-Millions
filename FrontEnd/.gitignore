@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 
+# Canonical lockfile here is pnpm-lock.yaml. The Docker build uses `npm install`
+# (not `npm ci`), so an npm-generated package-lock.json isn't needed and would
+# just create noise. Ignore it.
+package-lock.json
+
 # Environment files
 .env
 .env.local
