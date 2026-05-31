@@ -1,4 +1,5 @@
 import React from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 
 interface ImpactModelProps {
   content: {
@@ -23,7 +24,7 @@ export const ImpactModelSection: React.FC<ImpactModelProps> = ({ content }) => {
   };
 
   return (
-    <section id="model" className="bg-millions-light py-[7rem] px-[5%] overflow-hidden">
+    <section id="model" data-editable-section="impact-model" className="bg-millions-light py-[7rem] px-[5%] overflow-hidden">
       <div className="max-w-[1200px] w-[90%] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end mb-16 animate-fade-in-up">
           <div>
@@ -34,9 +35,10 @@ export const ImpactModelSection: React.FC<ImpactModelProps> = ({ content }) => {
               {title}
             </h2>
           </div>
-          <p className="text-millions-body text-[0.9rem] leading-[1.9] font-light lg:max-w-md">
-            {subTitle}
-          </p>
+          <div
+            className="text-millions-body text-[0.9rem] leading-[1.9] font-light lg:max-w-md [&_p]:my-0 [&_strong]:text-millions-dark [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(subTitle) }}
+          />
         </div>
 
         {isSlider ? (
@@ -107,8 +109,9 @@ const PillarCard = ({ pillar, renderText, className = "" }: { pillar: any; rende
     <h3 className="font-cormorant text-millions-dark text-[1.5rem] font-light mb-3">
       {renderText(pillar, 'title')}
     </h3>
-    <p className="text-millions-body text-[0.83rem] leading-[1.8] font-light">
-      {renderText(pillar, 'text')}
-    </p>
+    <div
+      className="text-millions-body text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-millions-dark [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderText(pillar, 'text')) }}
+    />
   </div>
 );

@@ -36,7 +36,7 @@ The only operational differences between the two are: the value of `SERVER_NAME`
 
 ### Prerequisites
 
-- EC2 instance: Ubuntu 22.04 LTS, t3.small (2 GB RAM), 16+ GB disk
+- EC2 instance: Ubuntu 22.04 LTS or 24.04 LTS, t3.small (2 GB RAM), **20+ GB disk** (the default 8 GB AMI fills up during Docker install — expand the EBS volume to 20 GB before bootstrapping, then `sudo growpart /dev/nvme0n1 1 && sudo resize2fs /dev/nvme0n1p1`)
 - Security group allows inbound: 22 (your IP), 80, 443 (0.0.0.0/0)
 - SSH key working: `ssh -i your-key.pem ubuntu@EC2_PUBLIC_IP`
 
@@ -95,11 +95,13 @@ open https://EC2_PUBLIC_IP   # click through the cert warning
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| Browser says "connection refused" | Security group not open on 443 | AWS console → security group → inbound rules |
+| `fallocate failed: No space left on device` during `setup-server.sh` | Root volume too small (default Ubuntu AMI = 8 GB; Docker fills it) | Expand EBS to 20 GB in AWS console, then `sudo growpart /dev/nvme0n1 1 && sudo resize2fs /dev/nvme0n1p1`. The patched `setup-server.sh` auto-removes stale `/swapfile` and tries smaller sizes (2G → 1G → 512M → skip) |
+| Browser says "connection refused" | Security group not open on 443 | AWS console → security group → inbound rules → add HTTP/HTTPS from `0.0.0.0/0` |
 | `docker: permission denied` | User not in docker group yet | log out + back in after `setup-server.sh` |
 | Backend logs show "JWT_SECRET must be at least 32 characters" | `deploy/.env` wasn't sourced | the env file is loaded by compose's `--env-file`; verify path |
 | CORS errors in browser console | `CORS_ORIGINS` doesn't include the URL you opened | add `https://EC2_PUBLIC_IP` to `CORS_ORIGINS` and redeploy |
 | Postgres unhealthy after compose up | First boot can take 10–20s | wait; `docker compose logs postgres` shows progress |
+| `type "public.ContactStatus" does not exist` during seed | Pre-existing migration drift — `schema.prisma` declares the enum but no migration creates it; `status` ends up as `text` in the DB | Run this once: `docker compose -f deploy/docker-compose.prod.yml --env-file deploy/.env exec -T postgres psql -U "$POSTGRES_USER" "$POSTGRES_DB" -c "CREATE TYPE \"ContactStatus\" AS ENUM ('NEW','READ','REPLIED'); ALTER TABLE \"ContactMessage\" ALTER COLUMN status DROP DEFAULT; ALTER TABLE \"ContactMessage\" ALTER COLUMN status TYPE \"ContactStatus\" USING status::\"ContactStatus\"; ALTER TABLE \"ContactMessage\" ALTER COLUMN status SET DEFAULT 'NEW';"`. A proper Prisma migration for this is a follow-up backend fix. |
 
 ---
 

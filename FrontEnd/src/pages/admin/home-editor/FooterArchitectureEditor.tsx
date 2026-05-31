@@ -33,14 +33,21 @@ const FooterArchitectureEditor = () => {
         const c = localPageData.contact;
         const f = localPageData.footer;
 
-        // Flatten data to match Backend Prisma Footer model
+        // Match Backend Prisma Footer model exactly (no string joining).
         const backendData = {
-            phone: Array.isArray(c.phones) ? c.phones.join(', ') : '',
+            phone: Array.isArray(c.phones) ? c.phones : [],
             email: c.email || '',
-            address: Array.isArray(c.address) ? c.address.join(', ') : '',
+            address: Array.isArray(c.address) ? c.address : [],
+            websiteUrl: c.website || '',
             socialMedia: { whatsapp: c.whatsapp || '' },
             copyright: f.copyright || '',
-            showContactBlock: localPageData.showContactBlock ?? true
+            showContactBlock: localPageData.showContactBlock ?? true,
+            contactLabel: c.label || '',
+            contactTitle: c.title || '',
+            contactSubTitle: c.subTitle || '',
+            buttonText: c.buttonText || '',
+            logoText: f.logo || '',
+            location: f.location || ''
         };
 
         const promise = updateFooter(backendData).unwrap();

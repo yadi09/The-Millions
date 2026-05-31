@@ -198,3 +198,13 @@ html {
 .pause-marquee {
   animation-play-state: paused;
 }
+
+/* Font size marks emitted by the inline-editing rich-text editor.
+   See FrontEnd/src/features/edit/FontSize.ts. Sizes are relative to the
+   surrounding paragraph so they compose well with any context. */
+[data-size="sm"] {
+  font-size: 0.85em;
+}
+[data-size="lg"] {
+  font-size: 1.25em;
+}

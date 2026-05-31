@@ -26,7 +26,7 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
   return (
     <>
       {/* Section 13: Get In Touch */}
-      <section id="contact" className="bg-millions-dark py-[7rem] text-center relative overflow-hidden">
+      <section id="contact" data-editable-section="global-footer" className="bg-millions-dark py-[7rem] text-center relative overflow-hidden">
         {/* Background Text Effect */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-cormorant text-[clamp(6rem,15vw,14rem)] font-semibold text-white/5 whitespace-nowrap pointer-events-none z-0">
           MILLIONS
@@ -87,7 +87,7 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
       </section>
 
       {/* Main Footer */}
-      <footer className="bg-[#080f0e] py-[1.8rem] px-[5%] text-white/25 flex flex-wrap gap-4 items-center justify-between border-t border-white/5">
+      <footer data-editable-section="global-footer" className="bg-[#080f0e] py-[1.8rem] px-[5%] text-white/25 flex flex-wrap gap-4 items-center justify-between border-t border-white/5">
         <div className="font-cormorant text-[1rem]">
           {footer.logo === '/logo.svg' ? 'the MILLIONS.' : footer.logo}
         </div>

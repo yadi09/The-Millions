@@ -1,4 +1,5 @@
 import React from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 
 interface GeographyProps {
   content: {
@@ -15,7 +16,7 @@ export const GeographySection: React.FC<GeographyProps> = ({ content }) => {
   const isSlider = (regions?.length || 0) > 2;
 
   return (
-    <section id="geography" className="bg-millions-light py-[7rem] px-[5%] overflow-hidden">
+    <section id="geography" data-editable-section="geography" className="bg-millions-light py-[7rem] px-[5%] overflow-hidden">
       <div className="max-w-[1200px] w-[90%] mx-auto">
         <div className="animate-fade-in-up mb-12">
           <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
@@ -24,9 +25,10 @@ export const GeographySection: React.FC<GeographyProps> = ({ content }) => {
           <h2 className="font-cormorant text-millions-dark text-[clamp(2rem,4vw,3rem)] font-light leading-tight">
             {title}
           </h2>
-          <p className="text-millions-body text-[0.9rem] leading-[1.9] font-light mt-4 lg:max-w-2xl">
-            {subTitle}
-          </p>
+          <div
+            className="text-millions-body text-[0.9rem] leading-[1.9] font-light mt-4 lg:max-w-2xl [&_p]:my-0 [&_strong]:text-millions-dark [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(subTitle) }}
+          />
         </div>
 
         {isSlider ? (
@@ -87,9 +89,10 @@ const RegionCard = ({ region }: { region: any }) => (
     <div className="text-millions-muted text-[0.78rem] mb-4 font-light">
       {region?.subTitle}
     </div>
-    <p className="text-millions-body text-[0.83rem] leading-[1.8] font-light mb-6">
-      {region?.text}
-    </p>
+    <div
+      className="text-millions-body text-[0.83rem] leading-[1.8] font-light mb-6 [&_p]:my-0 [&_strong]:text-millions-dark [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(region?.text || '') }}
+    />
     <div className="flex flex-wrap gap-2">
       {(region?.tags || []).map((tag: any, tIdx: number) => (
         <span 

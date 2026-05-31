@@ -13,6 +13,7 @@ import adminBlogRoutes from "./modules/blog/admin.blog.routes.js";
 import uploadRoutes from "./modules/upload/upload.routes.js";
 import footerRoutes from "./modules/footer/footer.routes.js";
 import testimonialsRoutes from "./modules/testimonials/testimonials.routes.js";
+import adminTestimonialsRoutes from "./modules/testimonials/admin.testimonials.routes.js";
 import swaggerRoutes from "./routes/swagger.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { notFoundHandler } from "./middlewares/notFound.middleware.js";
@@ -59,6 +60,7 @@ app.use("/api/admin/blogs", adminBlogRoutes);
 app.use("/api/admin/upload", uploadRoutes);
 app.use("/api/footer", footerRoutes);
 app.use("/api/testimonials", testimonialsRoutes);
+app.use("/api/admin/testimonials", adminTestimonialsRoutes);
 app.use("/api-docs", swaggerRoutes);
 
 app.use(notFoundHandler);

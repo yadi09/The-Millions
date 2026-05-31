@@ -1,4 +1,5 @@
 import React from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 
 interface FutureVisionProps {
   content: {
@@ -7,12 +8,13 @@ interface FutureVisionProps {
     subTitle?: string;
     goals?: any[];
     points?: any[]; // Fallback for static data mismatch
+    footer?: string;
   };
 }
 
 export const FutureVisionSection: React.FC<FutureVisionProps> = ({ content }) => {
   if (!content) return null;
-  const { label = "", title = "", subTitle = "", goals: rawGoals = [], points = [] } = content;
+  const { label = "", title = "", subTitle = "", goals: rawGoals = [], points = [], footer = "" } = content;
   const goals = rawGoals.length > 0 ? rawGoals : points;
 
   const renderText = (item: any) => {
@@ -24,7 +26,7 @@ export const FutureVisionSection: React.FC<FutureVisionProps> = ({ content }) =>
   };
 
   return (
-    <section id="vision" className="bg-millions-mid py-[7rem] px-[5%]">
+    <section id="vision" data-editable-section="future-vision" className="bg-millions-mid py-[7rem] px-[5%]">
       <div className="max-w-[1200px] w-[90%] mx-auto">
         <div className="animate-fade-in-up mb-12">
           <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
@@ -33,9 +35,10 @@ export const FutureVisionSection: React.FC<FutureVisionProps> = ({ content }) =>
           <h2 className="font-cormorant text-white text-[clamp(2rem,4vw,3rem)] font-light leading-tight">
             {title}
           </h2>
-          <p className="text-white/50 text-[0.9rem] leading-[1.9] font-light mt-4 lg:max-w-2xl">
-            {subTitle}
-          </p>
+          <div
+            className="text-white/50 text-[0.9rem] leading-[1.9] font-light mt-4 lg:max-w-2xl [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(subTitle) }}
+          />
         </div>
 
         <div className="flex flex-col gap-px mt-10 animate-fade-in-up">
@@ -44,16 +47,18 @@ export const FutureVisionSection: React.FC<FutureVisionProps> = ({ content }) =>
               <div className="font-cormorant text-millions-accent/40 text-[3rem] font-light leading-none group-hover:text-millions-accent transition-colors">
                 {String(idx + 1).padStart(2, '0')}
               </div>
-              <p className="text-white/55 text-[0.9rem] leading-[1.9] font-light pt-1">
-                {renderText(goal)}
-              </p>
+              <div
+                className="text-white/55 text-[0.9rem] leading-[1.9] font-light pt-1 [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderText(goal)) }}
+              />
             </div>
           ))}
         </div>
 
-        <p className="text-white/45 text-[0.9rem] leading-[1.9] font-light mt-12 lg:max-w-xl animate-fade-in-up md:animation-delay-300">
-          This strategic vision positions The MILLIONS as a lasting professional and social institution, capable of inspiring and empowering communities across generations.
-        </p>
+        <div
+          className="text-white/45 text-[0.9rem] leading-[1.9] font-light mt-12 lg:max-w-xl animate-fade-in-up md:animation-delay-300 [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(footer) }}
+        />
       </div>
     </section>
   );

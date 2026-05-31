@@ -1,24 +1,44 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { getToken } from '../../utils/authUtils';
+import { createApi, fetchBaseQuery, type BaseQueryFn, type FetchArgs, type FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
+import { getToken, clearAuth } from '../../utils/authUtils';
 import type { Page, UpdatePageRequest } from '../../types';
 import { type Testimonial, type SubmitTestimonialRequest, type TestimonialStatus } from '../../types/testimonial';
 import type { Service } from '../../types/service';
 import type { ContactMessage, GetContactMessagesResponse, ContactStatus } from '../../types/contact';
+
+const rawBaseQuery = fetchBaseQuery({
+  baseUrl: import.meta.env.VITE_API_BASE_URL,
+  prepareHeaders: (headers) => {
+    const token = getToken();
+    if (token) {
+      headers.set('authorization', `Bearer ${token}`);
+    }
+    return headers;
+  },
+});
+
+// Wraps the base fetch. Any 401 response (expired / invalid / missing token
+// on a protected endpoint) clears local auth and bounces to the login page.
+// We use window.location instead of react-router here because baseQuery runs
+// outside the React tree.
+const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+  args,
+  api,
+  extraOptions,
+) => {
+  const result = await rawBaseQuery(args, api, extraOptions);
+  if (result.error && result.error.status === 401) {
+    clearAuth();
+    if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin/login')) {
+      window.location.href = '/admin/login';
+    }
+  }
+  return result;
+};
+
 export const apiSlice = createApi({
   reducerPath: 'api',
   tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage'],
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_BASE_URL,
-    prepareHeaders: (headers) => {
-      // Get token from localStorage
-      const token = getToken();
-      // If token exists, attach Authorization header
-      if (token) {
-        headers.set('authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
     getPage: builder.query<Page, string>({
       query: (slug) => `/pages/${slug}`,
