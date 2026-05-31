@@ -1,4 +1,5 @@
 import React from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 
 interface Tier {
   badge: string;
@@ -44,7 +45,7 @@ export const SocialImpactSection: React.FC<SocialImpactProps> = ({ content }) =>
   };
 
   return (
-    <section id="impact" className="bg-millions-dark py-[7rem] px-[5%] overflow-hidden">
+    <section id="impact" data-editable-section="social-impact" className="bg-millions-dark py-[7rem] px-[5%] overflow-hidden">
       <div className="max-w-[1200px] w-[90%] mx-auto">
         <div className="animate-fade-in-up mb-12">
           <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
@@ -69,11 +70,12 @@ export const SocialImpactSection: React.FC<SocialImpactProps> = ({ content }) =>
           <h3 className="font-cormorant text-white text-[1.5rem] font-light mb-6">
             {governance?.title}
           </h3>
-          <div className="space-y-4 mb-6">
+          <div className="space-y-4 mb-6 text-white/45 text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline">
             {(governance?.paragraphs || []).map((p, idx) => (
-              <p key={idx} className="text-white/45 text-[0.83rem] leading-[1.8] font-light">
-                {renderText(p)}
-              </p>
+              <div
+                key={idx}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderText(p)) }}
+              />
             ))}
           </div>
           <ul className="space-y-3 mb-6">
@@ -83,9 +85,10 @@ export const SocialImpactSection: React.FC<SocialImpactProps> = ({ content }) =>
               </li>
             ))}
           </ul>
-          <p className="text-white/45 text-[0.83rem] leading-[1.8] font-light">
-            {renderText(governance?.footer)}
-          </p>
+          <div
+            className="text-white/45 text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderText(governance?.footer)) }}
+          />
         </div>
       </div>
     </section>
@@ -136,8 +139,9 @@ const TierCard = ({ tier }: { tier: Tier }) => (
     <h3 className="font-cormorant text-white text-[1.15rem] font-light mb-4 leading-snug">
       {tier?.title}
     </h3>
-    <p className="text-white/45 text-[0.83rem] leading-[1.8] font-light">
-      {tier?.text}
-    </p>
+    <div
+      className="text-white/45 text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(tier?.text || '') }}
+    />
   </div>
 );

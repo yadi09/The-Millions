@@ -1,36 +1,14 @@
-import { Router } from 'express';
-import { getTestimonials } from './testimonials.controller.js';
+import { Router } from "express";
+import { getTestimonials, postTestimonial } from "./testimonials.controller.js";
+import { testimonialRateLimiter } from "../../middlewares/rateLimit.middleware.js";
 
-/**
- * @swagger
- * tags:
- *   name: Testimonials
- *   description: Testimonials management
- */
-
-/**
- * @swagger
- * /api/testimonials:
- *   get:
- *     tags: [Testimonials]
- *     summary: Get all testimonials
- *     description: Returns a list of all testimonials
- *     responses:
- *       200:
- *         description: Testimonials retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Testimonial'
- *       404:
- *         description: Testimonials not found
- *       500:
- *         description: Internal server error
- */
 const router = Router();
 
-router.get('/', getTestimonials);
+// Public — list APPROVED testimonials for the marketing page
+router.get("/", getTestimonials);
+
+// Public — submit a new testimonial (lands in PENDING for admin moderation).
+// Rate-limited to mirror the contact form's spam-protection posture.
+router.post("/", testimonialRateLimiter, postTestimonial);
 
 export default router;

@@ -18,3 +18,13 @@ export const contactRateLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: "Too many contact submissions, please try again later" },
 });
+
+// Testimonial submissions: shares the contact form window/cap since both are
+// low-frequency, anti-spam-sensitive public POSTs.
+export const testimonialRateLimiter = rateLimit({
+  windowMs: env.RATE_LIMIT_CONTACT_WINDOW_MS,
+  limit: env.RATE_LIMIT_CONTACT_MAX,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { error: "Too many testimonial submissions, please try again later" },
+});

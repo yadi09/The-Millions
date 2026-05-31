@@ -5,19 +5,12 @@ import BlogPage from "../pages/blog/page";
 import BlogPost from "../pages/blog/BlogPost";
 import ComingSoonPage from "../pages/comingSoon/page";
 import AdminLayout from "../components/AdminLayout";
-import AdminDashboard from "../pages/admin/Dashboard";
-import AdminPageEditor from "../pages/admin/PageEditor";
-import AdminPagesList from "../pages/admin/PagesList";
-import AdminSettings from "../pages/admin/Settings";
 import AdminLogin from "../pages/admin/Login";
 import BlogManagement from "../pages/admin/BlogManagement";
 import BlogEditor from "../pages/admin/BlogEditor";
-import HomeArchitectureEditor from '../pages/admin/home-editor/HomeArchitectureEditor';
-import FooterArchitectureEditor from '../pages/admin/home-editor/FooterArchitectureEditor';
 import ProtectedRoute from "../components/ProtectedRoute";
 import TestimonialsPage from "../pages/testimonials/page";
 import SubmitTestimonial from "../pages/testimonials/submit";
-// Admin Testimonials
 import TestimonialsManagement from "../pages/admin/TestimonialsManagement";
 import ServicesManagement from "../pages/admin/ServicesManagement";
 import ServiceEditor from "../pages/admin/ServiceEditor";
@@ -29,6 +22,11 @@ const PublicLayout = () => (
         <Outlet />
     </Layout>
 );
+
+// The default landing inside the admin shell. All deprecated admin routes
+// (landing, footer, pages, dashboard, settings) redirect here.
+const ADMIN_DEFAULT = "/admin/inbox";
+const DeprecatedRedirect = () => <Navigate to={ADMIN_DEFAULT} replace />;
 
 export const AppRoutes = () => (
     <Routes>
@@ -54,22 +52,31 @@ export const AppRoutes = () => (
                 </AdminLayout>
             </ProtectedRoute>
         }>
-            <Route index element={<Navigate to="/admin/landing" replace />} />
-            <Route path="pages" element={<AdminPagesList />} />
-            <Route path="pages/:slug" element={<AdminPageEditor />} />
-            <Route path="landing" element={<HomeArchitectureEditor />} />
-            <Route path="footer" element={<FooterArchitectureEditor />} />
+            <Route index element={<Navigate to={ADMIN_DEFAULT} replace />} />
+
+            {/* Live admin tools */}
+            <Route path="inbox" element={<InboxManagement />} />
             <Route path="blog" element={<BlogManagement />} />
             <Route path="blog/new" element={<BlogEditor />} />
             <Route path="blog/edit/:id" element={<BlogEditor />} />
-            <Route path="testimonials" element={<TestimonialsManagement />} />
             <Route path="services" element={<ServicesManagement />} />
             <Route path="services/new" element={<ServiceEditor />} />
             <Route path="services/edit/:id" element={<ServiceEditor />} />
-            <Route path="inbox" element={<InboxManagement />} />
-            {/* Dashboard and Settings routes are kept for legacy but mapped to disabled components */}
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="settings" element={<AdminSettings />} />
+            <Route path="testimonials" element={<TestimonialsManagement />} />
+
+            {/* Deprecated — content editing now lives on the live site via
+                inline editing (visit /?edit=1 as an admin). These routes
+                redirect to the default admin landing so old bookmarks no
+                longer render the legacy editors. */}
+            <Route path="landing" element={<DeprecatedRedirect />} />
+            <Route path="footer" element={<DeprecatedRedirect />} />
+            <Route path="pages" element={<DeprecatedRedirect />} />
+            <Route path="pages/:slug" element={<DeprecatedRedirect />} />
+            <Route path="dashboard" element={<DeprecatedRedirect />} />
+            <Route path="settings" element={<DeprecatedRedirect />} />
+
+            {/* Catch any other /admin/* nonsense too. */}
+            <Route path="*" element={<DeprecatedRedirect />} />
         </Route>
     </Routes>
 );

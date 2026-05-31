@@ -10,11 +10,10 @@ import { SocialImpactSection } from '../components/landing/SocialImpactSection';
 import { LeadershipSection } from '../components/landing/LeadershipSection';
 import { FutureVisionSection } from '../components/landing/FutureVisionSection';
 import { landingContent } from '../data/landingContent';
-import { useGetPageQuery, useGetServicesQuery } from '../features/api/apiSlice';
+import { useGetPageQuery } from '../features/api/apiSlice';
 
 const Landing = () => {
   const { data: pageData } = useGetPageQuery('home');
-  const { data: servicesData } = useGetServicesQuery();
 
   const getSectionContent = (type: string, fallbackKey: keyof typeof landingContent): any => {
     const section = pageData?.sections?.find(s => s.type === type);
@@ -51,22 +50,10 @@ const Landing = () => {
     return { ...landingContent[fallbackKey], ...content };
   };
 
-  // Extract base Services architecture (Header/Footer)
-  const baseServicesContent = getSectionContent('services', 'services');
-
-  // Dynamically map real services from the DB into the UI format
-  const dynamicServicesItems = servicesData?.length 
-    ? servicesData.map(service => ({
-        title: service.name,
-        text: service.description || ""
-      }))
-    : baseServicesContent.items; // Fallback to static items if DB is empty
-
-  // Merge the architecture header with the dynamic items
-  const mergedServicesContent = {
-    ...baseServicesContent,
-    items: dynamicServicesItems
-  };
+  // Services cards now come from the page section's `items` directly, edited
+  // inline alongside the other landing content. /api/services remains the
+  // contact form's service-category dropdown — a separate concern.
+  const servicesContent = getSectionContent('services', 'services');
 
   return (
     <div className="flex flex-col">
@@ -76,7 +63,7 @@ const Landing = () => {
       <MissionVisionSection content={getSectionContent('mission-vision', 'missionVision')} />
       <ValuesSection content={getSectionContent('values', 'values')} />
       <ImpactModelSection content={getSectionContent('impact-model', 'impactModel')} />
-      <ServicesSection content={mergedServicesContent} />
+      <ServicesSection content={servicesContent} />
       <GeographySection content={getSectionContent('geography', 'geography')} />
       <SocialImpactSection content={getSectionContent('social-impact', 'socialImpact')} />
       <LeadershipSection content={getSectionContent('leadership', 'leadership')} />

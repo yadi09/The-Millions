@@ -1,4 +1,3 @@
-import * as React from "react";
 import { X } from "lucide-react";
 
 export interface ConfirmModalProps {
@@ -25,7 +24,7 @@ export function ConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-millions-dark/80 backdrop-blur-sm animate-fade-in">
       <div className="bg-millions-dark border border-white/10 w-full max-w-md p-6 shadow-2xl relative">
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors"
         >

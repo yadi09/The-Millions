@@ -1,4 +1,5 @@
 import React from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 
 interface ValuesProps {
   content: {
@@ -26,7 +27,7 @@ export const ValuesSection: React.FC<ValuesProps> = ({ content }) => {
   const isSlider = values.length > 7;
 
   return (
-    <section id="values" className="bg-millions-dark py-[7rem] px-[5%] overflow-hidden border-t border-white/5">
+    <section id="values" data-editable-section="values" className="bg-millions-dark py-[7rem] px-[5%] overflow-hidden border-t border-white/5">
       <div className="max-w-[1200px] w-[90%] mx-auto">
         <div className="animate-fade-in-up mb-12">
           <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
@@ -126,8 +127,9 @@ const ValueCard = ({ name, text, className = "" }: { name: string, text: string,
     <h4 className="font-cormorant text-white text-[1.4rem] font-semibold mb-3 group-hover:text-millions-accent transition-colors">
       {name}
     </h4>
-    <p className="text-white/40 text-[0.83rem] leading-[1.8] font-light">
-      {text}
-    </p>
+    <div
+      className="text-white/40 text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white/70 [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(text) }}
+    />
   </div>
 );

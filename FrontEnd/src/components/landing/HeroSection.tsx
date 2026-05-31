@@ -1,4 +1,5 @@
 import React from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 
 interface HeroProps {
   content: {
@@ -22,7 +23,7 @@ export const HeroSection: React.FC<HeroProps> = ({ content }) => {
   const titleParts = titleEm ? title.split(titleEm) : [title, ""];
 
   return (
-    <section id="hero" className="bg-millions-dark relative overflow-hidden pt-[7rem] px-[5%] pb-[10rem]">
+    <section id="hero" data-editable-section="hero" className="bg-millions-dark relative overflow-hidden pt-[7rem] px-[5%] pb-[10rem]">
       {/* Dynamic Backgrounds */}
       <div className="absolute inset-0 hero-bg"></div>
       <div className="absolute top-0 right-[15%] w-[1px] h-full hero-gradient-line"></div>
@@ -42,9 +43,10 @@ export const HeroSection: React.FC<HeroProps> = ({ content }) => {
             <em className="italic text-millions-accent not-italic font-light">{titleEm}</em>
           </h1>
 
-          <p className="text-white/50 font-light text-[0.88rem] leading-[1.8] max-w-md mb-10">
-            {subText}
-          </p>
+          <div
+            className="text-white/50 font-light text-[0.88rem] leading-[1.8] max-w-md mb-10 [&_p]:my-0 [&_p+p]:mt-3 [&_strong]:text-white/70 [&_u]:underline [&_a]:underline [&_a]:text-millions-accent"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(subText) }}
+          />
 
           <div className="flex flex-wrap gap-6 items-center">
             <a 

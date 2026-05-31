@@ -21,8 +21,16 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 ENV_FILE="$DIR/.env"
 EXAMPLE_FILE="$DIR/.env.example"
 
-gen_alnum() { tr -dc 'A-Za-z0-9' </dev/urandom | head -c "$1"; }
-gen_password() { tr -dc 'A-Za-z0-9!@#%^&*-_=+' </dev/urandom | head -c "$1"; }
+# Subshells turn off pipefail just for these reads. /dev/urandom is infinite,
+# so `head -c N` closes the pipe after N bytes and `tr` exits with SIGPIPE
+# (141). Under `set -o pipefail` that would kill the script — wrap in a
+# subshell where pipefail is off.
+#
+# Alphanumeric-only on purpose. Symbols are awkward: a `;`, `*`, `$`, or `"`
+# in a value silently breaks bash sourcing (`set -a; source .env`) and docker
+# compose's .env parser. Length compensates for the smaller class: 20 alnum
+# chars = log2(62^20) ≈ 119 bits — far more than enough.
+gen_alnum() { ( set +o pipefail; tr -dc 'A-Za-z0-9' </dev/urandom | head -c "$1" ); }
 gen_hex()   { openssl rand -hex "$1"; }
 
 if [[ -f "$ENV_FILE" ]]; then
@@ -38,7 +46,7 @@ fi
 
 POSTGRES_PASSWORD="$(gen_alnum 24)"
 JWT_SECRET="$(gen_hex 32)"
-ADMIN_PASSWORD="$(gen_password 16)"
+ADMIN_PASSWORD="$(gen_alnum 20)"
 
 cp "$EXAMPLE_FILE" "$ENV_FILE"
 chmod 600 "$ENV_FILE"
