@@ -1,12 +1,33 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useLoginMutation } from '../../features/auth/authSlice';
 import { Card, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Loader2, ShieldCheck, Lock } from 'lucide-react';
 
+// Set of deprecated admin routes — if the user was bounced from one of
+// these, send them to the default admin landing instead of looping back.
+const DEPRECATED_ROUTES = new Set<string>([
+    '/admin',
+    '/admin/landing',
+    '/admin/footer',
+    '/admin/pages',
+    '/admin/dashboard',
+    '/admin/settings',
+]);
+const DEFAULT_ADMIN_LANDING = '/admin/inbox';
+
+function resolveRedirect(from: unknown): string {
+    if (typeof from !== 'string' || !from.startsWith('/admin')) return DEFAULT_ADMIN_LANDING;
+    if (DEPRECATED_ROUTES.has(from)) return DEFAULT_ADMIN_LANDING;
+    // Also catch any /admin/pages/* sub-routes which are deprecated.
+    if (from.startsWith('/admin/pages')) return DEFAULT_ADMIN_LANDING;
+    return from;
+}
+
 const AdminLogin = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [login, { isLoading, error }] = useLoginMutation();
@@ -15,7 +36,8 @@ const AdminLogin = () => {
         e.preventDefault();
         try {
             await login({ email, password }).unwrap();
-            navigate('/admin/landing');
+            const from = (location.state as { from?: string } | null)?.from;
+            navigate(resolveRedirect(from), { replace: true });
         } catch (err) {
             console.error('Login failed:', err);
         }

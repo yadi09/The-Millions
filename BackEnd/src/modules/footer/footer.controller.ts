@@ -1,57 +1,65 @@
 import { Request, Response } from 'express';
 import { getGlobalFooter, updateGlobalFooter } from './footer.service.js';
 
-export async function getFooter(req: Request, res: Response) {
+// Defaults mirror FrontEnd/src/data/landingContent.ts so the empty-DB fallback
+// produces the same UI as the frontend's offline default.
+const DEFAULTS = {
+  contactLabel: "Get In Touch",
+  contactTitle: "Ready to Work Together?",
+  contactSubTitle:
+    "Reach out to discuss how The MILLIONS can support your organisation, your team, or your ambitions.",
+  buttonText: "Send Us a Message",
+  logoText: "the MILLIONS.",
+  location: "Southampton, United Kingdom",
+  copyright: "The MILLIONS. Setting You Up For Success. All rights reserved.",
+  websiteUrl: "www.themillions.co.uk",
+};
+
+export async function getFooter(_req: Request, res: Response) {
   try {
     const footer = await getGlobalFooter();
-    
-    // If no footer exists, return default data instead of 404
+
     if (!footer) {
-      const defaultFooter = {
+      return res.json({
         contact: {
-          label: "Ready to Start Your Journey?",
-          title: "Let's Build Something Great Together",
-          subTitle: "Our expert team is here to provide the professional advisory and learning services you need to succeed in global markets.",
+          label: DEFAULTS.contactLabel,
+          title: DEFAULTS.contactTitle,
+          subTitle: DEFAULTS.contactSubTitle,
           phones: [],
           email: "",
-          website: "www.themillions.com",
+          website: DEFAULTS.websiteUrl,
           address: [],
           whatsapp: "",
-          buttonText: "WhatsApp Us"
+          buttonText: DEFAULTS.buttonText,
         },
         footer: {
-          logo: "/logo.svg",
-          copyright: "© 2026 The Millions. All rights reserved.",
-          location: "London / Global"
+          logo: DEFAULTS.logoText,
+          copyright: DEFAULTS.copyright,
+          location: DEFAULTS.location,
         },
-        showContactBlock: true
-      };
-      
-      return res.json(defaultFooter);
+        showContactBlock: true,
+      });
     }
 
-    // Transform response to match frontend FooterData interface
-    const response = {
+    res.json({
       contact: {
-        label: "Ready to Start Your Journey?",
-        title: "Let's Build Something Great Together",
-        subTitle: "Our expert team is here to provide the professional advisory and learning services you need to succeed in global markets.",
-        phones: footer.phone.split(',').map(p => p.trim()),
+        label: footer.contactLabel ?? DEFAULTS.contactLabel,
+        title: footer.contactTitle ?? DEFAULTS.contactTitle,
+        subTitle: footer.contactSubTitle ?? DEFAULTS.contactSubTitle,
+        phones: footer.phone,
         email: footer.email,
-        website: "www.themillions.com",
-        address: footer.address.split(',').map(a => a.trim()),
+        website: footer.websiteUrl ?? DEFAULTS.websiteUrl,
+        address: footer.address,
         whatsapp: (footer.socialMedia as any)?.whatsapp || "",
-        buttonText: "WhatsApp Us"
+        buttonText: footer.buttonText ?? DEFAULTS.buttonText,
       },
       footer: {
-        logo: "/logo.svg",
+        logo: footer.logoText ?? DEFAULTS.logoText,
         copyright: footer.copyright,
-        location: "London / Global"
+        location: footer.location ?? DEFAULTS.location,
       },
-      showContactBlock: footer.showContactBlock
-    };
-    
-    res.json(response);
+      showContactBlock: footer.showContactBlock,
+    });
   } catch (error) {
     console.error('Error fetching global footer:', error);
     res.status(500).json({ error: 'Failed to fetch global footer' });

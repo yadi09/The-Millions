@@ -1,4 +1,5 @@
-export type TestimonialStatus = 'pending' | 'approved' | 'rejected';
+// Matches the backend's Prisma enum exactly (uppercase, by convention).
+export type TestimonialStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export interface Testimonial {
     id: string;

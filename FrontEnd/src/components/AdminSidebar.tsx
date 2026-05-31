@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, LogOut, BookOpen, Star, Briefcase, User, Monitor, Info, Mail } from 'lucide-react';
+import { LogOut, BookOpen, Star, Briefcase, User, Mail, Pencil } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import type { RootState } from '../app/store';
@@ -31,14 +31,15 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
         }
     };
 
+    // Operational tools only — content editing has moved to inline editing
+    // via the "Edit on Site" pill above. Legacy editors (/admin/landing,
+    // /admin/footer, /admin/pages) remain reachable by direct URL as a
+    // fallback but are no longer advertised in the nav.
     const navLinks = [
-        { to: "/admin/landing", icon: Monitor, label: "Landing Page" },
         { to: "/admin/inbox", icon: Mail, label: "Contact Inbox" },
         { to: "/admin/blog", icon: BookOpen, label: "Blog" },
         { to: "/admin/services", icon: Briefcase, label: "Services" },
         { to: "/admin/testimonials", icon: Star, label: "Testimonials" },
-        { to: "/admin/footer", icon: Info, label: "Global Footer" },
-        { to: "/admin/pages", icon: FileText, label: "Site Architecture" },
     ];
 
     return (
@@ -64,7 +65,22 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                 </div>
             </div>
 
-            <nav className="p-4 mt-6 space-y-2">
+            <div className="px-4 mt-6">
+                <a
+                    href="/?edit=1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handleNavigation}
+                    className="flex items-center gap-3 px-6 py-3 bg-millions-accent/10 border border-millions-accent/30 text-millions-accent hover:bg-millions-accent/20 transition-all group"
+                >
+                    <Pencil size={14} />
+                    <span className="font-jost text-[0.65rem] uppercase tracking-[0.2em] font-medium">
+                        Edit on Site
+                    </span>
+                </a>
+            </div>
+
+            <nav className="p-4 mt-4 space-y-2">
                 {navLinks.map((link) => {
                     const active = isActive(link.to);
                     const Icon = link.icon;

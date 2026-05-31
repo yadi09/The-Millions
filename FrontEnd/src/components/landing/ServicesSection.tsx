@@ -1,4 +1,5 @@
 import React from 'react';
+import { sanitizeHtml } from '../../utils/sanitize';
 
 interface ServiceItem {
   title: string;
@@ -23,7 +24,7 @@ export const ServicesSection: React.FC<ServicesProps> = ({ content }) => {
   const isSlider = (items?.length || 0) > 4;
 
   return (
-    <section id="services" className="bg-millions-mid py-[7rem] px-[5%] overflow-hidden">
+    <section id="services" data-editable-section="services" className="bg-millions-mid py-[7rem] px-[5%] overflow-hidden">
       <div className="max-w-[1200px] w-[90%] mx-auto">
         <div className="animate-fade-in-up mb-12">
           <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
@@ -45,9 +46,10 @@ export const ServicesSection: React.FC<ServicesProps> = ({ content }) => {
           <h3 className="font-cormorant text-millions-accent text-[1.2rem] md:text-[1.2rem] font-light mb-3">
             {footer.title}
           </h3>
-          <p className="text-white/50 text-[0.83rem] leading-[1.8] font-light">
-            {footer.text}
-          </p>
+          <div
+            className="text-white/50 text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(footer.text) }}
+          />
         </div>
       </div>
     </section>
@@ -108,8 +110,9 @@ const ServiceCard = ({ item }: { item: ServiceItem }) => (
     <h3 className="font-cormorant text-white text-[1.25rem] font-light mb-4">
       {item.title}
     </h3>
-    <p className="text-white/45 text-[0.83rem] leading-[1.8] font-light">
-      {item.text}
-    </p>
+    <div
+      className="text-white/45 text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+      dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.text) }}
+    />
   </div>
 );

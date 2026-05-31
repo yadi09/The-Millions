@@ -7,7 +7,7 @@ import {
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
-import { Check, Trash2, ArrowUp, Link2, Copy, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, Trash2, ArrowUp, Link2, Copy, Loader2, ChevronLeft, ChevronRight, XCircle, RotateCcw } from "lucide-react";
 import type { Testimonial } from "../../types/testimonial";
 import { toast } from 'sonner';
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
@@ -18,15 +18,19 @@ export default function TestimonialsManagement() {
     const { data: testimonials, isLoading } = useGetTestimonialsQuery({ role: 'admin' });
     const [updateStatus] = useUpdateTestimonialStatusMutation();
     const [deleteTestimonial] = useDeleteTestimonialMutation();
-    const [activeView, setActiveView] = useState<'pending' | 'approved'>('pending');
+    const [activeView, setActiveView] = useState<'PENDING' | 'APPROVED' | 'REJECTED'>('PENDING');
     const [currentPage, setCurrentPage] = useState(1);
     const [deleteId, setDeleteId] = useState<string | null>(null);
 
-    const pendingTestimonials = (testimonials || []).filter(t => t.status === 'pending');
-    const approvedTestimonials = (testimonials || []).filter(t => t.status === 'approved')
+    const pendingTestimonials = (testimonials || []).filter(t => t.status === 'PENDING');
+    const approvedTestimonials = (testimonials || []).filter(t => t.status === 'APPROVED')
         .sort((a, b) => b.order - a.order);
+    const rejectedTestimonials = (testimonials || []).filter(t => t.status === 'REJECTED');
 
-    const currentItems = activeView === 'pending' ? pendingTestimonials : approvedTestimonials;
+    const currentItems =
+        activeView === 'PENDING' ? pendingTestimonials
+        : activeView === 'APPROVED' ? approvedTestimonials
+        : rejectedTestimonials;
     const totalPages = Math.max(1, Math.ceil(currentItems.length / ITEMS_PER_PAGE));
 
     // Reset page to 1 whenever view changes
@@ -46,7 +50,7 @@ export default function TestimonialsManagement() {
     };
 
     const handleApprove = async (id: string) => {
-        const promise = updateStatus({ id, status: 'approved', order: 0 }).unwrap();
+        const promise = updateStatus({ id, status: 'APPROVED', order: 0 }).unwrap();
         toast.promise(promise, {
             loading: 'Approving testimonial...',
             success: 'Testimonial approved.',
@@ -70,14 +74,32 @@ export default function TestimonialsManagement() {
 
     const handleFeature = async (id: string, currentOrder: number) => {
         const newOrder = currentOrder === 0 ? 1 : currentOrder + 1;
-        await updateStatus({ id, status: 'approved', order: newOrder });
+        await updateStatus({ id, status: 'APPROVED', order: newOrder });
     };
 
     const handleUnfeature = async (id: string) => {
-        await updateStatus({ id, status: 'approved', order: 0 });
+        await updateStatus({ id, status: 'APPROVED', order: 0 });
     };
 
-    const TestimonialCard = ({ t, isPending }: { t: Testimonial, isPending: boolean }) => (
+    const handleReject = async (id: string) => {
+        const promise = updateStatus({ id, status: 'REJECTED', order: 0 }).unwrap();
+        toast.promise(promise, {
+            loading: 'Rejecting testimonial...',
+            success: 'Testimonial moved to Rejected.',
+            error: 'Failed to reject testimonial.'
+        });
+    };
+
+    const handleRestore = async (id: string) => {
+        const promise = updateStatus({ id, status: 'PENDING', order: 0 }).unwrap();
+        toast.promise(promise, {
+            loading: 'Restoring testimonial...',
+            success: 'Testimonial moved back to Pending.',
+            error: 'Failed to restore testimonial.'
+        });
+    };
+
+    const TestimonialCard = ({ t, view }: { t: Testimonial, view: 'PENDING' | 'APPROVED' | 'REJECTED' }) => (
         <Card className="bg-white/5 border-white/5 backdrop-blur-md rounded-none hover:border-millions-accent/30 transition-all duration-500 group animate-fade-in-up shadow-sm hover:shadow-xl">
             <CardContent className="p-6 md:p-8">
                 <div className="flex flex-col md:flex-row justify-between gap-8">
@@ -123,20 +145,36 @@ export default function TestimonialsManagement() {
                     </div>
 
                     <div className="flex flex-row md:flex-col gap-3 min-w-[150px] pt-4 md:pt-0 border-t border-white/5 md:border-t-0">
-                        {isPending ? (
-                            <Button onClick={() => handleApprove(t.id)} className="w-full bg-millions-accent text-millions-dark hover:bg-white rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-bold h-11 transition-all">
-                                <Check className="w-4 h-4 mr-2" /> Approve
+                        {view === 'PENDING' && (
+                            <>
+                                <Button onClick={() => handleApprove(t.id)} className="w-full bg-millions-accent text-millions-dark hover:bg-white rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-bold h-11 transition-all">
+                                    <Check className="w-4 h-4 mr-2" /> Approve
+                                </Button>
+                                <Button onClick={() => handleReject(t.id)} variant="outline" className="w-full border-red-400/20 text-red-400/70 hover:bg-red-400/5 hover:text-red-400 rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-medium h-11 transition-all">
+                                    <XCircle className="w-4 h-4 mr-2" /> Reject
+                                </Button>
+                            </>
+                        )}
+                        {view === 'APPROVED' && (
+                            <>
+                                {t.order === 0 ? (
+                                    <Button onClick={() => handleFeature(t.id, t.order)} variant="outline" className="w-full border-millions-accent/30 text-millions-accent hover:bg-millions-accent/10 rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-medium h-11 transition-all">
+                                        <ArrowUp className="w-4 h-4 mr-2" /> Feature
+                                    </Button>
+                                ) : (
+                                    <Button onClick={() => handleUnfeature(t.id)} className="w-full bg-millions-accent/10 text-millions-accent border border-millions-accent/20 rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-bold h-11 transition-all">
+                                        Featured ({t.order})
+                                    </Button>
+                                )}
+                                <Button onClick={() => handleReject(t.id)} variant="outline" className="w-full border-red-400/20 text-red-400/70 hover:bg-red-400/5 hover:text-red-400 rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-medium h-11 transition-all">
+                                    <XCircle className="w-4 h-4 mr-2" /> Reject
+                                </Button>
+                            </>
+                        )}
+                        {view === 'REJECTED' && (
+                            <Button onClick={() => handleRestore(t.id)} variant="outline" className="w-full border-millions-accent/30 text-millions-accent hover:bg-millions-accent/10 rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-medium h-11 transition-all">
+                                <RotateCcw className="w-4 h-4 mr-2" /> Restore to Pending
                             </Button>
-                        ) : (
-                            t.order === 0 ? (
-                                <Button onClick={() => handleFeature(t.id, t.order)} variant="outline" className="w-full border-millions-accent/30 text-millions-accent hover:bg-millions-accent/10 rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-medium h-11 transition-all">
-                                    <ArrowUp className="w-4 h-4 mr-2" /> Feature
-                                </Button>
-                            ) : (
-                                <Button onClick={() => handleUnfeature(t.id)} className="w-full bg-millions-accent/10 text-millions-accent border border-millions-accent/20 rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-bold h-11 transition-all">
-                                    Featured ({t.order})
-                                </Button>
-                            )
                         )}
                         <Button onClick={() => handleDelete(t.id)} variant="ghost" className="w-full text-white/20 hover:text-red-400 hover:bg-red-400/5 rounded-none uppercase text-[0.6rem] tracking-[0.2em] h-11 transition-all">
                             <Trash2 className="w-4 h-4 mr-2" /> Delete
@@ -198,9 +236,9 @@ export default function TestimonialsManagement() {
             {/* View Switcher Toggle */}
             <div className="flex items-center gap-8 border-b border-white/5 pb-2 animate-fade-in">
                 <button
-                    onClick={() => setActiveView('pending')}
+                    onClick={() => setActiveView('PENDING')}
                     className={`pb-4 px-2 text-[0.7rem] uppercase tracking-[0.3em] font-bold transition-all relative ${
-                        activeView === 'pending' ? 'text-millions-accent' : 'text-white/20 hover:text-white/40'
+                        activeView === 'PENDING' ? 'text-millions-accent' : 'text-white/20 hover:text-white/40'
                     }`}
                 >
                     Pending Sync
@@ -209,22 +247,38 @@ export default function TestimonialsManagement() {
                             {pendingTestimonials.length}
                         </span>
                     )}
-                    {activeView === 'pending' && (
+                    {activeView === 'PENDING' && (
                         <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-millions-accent animate-in fade-in slide-in-from-left-4 duration-500" />
                     )}
                 </button>
                 <button
-                    onClick={() => setActiveView('approved')}
+                    onClick={() => setActiveView('APPROVED')}
                     className={`pb-4 px-2 text-[0.7rem] uppercase tracking-[0.3em] font-bold transition-all relative ${
-                        activeView === 'approved' ? 'text-millions-accent' : 'text-white/20 hover:text-white/40'
+                        activeView === 'APPROVED' ? 'text-millions-accent' : 'text-white/20 hover:text-white/40'
                     }`}
                 >
                     Live Proof
                     <span className="ml-3 text-[0.6rem] bg-white/5 border border-white/10 px-2 py-0.5 text-white/40">
                         {approvedTestimonials.length}
                     </span>
-                    {activeView === 'approved' && (
+                    {activeView === 'APPROVED' && (
                         <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-millions-accent animate-in fade-in slide-in-from-right-4 duration-500" />
+                    )}
+                </button>
+                <button
+                    onClick={() => setActiveView('REJECTED')}
+                    className={`pb-4 px-2 text-[0.7rem] uppercase tracking-[0.3em] font-bold transition-all relative ${
+                        activeView === 'REJECTED' ? 'text-red-400' : 'text-white/20 hover:text-white/40'
+                    }`}
+                >
+                    Rejected
+                    {rejectedTestimonials.length > 0 && (
+                        <span className="ml-3 text-[0.6rem] bg-red-400/10 border border-red-400/20 px-2 py-0.5 text-red-400">
+                            {rejectedTestimonials.length}
+                        </span>
+                    )}
+                    {activeView === 'REJECTED' && (
+                        <div className="absolute bottom-[-1px] left-0 w-full h-[2px] bg-red-400 animate-in fade-in slide-in-from-right-4 duration-500" />
                     )}
                 </button>
             </div>
@@ -233,16 +287,20 @@ export default function TestimonialsManagement() {
                 {paginatedItems.length === 0 ? (
                     <div className="text-center p-24 border border-dashed border-white/5 bg-white/5 rounded-none">
                         <p className="font-cormorant text-white/20 italic text-xl font-light">
-                            {activeView === 'pending' ? 'The queue is currently silent.' : 'No active evidence.'}
+                            {activeView === 'PENDING'
+                                ? 'The queue is currently silent.'
+                                : activeView === 'APPROVED'
+                                ? 'No active evidence.'
+                                : 'No rejected submissions.'}
                         </p>
                     </div>
                 ) : (
                     <div className="space-y-8">
                         {paginatedItems.map(t => (
-                            <TestimonialCard 
-                                key={t.id} 
-                                t={t} 
-                                isPending={activeView === 'pending'} 
+                            <TestimonialCard
+                                key={t.id}
+                                t={t}
+                                view={activeView}
                             />
                         ))}
                     </div>

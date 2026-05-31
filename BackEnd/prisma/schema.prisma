@@ -30,12 +30,22 @@ model Section {
 
 model Footer {
   id                String   @id @default(cuid())
-  phone             String
+  phone             String[]
   email             String
-  address           String
+  address           String[]
+  websiteUrl        String?
   socialMedia       Json
   copyright         String
   showContactBlock  Boolean  @default(true)
+
+  // Admin-editable fields previously hardcoded in the controller
+  contactLabel      String?
+  contactTitle      String?
+  contactSubTitle   String?
+  buttonText        String?
+  logoText          String?
+  location          String?
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -126,17 +136,28 @@ model Service {
 }
 
 model Testimonial {
-  id           String   @id @default(uuid())
-  clientName   String
-  company      String
-  role         String
-  text         String   @db.Text
-  imageUrl     String?
-  rating       Int      @default(5)
-  serviceUsed  String?
-  location     String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id               String   @id @default(uuid())
+  name             String
+  email            String?
+  role             String
+  company          String
+  image            String?
+  rating           Int      @default(5)
+  category         String?
+  content          String   @db.Text
+  results          String?
+  videoTestimonial Boolean  @default(false)
+  location         String?
+  status           TestimonialStatus @default(PENDING)
+  order            Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+enum TestimonialStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model BlogPost {
