@@ -156,7 +156,7 @@ export const InboxManagement = () => {
                       {msg.status}
                     </span>
                     <span className="text-[0.65rem] text-millions-accent truncate max-w-[150px]">
-                      {msg.service.name}
+                      {msg.service?.name ?? (msg.source === 'AI_AGENT' ? '🤖 AI Agent' : '—')}
                     </span>
                   </div>
                   
@@ -228,7 +228,7 @@ export const InboxManagement = () => {
                 <div className="max-w-3xl">
                   <div className="mb-8 inline-flex items-center gap-3 px-4 py-3 bg-millions-accent/5 border border-millions-accent/20">
                     <Briefcase className="w-4 h-4 text-millions-accent" />
-                    <span className="font-jost text-[0.75rem] text-white/80">Inquiry regarding: <strong className="text-white font-medium ml-1">{selectedMessage.service.name}</strong></span>
+                    <span className="font-jost text-[0.75rem] text-white/80">Inquiry regarding: <strong className="text-white font-medium ml-1">{selectedMessage.service?.name ?? (selectedMessage.source === 'AI_AGENT' ? 'AI Agent submission' : 'No service specified')}</strong></span>
                   </div>
 
                   <div className="prose prose-invert max-w-none">

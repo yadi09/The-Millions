@@ -113,6 +113,8 @@ export async function getContactMessages(
         : undefined,
 
       status: msg.status,
+      source: msg.source,
+      metadata: msg.metadata ?? undefined,
       createdAt: msg.createdAt,
     }));
 
@@ -216,6 +218,8 @@ export async function updateContactMessageStatus(
         : undefined,
 
       status: msg.status,
+      source: msg.source,
+      metadata: msg.metadata ?? undefined,
       createdAt: msg.createdAt,
     });
   } catch (error) {
