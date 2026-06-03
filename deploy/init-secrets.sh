@@ -47,6 +47,7 @@ fi
 POSTGRES_PASSWORD="$(gen_alnum 24)"
 JWT_SECRET="$(gen_hex 32)"
 ADMIN_PASSWORD="$(gen_alnum 20)"
+AGENT_API_KEY="$(gen_hex 32)"
 
 cp "$EXAMPLE_FILE" "$ENV_FILE"
 chmod 600 "$ENV_FILE"
@@ -55,6 +56,7 @@ chmod 600 "$ENV_FILE"
 sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=${POSTGRES_PASSWORD}|" "$ENV_FILE"
 sed -i "s|^JWT_SECRET=.*|JWT_SECRET=${JWT_SECRET}|" "$ENV_FILE"
 sed -i "s|^ADMIN_PASSWORD=.*|ADMIN_PASSWORD=${ADMIN_PASSWORD}|" "$ENV_FILE"
+sed -i "s|^AGENT_API_KEY=.*|AGENT_API_KEY=${AGENT_API_KEY}|" "$ENV_FILE"
 
 cat <<EOF
 
@@ -64,6 +66,7 @@ Generated secrets:
   POSTGRES_PASSWORD  $POSTGRES_PASSWORD
   JWT_SECRET         (64 hex chars — see deploy/.env)
   ADMIN_PASSWORD     $ADMIN_PASSWORD
+  AGENT_API_KEY      (64 hex chars — see deploy/.env)
 
 ⚠️  STILL TO FILL IN MANUALLY (edit deploy/.env):
   SERVER_NAME        your domain, or '_' for the EC2 IP dry-run

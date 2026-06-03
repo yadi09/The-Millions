@@ -13,6 +13,13 @@ const envSchema = z.object({
     .string()
     .min(32, "JWT_SECRET must be at least 32 characters"),
 
+  // Long-lived service token for AI-agent / external integration platforms
+  // (e.g. WhatsApp bot) hitting POST /api/agent/leads. Authenticate via
+  // X-API-Key header. Rotate by editing deploy/.env and restarting backend.
+  AGENT_API_KEY: z
+    .string()
+    .min(32, "AGENT_API_KEY must be at least 32 characters"),
+
   CORS_ORIGINS: z
     .string()
     .min(1, "CORS_ORIGINS is required (comma-separated origin list)")
