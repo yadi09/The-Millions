@@ -146,6 +146,48 @@ export async function getContactMessages(
   }
 }
 
+/**
+ * DELETE /api/admin/contact-messages/:id
+ *
+ * Hard-deletes the row. Intentional: simpler than soft-delete and satisfies
+ * GDPR right-to-erasure for data subject requests. The frontend wraps the
+ * call in a confirmation modal so misclicks don't lose data.
+ */
+export async function deleteContactMessage(
+  req: Request,
+  res: Response,
+) {
+  try {
+    const rawId = req.params.id;
+    const id =
+      typeof rawId === 'string'
+        ? rawId
+        : Array.isArray(rawId)
+        ? rawId[0]
+        : undefined;
+
+    if (!id) {
+      return res.status(400).json({ message: 'Invalid id' });
+    }
+
+    const existing = await prisma.contactMessage.findUnique({ where: { id } });
+    if (!existing) {
+      return res.status(404).json({ message: 'Contact message not found' });
+    }
+
+    await prisma.contactMessage.delete({ where: { id } });
+
+    return res.status(200).json({
+      id,
+      deleted: true,
+      message: 'Contact message deleted',
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
 export async function updateContactMessageStatus(
   req: Request,
   res: Response,

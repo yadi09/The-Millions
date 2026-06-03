@@ -237,6 +237,14 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['ContactMessage'],
     }),
+
+    deleteContactMessage: builder.mutation<{ id: string; deleted: boolean }, string>({
+      query: (id) => ({
+        url: `/admin/contact-messages/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['ContactMessage'],
+    }),
     
     // --- FOOTER ENDPOINTS ---
     getFooter: builder.query<any, void>({
@@ -279,6 +287,7 @@ export const {
   useSubmitContactMutation,
   useGetContactMessagesQuery,
   useUpdateContactMessageStatusMutation,
+  useDeleteContactMessageMutation,
   useGetFooterQuery,
   useUpdateFooterMutation,
 } = apiSlice;

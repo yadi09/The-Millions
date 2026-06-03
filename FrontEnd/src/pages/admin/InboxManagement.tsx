@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react';
-import { Mail, Search, Filter, Reply, Phone, Briefcase, Calendar, MessageSquare, Loader2, RefreshCcw, CheckCircle2, Bot, FileText } from 'lucide-react';
+import { Mail, Search, Filter, Reply, Phone, Briefcase, Calendar, MessageSquare, Loader2, RefreshCcw, CheckCircle2, Bot, FileText, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useGetContactMessagesQuery, useUpdateContactMessageStatusMutation } from '../../features/api/apiSlice';
+import { useGetContactMessagesQuery, useUpdateContactMessageStatusMutation, useDeleteContactMessageMutation } from '../../features/api/apiSlice';
+import { ConfirmModal } from '../../components/ui/ConfirmModal';
 import type { ContactStatus, ContactSource } from '../../types/contact';
 
 export const InboxManagement = () => {
@@ -22,6 +23,8 @@ export const InboxManagement = () => {
   });
 
   const [updateStatus, { isLoading: isUpdating }] = useUpdateContactMessageStatusMutation();
+  const [deleteMessage, { isLoading: isDeleting }] = useDeleteContactMessageMutation();
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +39,16 @@ export const InboxManagement = () => {
       toast.success(`Message marked as ${newStatus}`);
     } catch (error) {
       toast.error('Failed to update message status');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteMessage(id).unwrap();
+      toast.success('Lead deleted');
+      setSelectedMessageId(null);
+    } catch (error) {
+      toast.error('Failed to delete lead');
     }
   };
 
@@ -300,6 +313,15 @@ export const InboxManagement = () => {
                       <Reply className="w-3 h-3" />
                       Mark as Replied
                     </button>
+                    <button
+                      onClick={() => setConfirmDeleteOpen(true)}
+                      disabled={isDeleting || isUpdating}
+                      title="Permanently delete this lead"
+                      className="flex items-center gap-2 px-4 py-2.5 border border-rose-400/30 text-rose-300 text-[0.65rem] uppercase tracking-widest font-bold hover:bg-rose-400/10 hover:border-rose-400/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Delete
+                    </button>
                   </div>
                 </div>
               </div>
@@ -374,6 +396,18 @@ export const InboxManagement = () => {
           )}
         </div>
       </div>
+
+      {selectedMessage && (
+        <ConfirmModal
+          isOpen={confirmDeleteOpen}
+          onClose={() => setConfirmDeleteOpen(false)}
+          onConfirm={() => handleDelete(selectedMessage.id)}
+          title="Delete this lead?"
+          message={`This will permanently remove ${selectedMessage.fullName}'s message from the database. This cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
+      )}
     </div>
   );
 };
