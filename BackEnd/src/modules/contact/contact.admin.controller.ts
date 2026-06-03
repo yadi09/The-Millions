@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ContactStatus, Prisma } from '@prisma/client';
+import { ContactStatus, ContactSource, Prisma } from '@prisma/client';
 import { prisma } from "../../lib/prisma.js";
 
 export async function getContactMessages(
@@ -22,6 +22,11 @@ export async function getContactMessages(
         ? (req.query.status as ContactStatus)
         : undefined;
 
+    const source =
+      typeof req.query.source === 'string'
+        ? (req.query.source as ContactSource)
+        : undefined;
+
     const search =
       typeof req.query.search === 'string'
         ? req.query.search
@@ -38,6 +43,10 @@ export async function getContactMessages(
 
     if (status) {
       whereClause.status = status;
+    }
+
+    if (source) {
+      whereClause.source = source;
     }
 
     if (search) {

@@ -1,13 +1,14 @@
-import { useState } from 'react';
-import { Mail, Search, Filter, Reply, Phone, Briefcase, Calendar, MessageSquare, Loader2, RefreshCcw } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { Mail, Search, Filter, Reply, Phone, Briefcase, Calendar, MessageSquare, Loader2, RefreshCcw, CheckCircle2, Bot, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { useGetContactMessagesQuery, useUpdateContactMessageStatusMutation } from '../../features/api/apiSlice';
-import type { ContactStatus } from '../../types/contact';
+import type { ContactStatus, ContactSource } from '../../types/contact';
 
 export const InboxManagement = () => {
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
   const [statusFilter, setStatusFilter] = useState<ContactStatus | ''>('');
+  const [sourceFilter, setSourceFilter] = useState<ContactSource | ''>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
@@ -16,6 +17,7 @@ export const InboxManagement = () => {
     page,
     limit,
     status: statusFilter !== '' ? statusFilter : undefined,
+    source: sourceFilter !== '' ? sourceFilter : undefined,
     search: searchQuery !== '' ? searchQuery : undefined,
   });
 
@@ -45,8 +47,42 @@ export const InboxManagement = () => {
       case 'NEW': return 'text-millions-accent border-millions-accent/20 bg-millions-accent/10';
       case 'READ': return 'text-white/60 border-white/10 bg-white/5';
       case 'REPLIED': return 'text-emerald-400 border-emerald-400/20 bg-emerald-400/10';
+      case 'PENDING_REVIEW': return 'text-amber-400 border-amber-400/30 bg-amber-400/10';
       default: return 'text-white/60 border-white/10 bg-white/5';
     }
+  };
+
+  // Order of metadata keys we want surfaced first in the detail panel.
+  // Anything else in metadata gets rendered after in insertion order.
+  const PRIORITY_METADATA_KEYS = [
+    'serviceCategory',
+    'urgency',
+    'businessName',
+    'businessType',
+    'whatsappNumber',
+    'preferredContactMethod',
+    'agentConfidence',
+    'conversationRef',
+  ] as const;
+
+  const formatMetadataKey = (key: string): string =>
+    key.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase()).trim();
+
+  const renderMetadataValue = (key: string, value: unknown): ReactNode => {
+    if (value === null || value === undefined || value === '') return null;
+    if (key === 'conversationRef' && typeof value === 'string') {
+      return (
+        <a href={value} target="_blank" rel="noreferrer" className="text-millions-accent hover:underline break-all">
+          Open transcript ↗
+        </a>
+      );
+    }
+    if (key === 'agentConfidence' && typeof value === 'number') {
+      const pct = Math.round(value * 100);
+      const color = pct >= 80 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-rose-400';
+      return <span className={`font-mono ${color}`}>{pct}%</span>;
+    }
+    return <span className="text-white/80 break-words">{String(value)}</span>;
   };
 
   return (
@@ -99,8 +135,30 @@ export const InboxManagement = () => {
             >
               <option value="" className="bg-millions-dark">All Statuses</option>
               <option value="NEW" className="bg-millions-dark">New</option>
+              <option value="PENDING_REVIEW" className="bg-millions-dark">Pending Review (AI)</option>
               <option value="READ" className="bg-millions-dark">Read</option>
               <option value="REPLIED" className="bg-millions-dark">Replied</option>
+            </select>
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+              <svg className="w-3 h-3 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+          </div>
+
+          <div className="relative shrink-0">
+            <Bot className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 pointer-events-none" />
+            <select
+              value={sourceFilter}
+              onChange={(e) => {
+                setSourceFilter(e.target.value as ContactSource | '');
+                setPage(1);
+                setSelectedMessageId(null);
+              }}
+              className="appearance-none bg-black/20 border border-white/10 text-white font-jost text-[0.8rem] h-11 pl-12 pr-10 focus:outline-none focus:border-millions-accent/50 hover:bg-white/5 transition-all cursor-pointer"
+            >
+              <option value="" className="bg-millions-dark">All Sources</option>
+              <option value="WEB_FORM" className="bg-millions-dark">Web Form</option>
+              <option value="AI_AGENT" className="bg-millions-dark">AI Agent</option>
+              <option value="MANUAL" className="bg-millions-dark">Manual</option>
             </select>
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
               <svg className="w-3 h-3 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -151,13 +209,25 @@ export const InboxManagement = () => {
                     </span>
                   </div>
                   
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
                     <span className={`text-[0.55rem] uppercase tracking-wider px-2 py-0.5 border ${getStatusColor(msg.status)}`}>
-                      {msg.status}
+                      {msg.status === 'PENDING_REVIEW' ? 'Pending' : msg.status}
                     </span>
-                    <span className="text-[0.65rem] text-millions-accent truncate max-w-[150px]">
-                      {msg.service?.name ?? (msg.source === 'AI_AGENT' ? '🤖 AI Agent' : '—')}
-                    </span>
+                    {msg.source === 'AI_AGENT' && (
+                      <span className="text-[0.55rem] uppercase tracking-wider px-2 py-0.5 border border-violet-400/30 bg-violet-400/10 text-violet-300 inline-flex items-center gap-1">
+                        <Bot className="w-2.5 h-2.5" /> AI
+                      </span>
+                    )}
+                    {msg.service?.name && (
+                      <span className="text-[0.65rem] text-millions-accent truncate max-w-[150px]">
+                        {msg.service.name}
+                      </span>
+                    )}
+                    {!msg.service?.name && msg.source === 'AI_AGENT' && (msg.metadata as any)?.serviceCategory && (
+                      <span className="text-[0.65rem] text-violet-300/80 truncate max-w-[150px]">
+                        {(msg.metadata as any).serviceCategory}
+                      </span>
+                    )}
                   </div>
                   
                   <p className="text-white/40 font-jost text-[0.75rem] line-clamp-2 leading-relaxed">
@@ -211,7 +281,18 @@ export const InboxManagement = () => {
                   </div>
                   
                   <div className="flex items-center gap-3 shrink-0">
-                    <button 
+                    {selectedMessage.status === 'PENDING_REVIEW' && (
+                      <button
+                        onClick={() => handleStatusUpdate(selectedMessage.id, 'NEW')}
+                        disabled={isUpdating}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-amber-400 text-millions-dark text-[0.65rem] uppercase tracking-widest font-bold hover:bg-amber-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Move this AI-collected lead into the normal inbox"
+                      >
+                        <CheckCircle2 className="w-3 h-3" />
+                        Approve Lead
+                      </button>
+                    )}
+                    <button
                       onClick={() => handleStatusUpdate(selectedMessage.id, 'REPLIED')}
                       disabled={selectedMessage.status === 'REPLIED' || isUpdating}
                       className="flex items-center gap-2 px-5 py-2.5 bg-millions-accent text-millions-dark text-[0.65rem] uppercase tracking-widest font-bold hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -236,6 +317,44 @@ export const InboxManagement = () => {
                       {selectedMessage.message}
                     </p>
                   </div>
+
+                  {/* Metadata block — only renders when the lead has extra
+                      structured info beyond the standard fields (typical of
+                      AI-agent-collected leads). */}
+                  {selectedMessage.metadata && typeof selectedMessage.metadata === 'object' && Object.keys(selectedMessage.metadata).length > 0 && (
+                    <div className="mt-10 pt-8 border-t border-white/5">
+                      <div className="flex items-center gap-3 mb-5">
+                        <FileText className="w-4 h-4 text-violet-300" />
+                        <h3 className="font-jost text-[0.7rem] uppercase tracking-[0.2em] text-violet-300/80">
+                          Conversation Details
+                        </h3>
+                      </div>
+                      <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 font-jost text-[0.8rem]">
+                        {[
+                          ...PRIORITY_METADATA_KEYS.filter(
+                            (k) => (selectedMessage.metadata as Record<string, unknown>)[k] !== undefined &&
+                                   (selectedMessage.metadata as Record<string, unknown>)[k] !== null &&
+                                   (selectedMessage.metadata as Record<string, unknown>)[k] !== ''
+                          ),
+                          ...Object.keys(selectedMessage.metadata).filter(
+                            (k) => !PRIORITY_METADATA_KEYS.includes(k as typeof PRIORITY_METADATA_KEYS[number])
+                          ),
+                        ].map((key) => {
+                          const value = (selectedMessage.metadata as Record<string, unknown>)[key];
+                          const rendered = renderMetadataValue(key, value);
+                          if (rendered === null) return null;
+                          return (
+                            <div key={key} className="flex flex-col">
+                              <dt className="text-[0.65rem] uppercase tracking-wider text-white/40 mb-1">
+                                {formatMetadataKey(key)}
+                              </dt>
+                              <dd>{rendered}</dd>
+                            </div>
+                          );
+                        })}
+                      </dl>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
