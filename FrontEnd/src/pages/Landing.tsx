@@ -36,10 +36,23 @@ const Landing = () => {
     }
 
     if (type === 'services') {
+      // Prefer the new `items` field (what the inline editor saves) over the
+      // legacy `cards` shape from the initial seed. When falling back to
+      // `cards`, map their `description` → `text` so the component still
+      // renders the body copy. Final fallback is the bundled static content.
+      const items: { title: string; text: string }[] = content.items?.length
+        ? content.items
+        : content.cards?.length
+          ? content.cards.map((c: any) => ({
+              title: c.title ?? '',
+              text: c.description ?? c.text ?? '',
+            }))
+          : landingContent.services.items;
+
       return {
         ...landingContent.services,
         title: content.title || landingContent.services.title,
-        items: content.cards || content.items || landingContent.services.items,
+        items,
         footer: {
           title: content.footerTitle || content.subtitle || landingContent.services.footer.title,
           text: content.footerText || (content.footerTitle && !content.subtitle ? "" : (content.subtitle ? "" : landingContent.services.footer.text)),
