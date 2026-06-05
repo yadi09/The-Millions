@@ -100,57 +100,60 @@ export default function TestimonialsManagement() {
     };
 
     const TestimonialCard = ({ t, view }: { t: Testimonial, view: 'PENDING' | 'APPROVED' | 'REJECTED' }) => (
-        <Card className="bg-white/5 border-white/5 backdrop-blur-md rounded-none hover:border-millions-accent/30 transition-all duration-500 group animate-fade-in-up shadow-sm hover:shadow-xl">
-            <CardContent className="p-6 md:p-8">
-                <div className="flex flex-col md:flex-row justify-between gap-8">
-                    <div className="flex-1">
-                        <div className="flex items-center gap-6 mb-6">
+        <Card className="bg-white/5 border-white/5 backdrop-blur-md rounded-none hover:border-millions-accent/30 active:bg-white/[0.08] transition-all duration-500 group animate-fade-in-up shadow-sm hover:shadow-xl">
+            <CardContent className="p-5 sm:p-6 md:p-8">
+                <div className="flex flex-col md:flex-row justify-between gap-6 md:gap-8">
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-4 sm:gap-5 md:gap-6 mb-5 sm:mb-6">
                             <div className="relative shrink-0">
                                 <img
                                     src={t.image || "/placeholder.svg"}
                                     alt={t.name}
-                                    className="w-14 h-14 rounded-none object-cover border border-white/5 aspect-square group-hover:border-millions-accent/30 transition-all grayscale group-hover:grayscale-0 duration-700"
+                                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-none object-cover border border-white/5 aspect-square group-hover:border-millions-accent/30 transition-all grayscale group-hover:grayscale-0 duration-700"
                                 />
                                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-millions-dark border border-millions-accent flex items-center justify-center">
                                     <Badge className="p-0 bg-transparent text-millions-accent text-[0.5rem] font-bold">{t.rating}</Badge>
                                 </div>
                             </div>
-                            <div>
-                                <h3 className="font-cormorant text-[1.4rem] text-white font-light group-hover:text-millions-accent transition-colors italic">{t.name}</h3>
-                                <div className="flex items-center gap-3 mt-1">
-                                    <span className="text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.15em]">{t.category}</span>
+                            <div className="min-w-0">
+                                <h3 className="font-cormorant text-[1.2rem] sm:text-[1.3rem] md:text-[1.4rem] text-white font-light group-hover:text-millions-accent transition-colors italic break-words">{t.name}</h3>
+                                <div className="flex items-center gap-2 sm:gap-3 mt-1 flex-wrap">
+                                    <span className="text-[0.55rem] sm:text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.15em]">{t.category}</span>
                                     <span className="w-1 h-1 rounded-full bg-white/5" />
-                                    <span className="text-[0.6rem] font-jost text-millions-accent/40 uppercase tracking-widest italic">{t.location}</span>
+                                    <span className="text-[0.55rem] sm:text-[0.6rem] font-jost text-millions-accent/40 uppercase tracking-widest italic">{t.location}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <p className="text-[0.7rem] text-white/30 font-jost mb-4 uppercase tracking-wider font-light">
+                        <p className="text-[0.65rem] sm:text-[0.7rem] text-white/30 font-jost mb-4 uppercase tracking-wider font-light break-words">
                             {t.role} @ <span className="text-white/50">{t.company}</span>
                         </p>
 
-                        <div className="relative mb-6">
-                            <div className="absolute -left-4 top-0 text-millions-accent/5 font-cormorant text-6xl leading-none">“</div>
-                            <div className="bg-white/5 p-6 border-l-2 border-millions-accent/20 italic text-white/60 font-cormorant text-[1.1rem] leading-relaxed font-light">
+                        <div className="relative mb-5 sm:mb-6">
+                            <div className="absolute -left-2 sm:-left-4 top-0 text-millions-accent/5 font-cormorant text-4xl sm:text-5xl md:text-6xl leading-none">“</div>
+                            <div className="bg-white/5 p-4 sm:p-5 md:p-6 border-l-2 border-millions-accent/20 italic text-white/60 font-cormorant text-[1rem] sm:text-[1.05rem] md:text-[1.1rem] leading-relaxed font-light">
                                 {t.content}
                             </div>
                         </div>
 
                         {t.results && (
-                            <div className="flex items-center gap-3 bg-millions-accent/5 px-4 py-2 border border-millions-accent/5 max-w-fit">
-                                <span className="text-[0.6rem] uppercase tracking-widest text-millions-accent/60 font-bold">Impact:</span>
-                                <span className="text-[0.7rem] text-white/60 font-jost italic font-light tracking-wide">{t.results}</span>
+                            <div className="flex items-center gap-3 bg-millions-accent/5 px-3 sm:px-4 py-2 border border-millions-accent/5 max-w-fit">
+                                <span className="text-[0.55rem] sm:text-[0.6rem] uppercase tracking-widest text-millions-accent/60 font-bold">Impact:</span>
+                                <span className="text-[0.65rem] sm:text-[0.7rem] text-white/60 font-jost italic font-light tracking-wide">{t.results}</span>
                             </div>
                         )}
                     </div>
 
-                    <div className="flex flex-row md:flex-col gap-3 min-w-[150px] pt-4 md:pt-0 border-t border-white/5 md:border-t-0">
+                    {/* Action sidebar: stacks vertically on mobile (full-width buttons),
+                        column on md+ (right-aligned narrow column). The flex-wrap on
+                        mobile keeps three buttons safe even at 320px viewport. */}
+                    <div className="flex flex-col md:flex-col gap-2 sm:gap-3 md:min-w-[150px] pt-5 md:pt-0 border-t border-white/5 md:border-t-0">
                         {view === 'PENDING' && (
                             <>
-                                <Button onClick={() => handleApprove(t.id)} className="w-full bg-millions-accent text-millions-dark hover:bg-white rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-bold h-11 transition-all">
+                                <Button onClick={() => handleApprove(t.id)} className="w-full bg-millions-accent text-millions-dark hover:bg-white rounded-none uppercase text-[0.6rem] sm:text-[0.65rem] tracking-[0.15em] sm:tracking-[0.2em] font-bold h-11 transition-all">
                                     <Check className="w-4 h-4 mr-2" /> Approve
                                 </Button>
-                                <Button onClick={() => handleReject(t.id)} variant="outline" className="w-full border-red-400/20 text-red-400/70 hover:bg-red-400/5 hover:text-red-400 rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-medium h-11 transition-all">
+                                <Button onClick={() => handleReject(t.id)} variant="outline" className="w-full border-red-400/20 text-red-400/70 hover:bg-red-400/5 hover:text-red-400 rounded-none uppercase text-[0.6rem] sm:text-[0.65rem] tracking-[0.15em] sm:tracking-[0.2em] font-medium h-11 transition-all">
                                     <XCircle className="w-4 h-4 mr-2" /> Reject
                                 </Button>
                             </>
@@ -158,25 +161,25 @@ export default function TestimonialsManagement() {
                         {view === 'APPROVED' && (
                             <>
                                 {t.order === 0 ? (
-                                    <Button onClick={() => handleFeature(t.id, t.order)} variant="outline" className="w-full border-millions-accent/30 text-millions-accent hover:bg-millions-accent/10 rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-medium h-11 transition-all">
+                                    <Button onClick={() => handleFeature(t.id, t.order)} variant="outline" className="w-full border-millions-accent/30 text-millions-accent hover:bg-millions-accent/10 rounded-none uppercase text-[0.6rem] sm:text-[0.65rem] tracking-[0.15em] sm:tracking-[0.2em] font-medium h-11 transition-all">
                                         <ArrowUp className="w-4 h-4 mr-2" /> Feature
                                     </Button>
                                 ) : (
-                                    <Button onClick={() => handleUnfeature(t.id)} className="w-full bg-millions-accent/10 text-millions-accent border border-millions-accent/20 rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-bold h-11 transition-all">
+                                    <Button onClick={() => handleUnfeature(t.id)} className="w-full bg-millions-accent/10 text-millions-accent border border-millions-accent/20 rounded-none uppercase text-[0.6rem] sm:text-[0.65rem] tracking-[0.15em] sm:tracking-[0.2em] font-bold h-11 transition-all">
                                         Featured ({t.order})
                                     </Button>
                                 )}
-                                <Button onClick={() => handleReject(t.id)} variant="outline" className="w-full border-red-400/20 text-red-400/70 hover:bg-red-400/5 hover:text-red-400 rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-medium h-11 transition-all">
+                                <Button onClick={() => handleReject(t.id)} variant="outline" className="w-full border-red-400/20 text-red-400/70 hover:bg-red-400/5 hover:text-red-400 rounded-none uppercase text-[0.6rem] sm:text-[0.65rem] tracking-[0.15em] sm:tracking-[0.2em] font-medium h-11 transition-all">
                                     <XCircle className="w-4 h-4 mr-2" /> Reject
                                 </Button>
                             </>
                         )}
                         {view === 'REJECTED' && (
-                            <Button onClick={() => handleRestore(t.id)} variant="outline" className="w-full border-millions-accent/30 text-millions-accent hover:bg-millions-accent/10 rounded-none uppercase text-[0.65rem] tracking-[0.2em] font-medium h-11 transition-all">
-                                <RotateCcw className="w-4 h-4 mr-2" /> Restore to Pending
+                            <Button onClick={() => handleRestore(t.id)} variant="outline" className="w-full border-millions-accent/30 text-millions-accent hover:bg-millions-accent/10 rounded-none uppercase text-[0.6rem] sm:text-[0.65rem] tracking-[0.15em] sm:tracking-[0.2em] font-medium h-11 transition-all">
+                                <RotateCcw className="w-4 h-4 mr-2" /> Restore<span className="hidden sm:inline"> to Pending</span>
                             </Button>
                         )}
-                        <Button onClick={() => handleDelete(t.id)} variant="ghost" className="w-full text-white/20 hover:text-red-400 hover:bg-red-400/5 rounded-none uppercase text-[0.6rem] tracking-[0.2em] h-11 transition-all">
+                        <Button onClick={() => handleDelete(t.id)} variant="ghost" className="w-full text-white/20 hover:text-red-400 hover:bg-red-400/5 rounded-none uppercase text-[0.55rem] sm:text-[0.6rem] tracking-[0.15em] sm:tracking-[0.2em] h-11 transition-all">
                             <Trash2 className="w-4 h-4 mr-2" /> Delete
                         </Button>
                     </div>

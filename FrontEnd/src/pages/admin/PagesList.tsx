@@ -36,27 +36,27 @@ const AdminPagesList = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto pb-20">
+    <div className="space-y-6 sm:space-y-8 md:space-y-10 max-w-6xl mx-auto pb-12 sm:pb-16 md:pb-20">
       <div className="animate-fade-in">
-        <h1 className="font-cormorant text-[clamp(2.2rem,5vw,3.5rem)] font-light text-white mb-4 leading-tight">
+        <h1 className="font-cormorant text-[clamp(1.85rem,6vw,3.5rem)] font-light text-white mb-3 sm:mb-4 leading-tight">
           Site <em className="italic text-millions-accent">Architecture</em>
         </h1>
-        <div className="flex items-center gap-4 text-millions-accent text-[0.7rem] tracking-[0.2em] uppercase mb-8">
-          <div className="w-8 h-[1px] bg-millions-accent/40" />
+        <div className="flex items-center gap-3 sm:gap-4 text-millions-accent text-[0.6rem] sm:text-[0.7rem] tracking-[0.2em] uppercase mb-6 sm:mb-8">
+          <div className="w-6 sm:w-8 h-[1px] bg-millions-accent/40" />
           Manage Architectural Refinements
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
         {managedPages.map((page, idx) => {
           const Icon = ICON_MAP[page.slug] || ICON_MAP.default;
           return (
             <Card
               key={page.slug}
-              className="bg-white/5 border-white/5 backdrop-blur-md rounded-none hover:border-millions-accent/30 transition-all duration-500 group animate-fade-in-up shadow-sm hover:shadow-xl"
+              className="bg-white/5 border-white/5 backdrop-blur-md rounded-none hover:border-millions-accent/30 active:bg-white/[0.08] transition-all duration-500 group animate-fade-in-up shadow-sm hover:shadow-xl"
               style={{ animationDelay: `${idx * 100}ms` }}
             >
-              <CardContent className="p-8">
+              <CardContent className="p-5 sm:p-6 md:p-8">
                 <div className="flex justify-between items-start mb-6">
                   <div className="w-11 h-11 bg-white/5 flex items-center justify-center border border-white/5 group-hover:border-millions-accent/30 transition-colors">
                     <Icon className="w-4 h-4 text-millions-accent" />
