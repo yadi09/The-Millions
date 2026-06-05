@@ -44,14 +44,15 @@ const MenuBar = ({ editor }: { editor: any }) => {
     ];
 
     return (
-        <div className="flex flex-wrap gap-1 p-3 border-b border-white/10 bg-black/20 backdrop-blur-md">
+        <div className="flex flex-wrap gap-1 p-2 sm:p-3 border-b border-white/10 bg-black/20 backdrop-blur-md sticky top-0 z-10">
             {buttons.map((btn, idx) => (
                 <button
                     key={idx}
                     onClick={(e) => { e.preventDefault(); btn.action(); }}
-                    className={`p-2 transition-all duration-200 border border-transparent hover:border-millions-accent/20 ${btn.isActive ? 'bg-millions-accent/10 text-millions-accent border-millions-accent/40' : 'text-white/40 hover:text-white'
+                    className={`p-1.5 sm:p-2 transition-all duration-200 border border-transparent hover:border-millions-accent/20 active:bg-white/5 ${btn.isActive ? 'bg-millions-accent/10 text-millions-accent border-millions-accent/40' : 'text-white/40 hover:text-white'
                         }`}
                     title={btn.title}
+                    aria-label={btn.title}
                 >
                     {btn.icon}
                 </button>
@@ -96,7 +97,9 @@ const BlogEditor = () => {
         content: '',
         editorProps: {
             attributes: {
-                class: 'prose prose-invert focus:outline-none min-h-[400px] p-8 max-w-none prose-headings:font-cormorant prose-headings:font-light prose-headings:tracking-widest prose-h1:text-4xl prose-h2:text-3xl prose-p:font-jost prose-p:text-white/60 prose-p:leading-loose prose-blockquote:border-millions-accent/40 prose-blockquote:bg-millions-accent/5 prose-blockquote:p-6 prose-blockquote:italic selection:bg-millions-accent/20',
+                // Responsive padding + heading sizes so the manuscript area
+                // stays readable on phones without sacrificing desktop polish.
+                class: 'prose prose-invert focus:outline-none min-h-[300px] sm:min-h-[400px] p-4 sm:p-6 md:p-8 max-w-none prose-headings:font-cormorant prose-headings:font-light prose-headings:tracking-widest prose-h1:text-2xl sm:prose-h1:text-3xl md:prose-h1:text-4xl prose-h2:text-xl sm:prose-h2:text-2xl md:prose-h2:text-3xl prose-p:font-jost prose-p:text-white/60 prose-p:leading-loose prose-blockquote:border-millions-accent/40 prose-blockquote:bg-millions-accent/5 prose-blockquote:p-4 sm:prose-blockquote:p-6 prose-blockquote:italic selection:bg-millions-accent/20',
             },
         },
     });
@@ -150,72 +153,74 @@ const BlogEditor = () => {
 
     if (isInitialLoading) return (
         <div className="flex flex-col h-[70vh] items-center justify-center animate-pulse">
-            <Loader2 className="w-10 h-10 text-millions-accent animate-spin mb-6" />
-            <p className="text-white/40 font-jost uppercase tracking-[0.25em] text-xs">Syncing Core Files...</p>
+            <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 text-millions-accent animate-spin mb-4 sm:mb-6" />
+            <p className="text-white/40 font-jost uppercase tracking-[0.25em] text-[0.65rem] sm:text-xs">Syncing Core Files...</p>
         </div>
     );
 
     return (
-        <div className="space-y-10 max-w-6xl mx-auto px-4 md:px-0 pb-32 animate-fade-in">
-            {/* Header Redesign */}
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 pb-8 border-b border-white/5">
-                <div className="flex items-center gap-6">
+        <div className="space-y-6 sm:space-y-8 md:space-y-10 max-w-6xl mx-auto px-2 sm:px-4 md:px-0 pb-16 sm:pb-24 md:pb-32 animate-fade-in">
+            {/* Header — compact on mobile, full on desktop */}
+            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 sm:gap-6 lg:gap-8 pb-5 sm:pb-6 md:pb-8 border-b border-white/5">
+                <div className="flex items-center gap-3 sm:gap-4 md:gap-6 min-w-0">
                     <Button
                         variant="ghost"
                         onClick={() => navigate("/admin/blog")}
-                        className="h-14 w-14 rounded-none border border-white/5 hover:border-millions-accent/40 text-white/40 hover:text-millions-accent transition-all"
+                        className="h-11 w-11 sm:h-12 sm:w-12 md:h-14 md:w-14 rounded-none border border-white/5 hover:border-millions-accent/40 text-white/40 hover:text-millions-accent transition-all shrink-0"
+                        aria-label="Back to blog list"
                     >
-                        <ArrowLeft className="w-5 h-5" />
+                        <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                     </Button>
-                    <div>
-                        <h1 className="font-cormorant text-[clamp(2.2rem,4vw,3rem)] font-light text-white leading-none">
+                    <div className="min-w-0">
+                        <h1 className="font-cormorant text-[clamp(1.5rem,5.5vw,3rem)] font-light text-white leading-tight">
                             {isEditing ? <>Editorial <em className="italic text-millions-accent not-italic">Refinement</em></> : <>New <em className="italic text-millions-accent not-italic">Architectural Note</em></>}
                         </h1>
-                        <div className="flex items-center gap-4 text-millions-accent text-[0.65rem] tracking-[0.2em] uppercase mt-4">
-                            <div className="w-6 h-[1px] bg-millions-accent/40" />
+                        <div className="hidden sm:flex items-center gap-3 text-millions-accent text-[0.6rem] sm:text-[0.65rem] tracking-[0.2em] uppercase mt-2 sm:mt-3">
+                            <div className="w-5 sm:w-6 h-[1px] bg-millions-accent/40" />
                             Synchronizing Brand Perspectives
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-4 w-full lg:w-auto">
+                <div className="flex items-center gap-2 sm:gap-3 w-full lg:w-auto">
                     <Button
                         variant="outline"
                         onClick={() => handleSave("draft")}
-                        className="flex-1 lg:flex-none h-14 bg-transparent border-white/5 text-white/30 hover:border-white/20 rounded-none uppercase text-[0.65rem] tracking-[0.2em] px-8 transition-all"
+                        className="flex-1 lg:flex-none h-11 sm:h-12 md:h-14 bg-transparent border-white/5 text-white/30 hover:border-white/20 rounded-none uppercase text-[0.6rem] sm:text-[0.65rem] tracking-[0.15em] sm:tracking-[0.2em] px-3 sm:px-6 md:px-8 transition-all"
                     >
                         Save Draft
                     </Button>
                     <Button
                         onClick={() => handleSave("published")}
-                        className="flex-1 lg:flex-none h-14 bg-millions-accent text-millions-dark hover:bg-white rounded-none uppercase text-[0.7rem] tracking-[0.2em] font-bold px-10 transition-all shadow-xl"
+                        className="flex-1 lg:flex-none h-11 sm:h-12 md:h-14 bg-millions-accent text-millions-dark hover:bg-white rounded-none uppercase text-[0.6rem] sm:text-[0.7rem] tracking-[0.15em] sm:tracking-[0.2em] font-bold px-3 sm:px-6 md:px-10 transition-all shadow-xl"
                     >
-                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-                        Deploy Note
+                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin sm:mr-2" /> : <Save className="w-4 h-4 sm:mr-2" />}
+                        <span className="hidden sm:inline">Deploy Note</span>
+                        <span className="sm:hidden">Deploy</span>
                     </Button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 lg:gap-12">
                 {/* Main Workspace */}
-                <div className="lg:col-span-8 space-y-10">
+                <div className="lg:col-span-8 space-y-6 md:space-y-8 lg:space-y-10">
                     <Card className="bg-white/5 border-white/5 backdrop-blur-xl rounded-none shadow-2xl p-0 overflow-hidden">
-                        <div className="p-8 border-b border-white/5 flex items-center gap-3 bg-white/5">
-                            <PenTool className="text-millions-accent w-4 h-4" />
-                            <h3 className="text-[0.7rem] font-jost text-white/60 font-bold uppercase tracking-[0.2em]">Manuscript</h3>
+                        <div className="p-4 sm:p-6 md:p-8 border-b border-white/5 flex items-center gap-3 bg-white/5">
+                            <PenTool className="text-millions-accent w-4 h-4 shrink-0" />
+                            <h3 className="text-[0.65rem] sm:text-[0.7rem] font-jost text-white/60 font-bold uppercase tracking-[0.2em]">Manuscript</h3>
                         </div>
-                        <CardContent className="p-8 md:p-12 space-y-10">
+                        <CardContent className="p-4 sm:p-6 md:p-8 lg:p-12 space-y-6 sm:space-y-8 md:space-y-10">
                             <div className="space-y-3">
                                 <Label className="text-[0.6rem] font-jost text-millions-accent/60 uppercase tracking-[0.15em] ml-1">Perspective Title</Label>
                                 <Input
                                     placeholder="Enter Architectural Title..."
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    className="bg-transparent border-none p-0 text-3xl md:text-5xl font-cormorant font-light text-white focus-visible:ring-0 placeholder:text-white/5 h-auto italic"
+                                    className="bg-transparent border-none p-0 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-cormorant font-light text-white focus-visible:ring-0 placeholder:text-white/5 h-auto italic leading-tight"
                                 />
                                 <div className="h-[1px] w-12 bg-millions-accent/30" />
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
                                 <Label className="text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.15em] ml-1">Structural Body</Label>
                                 <div className="border border-white/5 bg-black/10 rounded-none flex flex-col overflow-hidden group focus-within:border-millions-accent/30 transition-all">
                                     <MenuBar editor={editor} />
@@ -226,13 +231,13 @@ const BlogEditor = () => {
                     </Card>
 
                     <Card className="bg-white/5 border-white/5 backdrop-blur-xl rounded-none p-0 shadow-2xl overflow-hidden">
-                        <div className="p-8 border-b border-white/5 flex items-center gap-3 bg-white/5">
-                            <PenTool className="text-white/20 w-4 h-4" />
-                            <h3 className="text-[0.7rem] font-jost text-white/60 font-bold uppercase tracking-[0.2em]">Abstract</h3>
+                        <div className="p-4 sm:p-6 md:p-8 border-b border-white/5 flex items-center gap-3 bg-white/5">
+                            <PenTool className="text-white/20 w-4 h-4 shrink-0" />
+                            <h3 className="text-[0.65rem] sm:text-[0.7rem] font-jost text-white/60 font-bold uppercase tracking-[0.2em]">Abstract</h3>
                         </div>
-                        <CardContent className="p-8 md:p-12 pt-6">
+                        <CardContent className="p-4 sm:p-6 md:p-8 lg:p-12 pt-4 sm:pt-6">
                             <textarea
-                                className="w-full bg-transparent border-none p-0 text-white/60 font-jost italic font-light leading-relaxed text-[0.9rem] focus-within:ring-0 placeholder:text-white/5 resize-none min-h-[100px]"
+                                className="w-full bg-transparent border-none p-0 text-white/60 font-jost italic font-light leading-relaxed text-[0.85rem] sm:text-[0.9rem] focus-within:ring-0 placeholder:text-white/5 resize-none min-h-[100px]"
                                 placeholder="Refine the editorial summary for public indexing..."
                                 value={excerpt}
                                 onChange={(e) => setExcerpt(e.target.value)}
@@ -242,13 +247,13 @@ const BlogEditor = () => {
                 </div>
 
                 {/* Metadata Sidebar */}
-                <div className="lg:col-span-4 space-y-10">
+                <div className="lg:col-span-4 space-y-6 md:space-y-8 lg:space-y-10">
                     <Card className="bg-white/5 border-white/5 backdrop-blur-xl rounded-none p-0 shadow-2xl overflow-hidden">
-                        <div className="p-8 border-b border-white/5 flex items-center gap-3 bg-white/5">
-                            <Layout className="text-millions-accent w-4 h-4" />
-                            <h3 className="text-[0.7rem] font-jost text-white/60 font-bold uppercase tracking-[0.2em]">Identity Control</h3>
+                        <div className="p-4 sm:p-6 md:p-8 border-b border-white/5 flex items-center gap-3 bg-white/5">
+                            <Layout className="text-millions-accent w-4 h-4 shrink-0" />
+                            <h3 className="text-[0.65rem] sm:text-[0.7rem] font-jost text-white/60 font-bold uppercase tracking-[0.2em]">Identity Control</h3>
                         </div>
-                        <CardContent className="p-8 space-y-8">
+                        <CardContent className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
                             <div className="space-y-3">
                                 <Label className="text-[0.6rem] font-jost text-white/30 uppercase tracking-[0.15em] font-medium">Archival Path (Slug)</Label>
                                 <Input

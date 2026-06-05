@@ -44,7 +44,7 @@ const AdminLogin = () => {
     };
 
     return (
-        <div className="min-h-screen bg-millions-dark flex items-center justify-center p-6 relative overflow-hidden selection:bg-millions-accent selection:text-millions-dark">
+        <div className="min-h-screen bg-millions-dark flex items-center justify-center p-4 sm:p-6 relative overflow-hidden selection:bg-millions-accent selection:text-millions-dark">
             {/* Background Decorative Elements */}
             <div className="absolute inset-0 bg-[url('/grid-subtle.svg')] bg-repeat opacity-[0.03] pointer-events-none" />
             <div className="absolute -top-48 -left-48 w-96 h-96 bg-millions-accent/5 rounded-full blur-[120px] pointer-events-none animate-pulse" />
@@ -52,25 +52,25 @@ const AdminLogin = () => {
 
             <div className="w-full max-w-lg relative z-10 animate-fade-in">
                 {/* Branding Header */}
-                <div className="text-center mb-12">
-                    <div className="w-20 h-20 border border-millions-accent/20 rounded-none flex items-center justify-center mx-auto mb-8 relative group">
+                <div className="text-center mb-8 sm:mb-12">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 border border-millions-accent/20 rounded-none flex items-center justify-center mx-auto mb-6 sm:mb-8 relative group">
                         <div className="absolute inset-0 bg-millions-accent/5 group-hover:bg-millions-accent/10 transition-colors" />
-                        <span className="font-cormorant text-4xl font-bold text-millions-accent relative">M</span>
+                        <span className="font-cormorant text-3xl sm:text-4xl font-bold text-millions-accent relative">M</span>
                     </div>
-                    <h1 className="font-cormorant text-[clamp(2.5rem,6vw,4rem)] font-light text-white leading-none mb-6">
+                    <h1 className="font-cormorant text-[clamp(2rem,7vw,4rem)] font-light text-white leading-none mb-4 sm:mb-6">
                         Millions <em className="italic text-millions-accent not-italic">Sync</em>
                     </h1>
-                     <div className="flex items-center justify-center gap-4 text-millions-accent text-[0.65rem] tracking-[0.2em] uppercase opacity-50 font-light">
-                        <div className="w-8 h-[1px] bg-millions-accent/40" />
+                    <div className="flex items-center justify-center gap-3 sm:gap-4 text-millions-accent text-[0.6rem] sm:text-[0.65rem] tracking-[0.2em] uppercase opacity-50 font-light">
+                        <div className="w-6 sm:w-8 h-[1px] bg-millions-accent/40" />
                         Architectural Control Center
                     </div>
                 </div>
 
                 <Card className="bg-white/5 border-white/5 backdrop-blur-xl rounded-none shadow-2xl relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-millions-accent/20 to-transparent" />
-                    
-                    <CardContent className="p-10 md:p-14">
-                        <form onSubmit={handleSubmit} className="space-y-8">
+
+                    <CardContent className="p-6 sm:p-10 md:p-14">
+                        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
                             {/* Email Input */}
                             <div className="space-y-3">
                                 <label htmlFor="email" className="text-[0.6rem] font-jost text-white/30 uppercase tracking-[0.15em] flex items-center gap-2 font-light">
@@ -138,7 +138,7 @@ const AdminLogin = () => {
                         </form>
 
                         {/* Regulatory Footer */}
-                        <div className="mt-12 pt-8 border-t border-white/5 text-center">
+                        <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-white/5 text-center">
                             <p className="text-[0.55rem] font-jost text-white/10 uppercase tracking-[0.2em] leading-loose font-light">
                                 Protected Architectural Area. 
                                 <br />
