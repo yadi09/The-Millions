@@ -1,18 +1,58 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Mail, Search, Filter, Reply, Phone, Briefcase, Calendar, MessageSquare, Loader2, RefreshCcw, CheckCircle2, Bot, FileText, Trash2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useGetContactMessagesQuery, useUpdateContactMessageStatusMutation, useDeleteContactMessageMutation } from '../../features/api/apiSlice';
 import { ConfirmModal } from '../../components/ui/ConfirmModal';
 import type { ContactStatus, ContactSource } from '../../types/contact';
 
+const VALID_STATUSES: ContactStatus[] = ['NEW', 'READ', 'REPLIED', 'PENDING_REVIEW'];
+const VALID_SOURCES: ContactSource[] = ['WEB_FORM', 'AI_AGENT', 'MANUAL'];
+
 export const InboxManagement = () => {
-  const [page, setPage] = useState(1);
+  // Filters live in the URL so a tab refresh / shared link preserves the
+  // brothers' working state. The trade-off: state derives from search
+  // params and is written back via setSearchParams.
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const statusFilter = (() => {
+    const v = searchParams.get('status');
+    return v && (VALID_STATUSES as string[]).includes(v) ? (v as ContactStatus) : '';
+  })();
+  const sourceFilter = (() => {
+    const v = searchParams.get('source');
+    return v && (VALID_SOURCES as string[]).includes(v) ? (v as ContactSource) : '';
+  })();
+  const searchQuery = searchParams.get('q') ?? '';
+  const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10) || 1);
   const [limit] = useState(20);
-  const [statusFilter, setStatusFilter] = useState<ContactStatus | ''>('');
-  const [sourceFilter, setSourceFilter] = useState<ContactSource | ''>('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchInput, setSearchInput] = useState('');
+  const [searchInput, setSearchInput] = useState(searchQuery);
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+
+  // Keep the search input synced if the URL changes externally (e.g. back/forward nav)
+  useEffect(() => { setSearchInput(searchQuery); }, [searchQuery]);
+
+  // Helper: write one or more params, drop empty values, and reset page=1
+  // automatically when a filter changes (unless caller is changing page).
+  const updateParams = (patch: Record<string, string | null>, resetPage = true) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      for (const [k, v] of Object.entries(patch)) {
+        if (v === null || v === '') next.delete(k);
+        else next.set(k, v);
+      }
+      if (resetPage && !('page' in patch)) next.delete('page');
+      return next;
+    }, { replace: true });
+    if (resetPage) setSelectedMessageId(null);
+  };
+
+  const setStatusFilter = (s: ContactStatus | '') => updateParams({ status: s || null });
+  const setSourceFilter = (s: ContactSource | '') => updateParams({ source: s || null });
+  const setPage = (p: number | ((prev: number) => number)) => {
+    const nextPage = typeof p === 'function' ? p(page) : p;
+    updateParams({ page: nextPage > 1 ? String(nextPage) : null }, false);
+  };
 
   const { data, isLoading, isFetching, refetch } = useGetContactMessagesQuery({
     page,
@@ -28,9 +68,7 @@ export const InboxManagement = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setSearchQuery(searchInput);
-    setPage(1);
-    setSelectedMessageId(null);
+    updateParams({ q: searchInput.trim() || null });
   };
 
   const handleStatusUpdate = async (id: string, newStatus: ContactStatus) => {
