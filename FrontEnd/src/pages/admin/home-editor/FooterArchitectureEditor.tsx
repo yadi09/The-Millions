@@ -94,49 +94,52 @@ const FooterArchitectureEditor = () => {
     const f = localPageData.footer || {};
 
     return (
-        <div className="flex flex-col bg-millions-dark h-full animate-fade-in -m-6 md:-m-10">
+        <div className="flex flex-col bg-millions-dark h-full animate-fade-in -m-4 sm:-m-6 md:-m-10">
             {/* Header */}
-            <div className="bg-white/5 backdrop-blur-xl border-b border-white/5 px-6 md:px-10 flex items-center justify-between shrink-0 h-24 sticky top-0 z-[40]">
-                <div className="flex items-center gap-6">
-                    <div className="w-12 h-12 border border-millions-accent/10 flex items-center justify-center">
+            <div className="bg-white/5 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 md:px-10 flex items-center justify-between gap-3 shrink-0 py-3 sm:py-4 md:py-0 md:h-24 sticky top-0 z-[40]">
+                <div className="flex items-center gap-3 sm:gap-4 md:gap-6 min-w-0 flex-1">
+                    <div className="w-12 h-12 border border-millions-accent/10 hidden md:flex items-center justify-center shrink-0">
                         <Info className="w-5 h-5 text-millions-accent" />
                     </div>
-                    <div>
-                        <h1 className="font-cormorant text-2xl md:text-3xl text-white font-light tracking-wider leading-none">
+                    <div className="min-w-0">
+                        <h1 className="font-cormorant text-lg sm:text-xl md:text-2xl lg:text-3xl text-white font-light tracking-wider leading-tight truncate">
                             Global <em className="italic text-millions-accent not-italic">Footer</em>
                         </h1>
-                        <p className="text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.2em] mt-2">Shared Institutional Identity & Reach</p>
+                        <p className="hidden sm:block text-[0.55rem] sm:text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.15em] sm:tracking-[0.2em] mt-1 sm:mt-2 truncate">Shared Institutional Identity & Reach</p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-3 md:gap-4 shrink-0">
 
-                    <Button variant="ghost" size="sm" onClick={handleDiscard} className="text-white/20 hover:text-white uppercase text-[0.65rem] tracking-[0.2em]">Discard</Button>
+                    <Button variant="ghost" size="sm" onClick={handleDiscard} className="text-white/20 hover:text-white uppercase text-[0.6rem] sm:text-[0.65rem] tracking-[0.15em] sm:tracking-[0.2em] h-10 px-3 sm:px-6">
+                        <span className="hidden sm:inline">Discard</span>
+                        <span className="sm:hidden">Cancel</span>
+                    </Button>
 
-                    <Button onClick={handleSave} disabled={isSaving} className="bg-millions-accent text-millions-dark hover:bg-white rounded-none h-11 px-10 text-[0.7rem] uppercase tracking-[0.2em] font-bold">
-                        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>Deploy Changes</span>}
+                    <Button onClick={handleSave} disabled={isSaving} className="bg-millions-accent text-millions-dark hover:bg-white rounded-none h-10 sm:h-11 px-4 sm:px-6 md:px-10 text-[0.6rem] sm:text-[0.65rem] md:text-[0.7rem] uppercase tracking-[0.15em] sm:tracking-[0.2em] font-bold">
+                        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : (<><span className="hidden sm:inline">Deploy Changes</span><span className="sm:hidden">Deploy</span></>)}
                     </Button>
                 </div>
             </div>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar bg-black/10">
-                <div className="max-w-4xl mx-auto p-8 md:p-16 space-y-20 pb-40">
+                <div className="max-w-4xl mx-auto p-4 sm:p-6 md:p-10 lg:p-16 space-y-10 sm:space-y-14 md:space-y-20 pb-20 sm:pb-32 md:pb-40">
 
                     {/* CONTACT INTERFACE */}
                     <div className="animate-fade-in">
                         <FormSectionHeader title="Contact Interface" icon={Mail} description="The primary engagement gateway." />
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 md:mb-12">
                             <FieldGroup label="Section Label"><DarkInput value={c.label || ''} onChange={e => updateContact('label', e.target.value)} /></FieldGroup>
                             <FieldGroup label="Main Title"><DarkInput value={c.title || ''} onChange={e => updateContact('title', e.target.value)} /></FieldGroup>
                         </div>
                         <FieldGroup label="Inquiry Sub-title"><DarkTextarea value={c.subTitle || ''} onChange={e => updateContact('subTitle', e.target.value)} /></FieldGroup>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mt-12 bg-white/[0.01] p-8 border border-white/5">
-                            <div className="space-y-6">
-                                <FieldGroup label="Official Email"><div className="flex gap-3"><Mail className="w-4 h-4 text-white/10 mt-3" /><DarkInput value={c.email || ''} onChange={e => updateContact('email', e.target.value)} /></div></FieldGroup>
-                                <FieldGroup label="Institutional Website"><div className="flex gap-3"><Globe className="w-4 h-4 text-white/10 mt-3" /><DarkInput value={c.website || ''} onChange={e => updateContact('website', e.target.value)} /></div></FieldGroup>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 lg:gap-x-12 gap-y-4 sm:gap-y-6 md:gap-y-8 mt-8 sm:mt-10 md:mt-12 bg-white/[0.01] p-4 sm:p-6 md:p-8 border border-white/5">
+                            <div className="space-y-4 sm:space-y-6">
+                                <FieldGroup label="Official Email"><div className="flex gap-3"><Mail className="w-4 h-4 text-white/10 mt-3 shrink-0" /><DarkInput value={c.email || ''} onChange={e => updateContact('email', e.target.value)} /></div></FieldGroup>
+                                <FieldGroup label="Institutional Website"><div className="flex gap-3"><Globe className="w-4 h-4 text-white/10 mt-3 shrink-0" /><DarkInput value={c.website || ''} onChange={e => updateContact('website', e.target.value)} /></div></FieldGroup>
                             </div>
-                            <div className="space-y-6">
+                            <div className="space-y-4 sm:space-y-6">
                                 <FieldGroup label="Engagement Button"><DarkInput value={c.buttonText || ''} onChange={e => updateContact('buttonText', e.target.value)} /></FieldGroup>
                                 <ListManager
                                     label="Direct Lines"
@@ -144,29 +147,29 @@ const FooterArchitectureEditor = () => {
                                     onAdd={() => updateContact('phones', [...(c.phones || []), ''])}
                                     onRemove={(i) => updateContact('phones', c.phones.filter((_: any, idx: number) => idx !== i))}
                                     renderItem={(item, i) => (
-                                        <div className="flex gap-3"><Phone className="w-3 h-3 text-white/10 mt-4" /><DarkInput value={item} onChange={e => { const p = [...c.phones]; p[i] = e.target.value; updateContact('phones', p); }} /></div>
+                                        <div className="flex gap-3"><Phone className="w-3 h-3 text-white/10 mt-4 shrink-0" /><DarkInput value={item} onChange={e => { const p = [...c.phones]; p[i] = e.target.value; updateContact('phones', p); }} /></div>
                                     )}
                                 />
                             </div>
                         </div>
 
-                        <div className="mt-8">
+                        <div className="mt-6 sm:mt-8">
                             <ListManager
                                 label="Physical Presence (Address Lines)"
                                 items={c.address || []}
                                 onAdd={() => updateContact('address', [...(c.address || []), ''])}
                                 onRemove={(i) => updateContact('address', c.address.filter((_: any, idx: number) => idx !== i))}
                                 renderItem={(item, i) => (
-                                    <div className="flex gap-3"><MapPin className="w-3 h-3 text-white/10 mt-4" /><DarkInput value={item} onChange={e => { const a = [...c.address]; a[i] = e.target.value; updateContact('address', a); }} /></div>
+                                    <div className="flex gap-3"><MapPin className="w-3 h-3 text-white/10 mt-4 shrink-0" /><DarkInput value={item} onChange={e => { const a = [...c.address]; a[i] = e.target.value; updateContact('address', a); }} /></div>
                                 )}
                             />
                         </div>
                     </div>
 
                     {/* BASE FOOTER */}
-                    <div className="animate-fade-in pt-20 border-t border-white/5">
+                    <div className="animate-fade-in pt-10 sm:pt-14 md:pt-20 border-t border-white/5">
                         <FormSectionHeader title="Base Architecture" icon={Monitor} description="Copyright and legal placement." />
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
                             <FieldGroup label="Logo Text"><DarkInput value={f.logo || ''} onChange={e => updateFooterState('logo', e.target.value)} /></FieldGroup>
                             <FieldGroup label="Copyright Notice (Year is Auto-Dynamic)"><DarkInput value={f.copyright || ''} onChange={e => updateFooterState('copyright', e.target.value)} /></FieldGroup>
                             <FieldGroup label="Operating Location"><DarkInput value={f.location || ''} onChange={e => updateFooterState('location', e.target.value)} /></FieldGroup>

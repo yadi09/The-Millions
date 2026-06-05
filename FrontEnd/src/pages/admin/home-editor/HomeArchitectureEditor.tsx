@@ -192,44 +192,73 @@ const HomeArchitectureEditor = () => {
     };
 
     return (
-        <div className="flex flex-col bg-millions-dark h-full animate-fade-in -m-6 md:-m-10">
+        <div className="flex flex-col bg-millions-dark h-full animate-fade-in -m-4 sm:-m-6 md:-m-10">
             {/* Header */}
-            <div className="bg-white/5 backdrop-blur-xl border-b border-white/5 px-6 md:px-10 flex items-center justify-between shrink-0 h-24 sticky top-0 z-[40]">
-                <div className="flex items-center gap-6">
-                    <div className="w-12 h-12 border border-millions-accent/10 items-center justify-center hidden sm:flex">
+            <div className="bg-white/5 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 md:px-10 flex items-center justify-between gap-3 shrink-0 py-3 sm:py-4 md:py-0 md:h-24 sticky top-0 z-[40]">
+                <div className="flex items-center gap-3 sm:gap-4 md:gap-6 min-w-0 flex-1">
+                    <div className="w-12 h-12 border border-millions-accent/10 items-center justify-center hidden md:flex shrink-0">
                         <Monitor className="w-5 h-5 text-millions-accent" />
                     </div>
-                    <div>
-                        <h1 className="font-cormorant text-2xl md:text-3xl text-white font-light tracking-wider leading-none">
+                    <div className="min-w-0">
+                        <h1 className="font-cormorant text-lg sm:text-xl md:text-2xl lg:text-3xl text-white font-light tracking-wider leading-tight truncate">
                             Home <em className="italic text-millions-accent not-italic">Architecture</em>
                         </h1>
-                        <p className="text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.2em] mt-2">Unified Central Refinement Console</p>
+                        <p className="hidden sm:block text-[0.55rem] sm:text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.15em] sm:tracking-[0.2em] mt-1 sm:mt-2 truncate">Unified Central Refinement Console</p>
                     </div>
                 </div>
-                
-                <div className="flex items-center gap-4">
-                    <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={handleDiscard} 
-                        className="bg-transparent text-white/20 hover:text-white rounded-none uppercase text-[0.65rem] tracking-[0.2em] h-10 px-6 transition-all"
+
+                <div className="flex items-center gap-2 sm:gap-3 md:gap-4 shrink-0">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleDiscard}
+                        title="Discard Changes"
+                        className="bg-transparent text-white/20 hover:text-white rounded-none uppercase text-[0.6rem] sm:text-[0.65rem] tracking-[0.15em] sm:tracking-[0.2em] h-10 px-3 sm:px-6 transition-all"
                     >
-                        Discard Changes
+                        <span className="hidden sm:inline">Discard Changes</span>
+                        <span className="sm:hidden">Discard</span>
                     </Button>
 
                     <Button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="bg-millions-accent text-millions-dark hover:bg-white rounded-none h-11 px-10 text-[0.7rem] uppercase tracking-[0.2em] font-bold shadow-xl transition-all"
+                        className="bg-millions-accent text-millions-dark hover:bg-white rounded-none h-10 sm:h-11 px-4 sm:px-6 md:px-10 text-[0.6rem] sm:text-[0.65rem] md:text-[0.7rem] uppercase tracking-[0.15em] sm:tracking-[0.2em] font-bold shadow-xl transition-all"
                     >
-                        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>Deploy Changes</span>}
+                        {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : (<><span className="hidden sm:inline">Deploy Changes</span><span className="sm:hidden">Deploy</span></>)}
                     </Button>
                 </div>
             </div>
 
-            <div className="flex flex-1 flex-col md:flex-row overflow-hidden h-[calc(100vh-10rem)]">
-                {/* Left Sidebar */}
-                <div className="w-full md:w-80 border-r border-white/5 bg-black/20 overflow-y-auto custom-scrollbar">
+            {/* Mobile horizontal section nav — pill scroller. Replaces the
+                full-height vertical sidebar that would otherwise push the
+                editor below the fold on phones. */}
+            <div className="md:hidden border-b border-white/5 bg-black/30 sticky top-[57px] z-30">
+                <div className="overflow-x-auto custom-scrollbar">
+                    <div className="flex gap-2 px-4 py-3 min-w-max">
+                        {HOME_ARCHITECTURE_STRUCTURE.map((section, idx) => {
+                            const isActive = activeSectionType === section.type;
+                            return (
+                                <button
+                                    key={section.type}
+                                    onClick={() => setActiveSectionType(section.type)}
+                                    className={`shrink-0 px-3 py-2 text-[0.6rem] font-jost uppercase tracking-[0.15em] transition-all border ${
+                                        isActive
+                                            ? 'bg-millions-accent text-millions-dark border-millions-accent font-bold'
+                                            : 'bg-white/5 text-white/40 border-white/5 active:bg-white/10'
+                                    }`}
+                                >
+                                    <span className="text-millions-accent/60 mr-1.5">{String(idx + 1).padStart(2, '0')}</span>
+                                    <span className={isActive ? '' : 'text-white/50'}>{section.label.replace(/^Section \d+: /, '')}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex flex-1 flex-col md:flex-row md:overflow-hidden md:h-[calc(100vh-10rem)]">
+                {/* Desktop sidebar — hidden on mobile (replaced by pill nav above) */}
+                <div className="hidden md:block md:w-80 border-r border-white/5 bg-black/20 overflow-y-auto custom-scrollbar">
                     <div className="p-6">
                         <p className="text-[0.55rem] font-jost text-white/20 uppercase tracking-[0.3em] font-medium mb-6 ml-2">Structural Flow</p>
                         <div className="space-y-1">
@@ -238,8 +267,8 @@ const HomeArchitectureEditor = () => {
                                     key={section.type}
                                     onClick={() => setActiveSectionType(section.type)}
                                     className={`w-full flex items-center justify-between p-4 text-left transition-all group ${
-                                        activeSectionType === section.type 
-                                        ? 'bg-millions-accent/10 border-l-2 border-millions-accent' 
+                                        activeSectionType === section.type
+                                        ? 'bg-millions-accent/10 border-l-2 border-millions-accent'
                                         : 'hover:bg-white/[0.03] border-l-2 border-transparent'
                                     }`}
                                 >
@@ -258,8 +287,8 @@ const HomeArchitectureEditor = () => {
                 </div>
 
                 {/* Main Content Area */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar bg-black/10">
-                    <div className="max-w-4xl mx-auto p-8 md:p-16 pb-32">
+                <div className="flex-1 md:overflow-y-auto custom-scrollbar bg-black/10">
+                    <div className="max-w-4xl mx-auto p-4 sm:p-6 md:p-10 lg:p-16 pb-16 sm:pb-24 md:pb-32">
                         {renderActiveForm()}
                     </div>
                 </div>
