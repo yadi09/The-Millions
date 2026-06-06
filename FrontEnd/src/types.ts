@@ -1,16 +1,15 @@
 export interface Section {
-    id: string;
-    type: string;
-    content: Record<string, any>;
-    pageId?: string;
+  id: string;
+  type: string;
+  order: number;  
+  content: Record<string, unknown>;
+  pageId?: string;
 }
 
 export interface Page {
     id: string;
     slug: string;
     title?: string;
-    name?: string;
-    description?: string;
     sections: Section[];
     createdAt?: string;
     updatedAt?: string;
