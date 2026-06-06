@@ -294,7 +294,7 @@ async function seedAdminUser() {
   if (!process.env.ADMIN_PASSWORD && process.env.NODE_ENV === "production") {
     console.error(
       "❌ ADMIN_PASSWORD env var is required when seeding in production. " +
-        "Refusing to seed the default 'adminpassword123' into a production database."
+      "Refusing to seed the default 'adminpassword123' into a production database."
     );
     process.exit(1);
   }
@@ -922,245 +922,245 @@ async function seedContactMessages() {
     metadata?: Record<string, unknown>;
     createdAt: Date;
   }> = [
-    // ====================== WEB FORM (6) ======================
-    {
-      id: "demo-msg-001",
-      fullName: "Sarah Mitchell",
-      email: "sarah.mitchell@freelancedesign.co.uk",
-      phone: "+44 7700 900101",
-      message:
-        "Hi, I'm a freelance designer (sole trader) and my self-assessment is getting too complicated for me to keep doing on my own. Looking for someone to take over the annual return and ideally help me with quarterly bookkeeping. I use FreeAgent currently.",
-      serviceId: sid("Accountancy & Financial Advisory"),
-      status: "NEW",
-      source: "WEB_FORM",
-      createdAt: daysAgo(2),
-    },
-    {
-      id: "demo-msg-002",
-      fullName: "David Chen",
-      email: "david@artisan-coffee-co.com",
-      phone: "+44 7700 900102",
-      message:
-        "We're a limited company doing about £200K/year in ecommerce (specialty coffee). Looking to switch accountants — current one is unresponsive and we feel like we're paying for compliance not advice. Want a partner who will help us plan, not just file. Happy to jump on a call.",
-      serviceId: sid("Accountancy & Financial Advisory"),
-      status: "READ",
-      source: "WEB_FORM",
-      createdAt: daysAgo(4),
-    },
-    {
-      id: "demo-msg-003",
-      fullName: "Emma Thompson",
-      email: "emma@thompson-consulting.co.uk",
-      message:
-        "Hi — I run a small consultancy that just crossed the VAT threshold last quarter. I need to register and want to make sure I'm doing it correctly the first time. Do you offer a one-off engagement for this or is it ongoing only?",
-      serviceId: sid("Tax Advisory & Compliance"),
-      status: "REPLIED",
-      source: "WEB_FORM",
-      createdAt: daysAgo(7),
-    },
-    {
-      id: "demo-msg-004",
-      fullName: "Mohammed Ali",
-      email: "mohammed.ali@outlook.com",
-      phone: "+44 7700 900104",
-      message:
-        "I have 3 buy-to-let properties in Southampton and one in Portsmouth. Self-managing all of them. Need help with rental income reporting and want to discuss CGT planning ahead of a potential sale next year. Are you familiar with property tax specifically?",
-      serviceId: sid("Tax Advisory & Compliance"),
-      status: "NEW",
-      source: "WEB_FORM",
-      createdAt: daysAgo(1),
-    },
-    {
-      id: "demo-msg-005",
-      fullName: "Lucy Patterson",
-      email: "lucy@pattersonpilates.co.uk",
-      phone: "+44 7700 900105",
-      message:
-        "My pilates studio (limited co) has outgrown spreadsheets. Need ongoing bookkeeping support and ideally a migration to Xero. We do classes + memberships + retail, so transactions are getting messy. About 5 employees on payroll.",
-      serviceId: sid("Accountancy & Financial Advisory"),
-      status: "REPLIED",
-      source: "WEB_FORM",
-      createdAt: daysAgo(14),
-    },
-    {
-      id: "demo-msg-006",
-      fullName: "James Wilson",
-      email: "jwilson@wilsondev.io",
-      message:
-        "Just registered a limited company for my software consultancy last week (Wilson Dev Ltd). New to all this — what taxes do I need to pay, when, and what's the cleanest way to take money out? Mix of UK and Irish clients if that matters.",
-      serviceId: sid("Business & Governance Consulting"),
-      status: "READ",
-      source: "WEB_FORM",
-      createdAt: daysAgo(5),
-    },
+      // ====================== WEB FORM (6) ======================
+      {
+        id: "demo-msg-001",
+        fullName: "Sarah Mitchell",
+        email: "sarah.mitchell@freelancedesign.co.uk",
+        phone: "+44 7700 900101",
+        message:
+          "Hi, I'm a freelance designer (sole trader) and my self-assessment is getting too complicated for me to keep doing on my own. Looking for someone to take over the annual return and ideally help me with quarterly bookkeeping. I use FreeAgent currently.",
+        serviceId: sid("Accountancy & Financial Advisory"),
+        status: "NEW",
+        source: "WEB_FORM",
+        createdAt: daysAgo(2),
+      },
+      {
+        id: "demo-msg-002",
+        fullName: "David Chen",
+        email: "david@artisan-coffee-co.com",
+        phone: "+44 7700 900102",
+        message:
+          "We're a limited company doing about £200K/year in ecommerce (specialty coffee). Looking to switch accountants — current one is unresponsive and we feel like we're paying for compliance not advice. Want a partner who will help us plan, not just file. Happy to jump on a call.",
+        serviceId: sid("Accountancy & Financial Advisory"),
+        status: "READ",
+        source: "WEB_FORM",
+        createdAt: daysAgo(4),
+      },
+      {
+        id: "demo-msg-003",
+        fullName: "Emma Thompson",
+        email: "emma@thompson-consulting.co.uk",
+        message:
+          "Hi — I run a small consultancy that just crossed the VAT threshold last quarter. I need to register and want to make sure I'm doing it correctly the first time. Do you offer a one-off engagement for this or is it ongoing only?",
+        serviceId: sid("Tax Advisory & Compliance"),
+        status: "REPLIED",
+        source: "WEB_FORM",
+        createdAt: daysAgo(7),
+      },
+      {
+        id: "demo-msg-004",
+        fullName: "Mohammed Ali",
+        email: "mohammed.ali@outlook.com",
+        phone: "+44 7700 900104",
+        message:
+          "I have 3 buy-to-let properties in Southampton and one in Portsmouth. Self-managing all of them. Need help with rental income reporting and want to discuss CGT planning ahead of a potential sale next year. Are you familiar with property tax specifically?",
+        serviceId: sid("Tax Advisory & Compliance"),
+        status: "NEW",
+        source: "WEB_FORM",
+        createdAt: daysAgo(1),
+      },
+      {
+        id: "demo-msg-005",
+        fullName: "Lucy Patterson",
+        email: "lucy@pattersonpilates.co.uk",
+        phone: "+44 7700 900105",
+        message:
+          "My pilates studio (limited co) has outgrown spreadsheets. Need ongoing bookkeeping support and ideally a migration to Xero. We do classes + memberships + retail, so transactions are getting messy. About 5 employees on payroll.",
+        serviceId: sid("Accountancy & Financial Advisory"),
+        status: "REPLIED",
+        source: "WEB_FORM",
+        createdAt: daysAgo(14),
+      },
+      {
+        id: "demo-msg-006",
+        fullName: "James Wilson",
+        email: "jwilson@wilsondev.io",
+        message:
+          "Just registered a limited company for my software consultancy last week (Wilson Dev Ltd). New to all this — what taxes do I need to pay, when, and what's the cleanest way to take money out? Mix of UK and Irish clients if that matters.",
+        serviceId: sid("Business & Governance Consulting"),
+        status: "READ",
+        source: "WEB_FORM",
+        createdAt: daysAgo(5),
+      },
 
-    // ====================== AI AGENT (5) ======================
-    {
-      id: "demo-msg-007",
-      fullName: "Olivia Park",
-      email: "olivia@parksupplements.co.uk",
-      phone: "+44 7700 900107",
-      message:
-        "Limited co in supplements/ecommerce, 18 months trading, ~£350K turnover. Struggling with quarterly VAT returns under MTD and current accountant takes 5+ days to respond. Wants to move within the next month. Mentioned looking at fixed-fee firms specifically.",
-      serviceId: null,
-      status: "PENDING_REVIEW",
-      source: "AI_AGENT",
-      metadata: {
-        whatsappNumber: "+44 7700 900107",
-        serviceCategory: "VAT & Making Tax Digital",
-        businessName: "Park Supplements Ltd",
-        businessType: "limited company",
-        urgency: "this_month",
-        preferredContactMethod: "whatsapp",
-        conversationRef:
-          "https://openclaw.app/conversations/c-9f2e8a1b-park",
-        agentConfidence: 0.92,
+      // ====================== AI AGENT (5) ======================
+      {
+        id: "demo-msg-007",
+        fullName: "Olivia Park",
+        email: "olivia@parksupplements.co.uk",
+        phone: "+44 7700 900107",
+        message:
+          "Limited co in supplements/ecommerce, 18 months trading, ~£350K turnover. Struggling with quarterly VAT returns under MTD and current accountant takes 5+ days to respond. Wants to move within the next month. Mentioned looking at fixed-fee firms specifically.",
+        serviceId: null,
+        status: "PENDING_REVIEW",
+        source: "AI_AGENT",
+        metadata: {
+          whatsappNumber: "+44 7700 900107",
+          serviceCategory: "VAT & Making Tax Digital",
+          businessName: "Park Supplements Ltd",
+          businessType: "limited company",
+          urgency: "this_month",
+          preferredContactMethod: "whatsapp",
+          conversationRef:
+            "https://openclaw.app/conversations/c-9f2e8a1b-park",
+          agentConfidence: 0.92,
+        },
+        createdAt: hoursAgo(1),
       },
-      createdAt: hoursAgo(1),
-    },
-    {
-      id: "demo-msg-008",
-      fullName: "Ahmed Hassan",
-      email: "ahmed@noor-restaurant.co.uk",
-      phone: "+44 7700 900108",
-      message:
-        "Opening a new restaurant in Southampton in 6 weeks. Needs to set up payroll for 8 staff, register for VAT, and get bookkeeping in place. Says he wants someone he can call rather than email.",
-      serviceId: null,
-      status: "PENDING_REVIEW",
-      source: "AI_AGENT",
-      metadata: {
-        whatsappNumber: "+44 7700 900108",
-        serviceCategory: "Payroll & Bookkeeping",
-        businessName: "Noor Restaurant",
-        businessType: "limited company",
-        urgency: "this_month",
-        preferredContactMethod: "phone",
-        conversationRef:
-          "https://openclaw.app/conversations/c-3d1f2e9c-hassan",
-        agentConfidence: 0.88,
+      {
+        id: "demo-msg-008",
+        fullName: "Ahmed Hassan",
+        email: "ahmed@noor-restaurant.co.uk",
+        phone: "+44 7700 900108",
+        message:
+          "Opening a new restaurant in Southampton in 6 weeks. Needs to set up payroll for 8 staff, register for VAT, and get bookkeeping in place. Says he wants someone he can call rather than email.",
+        serviceId: null,
+        status: "PENDING_REVIEW",
+        source: "AI_AGENT",
+        metadata: {
+          whatsappNumber: "+44 7700 900108",
+          serviceCategory: "Payroll & Bookkeeping",
+          businessName: "Noor Restaurant",
+          businessType: "limited company",
+          urgency: "this_month",
+          preferredContactMethod: "phone",
+          conversationRef:
+            "https://openclaw.app/conversations/c-3d1f2e9c-hassan",
+          agentConfidence: 0.88,
+        },
+        createdAt: hoursAgo(3),
       },
-      createdAt: hoursAgo(3),
-    },
-    {
-      id: "demo-msg-009",
-      fullName: "Chloe Williams",
-      email: "chloe.writes@gmail.com",
-      message:
-        "Freelance copywriter, sole trader, ~£45K turnover last year. Asked about pricing for self-assessment + ongoing quarterly bookkeeping. Open to a fixed-fee package. No current accountant, has been doing it herself with help from her mum.",
-      serviceId: null,
-      status: "PENDING_REVIEW",
-      source: "AI_AGENT",
-      metadata: {
-        whatsappNumber: "+44 7700 900109",
-        serviceCategory: "Accountancy & Financial Advisory",
-        businessType: "sole trader",
-        urgency: "exploring",
-        preferredContactMethod: "email",
-        conversationRef:
-          "https://openclaw.app/conversations/c-7a4b5c8d-williams",
-        agentConfidence: 0.78,
+      {
+        id: "demo-msg-009",
+        fullName: "Chloe Williams",
+        email: "chloe.writes@gmail.com",
+        message:
+          "Freelance copywriter, sole trader, ~£45K turnover last year. Asked about pricing for self-assessment + ongoing quarterly bookkeeping. Open to a fixed-fee package. No current accountant, has been doing it herself with help from her mum.",
+        serviceId: null,
+        status: "PENDING_REVIEW",
+        source: "AI_AGENT",
+        metadata: {
+          whatsappNumber: "+44 7700 900109",
+          serviceCategory: "Accountancy & Financial Advisory",
+          businessType: "sole trader",
+          urgency: "exploring",
+          preferredContactMethod: "email",
+          conversationRef:
+            "https://openclaw.app/conversations/c-7a4b5c8d-williams",
+          agentConfidence: 0.78,
+        },
+        createdAt: daysAgo(1),
       },
-      createdAt: daysAgo(1),
-    },
-    {
-      id: "demo-msg-010",
-      fullName: "Raj Patel",
-      email: "raj@patel-construction.co.uk",
-      phone: "+44 7700 900110",
-      message:
-        "URGENT — received an HMRC enquiry letter regarding 2023/24 corporation tax return. Has 30 days to respond. Wants help drafting the response and reviewing what triggered it. Construction company, limited, ~£800K turnover. Very stressed on the call.",
-      serviceId: null,
-      status: "PENDING_REVIEW",
-      source: "AI_AGENT",
-      metadata: {
-        whatsappNumber: "+44 7700 900110",
-        serviceCategory: "Tax Advisory & Compliance",
-        businessName: "Patel Construction Ltd",
-        businessType: "limited company",
-        urgency: "immediate",
-        preferredContactMethod: "phone",
-        conversationRef:
-          "https://openclaw.app/conversations/c-1e8d6f2a-raj",
-        agentConfidence: 0.95,
-        flags: ["URGENT", "HMRC_ENQUIRY"],
+      {
+        id: "demo-msg-010",
+        fullName: "Raj Patel",
+        email: "raj@patel-construction.co.uk",
+        phone: "+44 7700 900110",
+        message:
+          "URGENT — received an HMRC enquiry letter regarding 2023/24 corporation tax return. Has 30 days to respond. Wants help drafting the response and reviewing what triggered it. Construction company, limited, ~£800K turnover. Very stressed on the call.",
+        serviceId: null,
+        status: "PENDING_REVIEW",
+        source: "AI_AGENT",
+        metadata: {
+          whatsappNumber: "+44 7700 900110",
+          serviceCategory: "Tax Advisory & Compliance",
+          businessName: "Patel Construction Ltd",
+          businessType: "limited company",
+          urgency: "immediate",
+          preferredContactMethod: "phone",
+          conversationRef:
+            "https://openclaw.app/conversations/c-1e8d6f2a-raj",
+          agentConfidence: 0.95,
+          flags: ["URGENT", "HMRC_ENQUIRY"],
+        },
+        createdAt: hoursAgo(0.5),
       },
-      createdAt: hoursAgo(0.5),
-    },
-    {
-      id: "demo-msg-011",
-      fullName: "Sophie Brown",
-      email: "sophie@bakehouse-southampton.co.uk",
-      phone: "+44 7700 900111",
-      message:
-        "Newly opened artisan bakery in Bedford Place. Sole trader currently. Asked about whether to incorporate, VAT registration timing, and getting cloud accounting set up. Conversion of an old workshop, so some startup capital allowance questions too.",
-      serviceId: null,
-      status: "NEW",
-      source: "AI_AGENT",
-      metadata: {
-        whatsappNumber: "+44 7700 900111",
-        serviceCategory: "Business & Governance Consulting",
-        businessName: "Bakehouse Southampton",
-        businessType: "sole trader",
-        urgency: "this_month",
-        preferredContactMethod: "whatsapp",
-        conversationRef:
-          "https://openclaw.app/conversations/c-5c2e8b9d-sophie",
-        agentConfidence: 0.86,
-        approvedBy: "Mark MILLION",
-        approvedAt: daysAgo(3).toISOString(),
+      {
+        id: "demo-msg-011",
+        fullName: "Sophie Brown",
+        email: "sophie@bakehouse-southampton.co.uk",
+        phone: "+44 7700 900111",
+        message:
+          "Newly opened artisan bakery in Bedford Place. Sole trader currently. Asked about whether to incorporate, VAT registration timing, and getting cloud accounting set up. Conversion of an old workshop, so some startup capital allowance questions too.",
+        serviceId: null,
+        status: "NEW",
+        source: "AI_AGENT",
+        metadata: {
+          whatsappNumber: "+44 7700 900111",
+          serviceCategory: "Business & Governance Consulting",
+          businessName: "Bakehouse Southampton",
+          businessType: "sole trader",
+          urgency: "this_month",
+          preferredContactMethod: "whatsapp",
+          conversationRef:
+            "https://openclaw.app/conversations/c-5c2e8b9d-sophie",
+          agentConfidence: 0.86,
+          approvedBy: "Mark MILLION",
+          approvedAt: daysAgo(3).toISOString(),
+        },
+        createdAt: daysAgo(4),
       },
-      createdAt: daysAgo(4),
-    },
 
-    // ====================== MANUAL (2) ======================
-    {
-      id: "demo-msg-012",
-      fullName: "Catherine Foster",
-      email: "catherine@foster-design-studio.com",
-      phone: "+44 7700 900112",
-      message:
-        "Met Catherine at the Hampshire Chamber networking event last week. She runs an interior design studio (limited co, ~£180K), looking for a more proactive accountant. I told her we'd reach out — please follow up by end of week.",
-      serviceId: sid("Accountancy & Financial Advisory"),
-      status: "REPLIED",
-      source: "MANUAL",
-      metadata: {
-        addedBy: "Sleshi MILLION",
-        referralSource: "Hampshire Chamber networking event",
+      // ====================== MANUAL (2) ======================
+      {
+        id: "demo-msg-012",
+        fullName: "Catherine Foster",
+        email: "catherine@foster-design-studio.com",
+        phone: "+44 7700 900112",
+        message:
+          "Met Catherine at the Hampshire Chamber networking event last week. She runs an interior design studio (limited co, ~£180K), looking for a more proactive accountant. I told her we'd reach out — please follow up by end of week.",
+        serviceId: sid("Accountancy & Financial Advisory"),
+        status: "REPLIED",
+        source: "MANUAL",
+        metadata: {
+          addedBy: "Sleshi MILLION",
+          referralSource: "Hampshire Chamber networking event",
+        },
+        createdAt: daysAgo(10),
       },
-      createdAt: daysAgo(10),
-    },
-    {
-      id: "demo-msg-013",
-      fullName: "George Roberts",
-      email: "g.roberts@robertsfamily.co.uk",
-      phone: "+44 7700 900113",
-      message:
-        "Referred by Smith & Co solicitors. George is executor of his late father's estate. Need help with the deceased's outstanding tax affairs (self-assessment + IHT planning for the estate). Sensitive — handle with care.",
-      serviceId: sid("Tax Advisory & Compliance"),
-      status: "NEW",
-      source: "MANUAL",
-      metadata: {
-        addedBy: "Mark MILLION",
-        referralSource: "Smith & Co solicitors",
-        sensitivity: "high",
+      {
+        id: "demo-msg-013",
+        fullName: "George Roberts",
+        email: "g.roberts@robertsfamily.co.uk",
+        phone: "+44 7700 900113",
+        message:
+          "Referred by Smith & Co solicitors. George is executor of his late father's estate. Need help with the deceased's outstanding tax affairs (self-assessment + IHT planning for the estate). Sensitive — handle with care.",
+        serviceId: sid("Tax Advisory & Compliance"),
+        status: "NEW",
+        source: "MANUAL",
+        metadata: {
+          addedBy: "Mark MILLION",
+          referralSource: "Smith & Co solicitors",
+          sensitivity: "high",
+        },
+        createdAt: daysAgo(2),
       },
-      createdAt: daysAgo(2),
-    },
 
-    // ====================== ORIGINAL SAMPLE (1) ======================
-    {
-      id: "sample-contact-message-1",
-      fullName: "John Doe",
-      email: "john.doe@example.com",
-      phone: "+1234567890",
-      message:
-        "This is the original sample contact message — kept here for backward compatibility with earlier seed runs and tests.",
-      serviceId: sid("Accountancy & Financial Advisory"),
-      status: "NEW",
-      source: "WEB_FORM",
-      createdAt: daysAgo(30),
-    },
-  ];
+      // ====================== ORIGINAL SAMPLE (1) ======================
+      {
+        id: "sample-contact-message-1",
+        fullName: "John Doe",
+        email: "john.doe@example.com",
+        phone: "+1234567890",
+        message:
+          "This is the original sample contact message — kept here for backward compatibility with earlier seed runs and tests.",
+        serviceId: sid("Accountancy & Financial Advisory"),
+        status: "NEW",
+        source: "WEB_FORM",
+        createdAt: daysAgo(30),
+      },
+    ];
 
   let created = 0;
   let skipped = 0;
@@ -1353,7 +1353,7 @@ async function seedGlobalFooter() {
   };
 
   const existing = await prisma.footer.findFirst();
-  
+
   if (existing) {
     await prisma.footer.update({
       where: { id: existing.id },
@@ -1373,21 +1373,21 @@ async function seedGlobalFooter() {
 ------------------------------*/
 async function main() {
   console.log("🌱 Starting database seeding...");
-  
+
   // Seed pages first (without nested footer)
   await seedHomePage();
   await seedAboutPage();
   await seedBlogPage();
   await seedTestimonialsPage();
   await seedTestimonialRecords();
-  
+
   // Seed global data
   await seedGlobalFooter(); // ✅ NEW: Seed footer separately
   await seedAdminUser();
   await seedServices();        // must run before seedContactMessages (FK)
   await seedContactMessages();
   await seedBlogPosts();
-  
+
   console.log("✅ Database seeding completed successfully!");
 }
 
@@ -1401,4 +1401,4 @@ main()
   });
 
 // ✅ ADD THIS EMPTY EXPORT STATEMENT TO MAKE FILE A MODULE
-export {};
+export { };
