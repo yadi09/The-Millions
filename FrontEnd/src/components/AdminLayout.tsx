@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { AdminSidebar } from './AdminSidebar';
 import { MobileHeader } from './MobileHeader';
 
@@ -8,6 +8,15 @@ type AdminLayoutProps = {
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    // Lock body scroll while the mobile drawer is open so the underlying
+    // content doesn't shift behind the overlay. Reverts on unmount or close.
+    useEffect(() => {
+        if (!isSidebarOpen) return;
+        const original = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = original; };
+    }, [isSidebarOpen]);
 
     return (
         <div className="min-h-screen bg-millions-dark flex flex-col selection:bg-millions-accent selection:text-millions-dark">

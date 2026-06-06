@@ -96,50 +96,53 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
         <div className={`flex flex-col bg-millions-dark ${isModal ? 'h-[80vh]' : 'h-full'} animate-fade-in`}>
             {/* Header Redesign */}
             <div className={`
-                bg-white/5 backdrop-blur-xl border-b border-white/5 px-6 md:px-10 flex items-center justify-between shrink-0 z-30 sticky
-                ${isModal ? 'top-0 py-6' : 'top-[57px] lg:top-0 h-24'}
+                bg-white/5 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 md:px-10 flex items-center justify-between gap-3 shrink-0 z-30 sticky
+                ${isModal ? 'top-0 py-4 sm:py-6' : 'top-[57px] lg:top-0 py-3 sm:py-4 md:py-0 md:h-24'}
             `}>
-                <div className="flex items-center gap-6">
-                    <div className="hidden sm:flex w-12 h-12 border border-millions-accent/10 items-center justify-center">
+                <div className="flex items-center gap-3 sm:gap-4 md:gap-6 min-w-0 flex-1">
+                    <div className="hidden md:flex w-12 h-12 border border-millions-accent/10 items-center justify-center shrink-0">
                         <Layout className="w-5 h-5 text-millions-accent/60" />
                     </div>
-                    <div>
-                        <h1 className="font-cormorant text-2xl md:text-3xl text-white font-light tracking-wider leading-none">
+                    <div className="min-w-0">
+                        <h1 className="font-cormorant text-lg sm:text-xl md:text-2xl lg:text-3xl text-white font-light tracking-wider leading-tight truncate">
                             {slug === 'home' ? <>Home <em className="italic text-millions-accent not-italic">Architecture</em></> : <>{localPageData.name || slug} <em className="italic text-millions-accent not-italic">Refinement</em></>}
                         </h1>
-                        <div className="flex items-center gap-3 mt-2 opacity-30 font-light">
-                             <span className="text-[0.55rem] font-jost text-white uppercase tracking-[0.2em]">Ref: {localPageData.id}</span>
+                        <div className="hidden sm:flex items-center gap-3 mt-2 opacity-30 font-light">
+                             <span className="text-[0.55rem] font-jost text-white uppercase tracking-[0.2em] truncate">Ref: {localPageData.id}</span>
                         </div>
                     </div>
                 </div>
-                
-                <div className="flex items-center gap-4">
+
+                <div className="flex items-center gap-2 sm:gap-3 md:gap-4 shrink-0">
                     {onClose && (
-                        <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={onClose} 
-                            className="bg-transparent text-white/20 hover:text-white rounded-none uppercase text-[0.65rem] tracking-[0.2em] h-10 px-6 transition-all"
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={onClose}
+                            title="Discard"
+                            className="bg-transparent text-white/20 hover:text-white rounded-none uppercase text-[0.6rem] sm:text-[0.65rem] tracking-[0.15em] sm:tracking-[0.2em] h-10 px-3 sm:px-6 transition-all"
                         >
-                            Discard
+                            <span className="hidden sm:inline">Discard</span>
+                            <span className="sm:hidden">Cancel</span>
                         </Button>
                     )}
 
                     <Button
                         onClick={handleSave}
                         disabled={isSaving || !localPageData?.id}
-                        className="bg-millions-accent text-millions-dark hover:bg-white rounded-none h-11 px-10 text-[0.7rem] uppercase tracking-[0.2em] font-bold shadow-xl transition-all"
+                        className="bg-millions-accent text-millions-dark hover:bg-white rounded-none h-10 sm:h-11 px-3 sm:px-6 md:px-10 text-[0.6rem] sm:text-[0.65rem] md:text-[0.7rem] uppercase tracking-[0.15em] sm:tracking-[0.2em] font-bold shadow-xl transition-all"
                         size="sm"
                     >
                         {isSaving ? (
                             <>
-                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                <span>Syncing...</span>
+                                <Loader2 className="w-4 h-4 animate-spin sm:mr-2" />
+                                <span className="hidden sm:inline">Syncing...</span>
                             </>
                         ) : (
                             <>
-                                <Save className="w-4 h-4 mr-2" />
-                                <span>Deploy Changes</span>
+                                <Save className="w-4 h-4 sm:mr-2" />
+                                <span className="hidden sm:inline">Deploy Changes</span>
+                                <span className="sm:hidden ml-1.5">Deploy</span>
                             </>
                         )}
                     </Button>
@@ -157,18 +160,18 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
                 </div>
 
                 {/* Main Workspace Area */}
-                <div className="flex-1 w-full p-6 md:p-12 md:overflow-y-auto custom-scrollbar bg-black/10">
-                    <div className="max-w-4xl mx-auto pb-20 md:pb-0">
+                <div className="flex-1 w-full p-4 sm:p-6 md:p-8 lg:p-12 md:overflow-y-auto custom-scrollbar bg-black/10">
+                    <div className="max-w-4xl mx-auto pb-12 md:pb-0">
                         {activeSection ? (
-                            <div className="bg-white/5 border border-white/5 backdrop-blur-md rounded-none p-8 md:p-12 shadow-2xl animate-fade-in-up">
-                                <div className="mb-10 pb-8 border-b border-white/5">
-                                     <div className="flex items-center gap-3 mb-3">
-                                        <div className="w-1.5 h-1.5 bg-millions-accent/60" />
-                                        <h2 className="font-cormorant text-2xl md:text-3xl text-white font-light tracking-wider leading-none italic">
+                            <div className="bg-white/5 border border-white/5 backdrop-blur-md rounded-none p-5 sm:p-6 md:p-8 lg:p-12 shadow-2xl animate-fade-in-up">
+                                <div className="mb-6 sm:mb-8 md:mb-10 pb-5 sm:pb-6 md:pb-8 border-b border-white/5">
+                                     <div className="flex items-center gap-3 mb-2 sm:mb-3">
+                                        <div className="w-1.5 h-1.5 bg-millions-accent/60 shrink-0" />
+                                        <h2 className="font-cormorant text-xl sm:text-2xl md:text-3xl text-white font-light tracking-wider leading-tight italic capitalize break-words">
                                             {activeSection.type.replace('-', ' ')} Refinement
                                         </h2>
                                     </div>
-                                    <p className="text-[0.65rem] font-jost text-white/20 uppercase tracking-[0.2em] font-light">Refine Structural Component Properties</p>
+                                    <p className="text-[0.6rem] sm:text-[0.65rem] font-jost text-white/20 uppercase tracking-[0.15em] sm:tracking-[0.2em] font-light">Refine Structural Component Properties</p>
                                 </div>
 
                                 <div className="animate-fade-in">
@@ -181,11 +184,11 @@ const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContent
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center h-[50vh]">
-                                <div className="w-12 h-12 border border-white/5 rounded-none flex items-center justify-center mb-6">
-                                    <Layout className="w-6 h-6 text-white/5" />
+                            <div className="flex flex-col items-center justify-center h-[40vh] sm:h-[50vh]">
+                                <div className="w-10 h-10 sm:w-12 sm:h-12 border border-white/5 rounded-none flex items-center justify-center mb-4 sm:mb-6">
+                                    <Layout className="w-5 h-5 sm:w-6 sm:h-6 text-white/5" />
                                 </div>
-                                <p className="font-cormorant text-2xl text-white/10 italic font-light">Awaiting structural selection.</p>
+                                <p className="font-cormorant text-xl sm:text-2xl text-white/10 italic font-light px-4 text-center">Awaiting structural selection.</p>
                             </div>
                         )}
                     </div>

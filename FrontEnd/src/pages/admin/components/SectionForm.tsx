@@ -15,9 +15,9 @@ const FormLabel = ({ children }: { children: React.ReactNode }) => (
 );
 
 const FormSectionHeader = ({ title, icon: Icon }: { title: string; icon: any }) => (
-  <div className="flex items-center gap-3 mb-8 pb-4 border-b border-white/5">
-    <Icon className="w-3.5 h-3.5 text-millions-accent" />
-    <h3 className="text-[0.7rem] font-jost text-white font-bold uppercase tracking-[0.3em]">{title}</h3>
+  <div className="flex items-center gap-3 mb-6 sm:mb-8 pb-3 sm:pb-4 border-b border-white/5">
+    <Icon className="w-3.5 h-3.5 text-millions-accent shrink-0" />
+    <h3 className="text-[0.65rem] sm:text-[0.7rem] font-jost text-white font-bold uppercase tracking-[0.25em] sm:tracking-[0.3em] break-words">{title}</h3>
   </div>
 );
 
@@ -62,7 +62,7 @@ function HeroForm({ content, onChange }: { content: Record<string, any>; onChang
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <FormSectionHeader title="Hero Section" icon={Image} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -129,7 +129,7 @@ function StatsForm({ content, onChange }: { content: Record<string, any>; onChan
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <FormSectionHeader title="Stats Section" icon={BarChart2} />
 
       <FieldGroup label="Section Title">
@@ -179,7 +179,7 @@ function CtaForm({ content, onChange }: { content: Record<string, any>; onChange
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <FormSectionHeader title="Call to Action Section" icon={PhoneCall} />
 
       <FieldGroup label="Headline">
@@ -241,7 +241,7 @@ function PopularPostsForm({ content, onChange }: { content: Record<string, any>;
   const update = (key: string, value: any) => onChange({ ...c, [key]: value });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <FormSectionHeader title="Popular Posts Section" icon={TrendingUp} />
 
       <FieldGroup label="Section Title">
@@ -283,7 +283,7 @@ function FeaturedPostsForm({ content, onChange, blogPosts, isLoading }: { conten
   const update = (key: string, value: any) => onChange({ ...c, [key]: value });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <FormSectionHeader title="Highlighted Editorial" icon={Eye} />
       <div className="space-y-2">
         <FormLabel>Display Filter (Title)</FormLabel>
@@ -333,9 +333,9 @@ const SectionForm = ({ type, content, onChange }: SectionFormProps) => {
       return <FeaturedPostsForm content={content} onChange={onChange} blogPosts={blogPosts} isLoading={isBlogLoading} />;
     default:
       return (
-        <div className="p-12 border border-white/5 border-dashed bg-white/[0.02] flex flex-col items-center justify-center text-center">
-          <h3 className="font-cormorant text-2xl text-white/20 italic mb-2">Structural Variant Observed: "{type}"</h3>
-          <p className="text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.3em]">No dedicated refinement mapping available.</p>
+        <div className="p-6 sm:p-8 md:p-12 border border-white/5 border-dashed bg-white/[0.02] flex flex-col items-center justify-center text-center">
+          <h3 className="font-cormorant text-lg sm:text-xl md:text-2xl text-white/20 italic mb-2 break-words">Structural Variant Observed: "{type}"</h3>
+          <p className="text-[0.55rem] sm:text-[0.6rem] font-jost text-white/20 uppercase tracking-[0.2em] sm:tracking-[0.3em]">No dedicated refinement mapping available.</p>
         </div>
       );
   }

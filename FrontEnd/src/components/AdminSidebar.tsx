@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LogOut, BookOpen, Star, Briefcase, User, Mail, Pencil } from 'lucide-react';
+import { LogOut, BookOpen, Star, Briefcase, User, Mail, Pencil, Settings as SettingsIcon } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import type { RootState } from '../app/store';
@@ -40,6 +40,7 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
         { to: "/admin/blog", icon: BookOpen, label: "Blog" },
         { to: "/admin/services", icon: Briefcase, label: "Services" },
         { to: "/admin/testimonials", icon: Star, label: "Testimonials" },
+        { to: "/admin/settings", icon: SettingsIcon, label: "Settings" },
     ];
 
     return (

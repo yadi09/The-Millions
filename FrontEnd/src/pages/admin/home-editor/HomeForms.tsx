@@ -428,7 +428,7 @@ export function MissionVisionForm({ content, onChange }: { content: any, onChang
         <div className="animate-fade-in">
             <FormSectionHeader title="Mission & Vision" icon={Target} description="Defining purpose and global ambition." />
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6 mb-8 sm:mb-10 md:mb-12">
                 <FieldGroup label="Section Label">
                     <DarkInput value={c.label || ''} onChange={e => update('label', e.target.value)} />
                 </FieldGroup>
@@ -437,8 +437,8 @@ export function MissionVisionForm({ content, onChange }: { content: any, onChang
                 </FieldGroup>
             </div>
 
-            <div className="space-y-12">
-                <div className="p-8 bg-white/[0.02] border border-white/5">
+            <div className="space-y-6 sm:space-y-8 md:space-y-12">
+                <div className="p-5 sm:p-6 md:p-8 bg-white/[0.02] border border-white/5">
                     <FormLabel>The Mission</FormLabel>
                     <div className="space-y-4 mt-4">
                         <DarkInput value={c.mission?.label || ''} onChange={e => updateSub('mission', 'label', e.target.value)} placeholder="Mission Label" />
@@ -447,7 +447,7 @@ export function MissionVisionForm({ content, onChange }: { content: any, onChang
                     </div>
                 </div>
 
-                <div className="p-8 bg-white/[0.02] border border-white/5">
+                <div className="p-5 sm:p-6 md:p-8 bg-white/[0.02] border border-white/5">
                     <FormLabel>The Vision</FormLabel>
                     <div className="space-y-4 mt-4">
                         <DarkInput value={c.vision?.label || ''} onChange={e => updateSub('vision', 'label', e.target.value)} placeholder="Vision Label" />
@@ -474,7 +474,7 @@ export function ServicesForm({ content, onChange }: { content: any, onChange: (c
         <div className="animate-fade-in">
             <FormSectionHeader title="Professional Capability" icon={Layers} description="Technical advisory and learning initiatives." />
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6 mb-6 sm:mb-8 md:mb-10">
                 <FieldGroup label="Label">
                     <DarkInput value={c.label || ''} onChange={e => update('label', e.target.value)} />
                 </FieldGroup>
@@ -483,7 +483,7 @@ export function ServicesForm({ content, onChange }: { content: any, onChange: (c
                 </FieldGroup>
             </div>
 
-            <div className="mb-10 bg-black/20 border border-white/5 p-8">
+            <div className="mb-6 sm:mb-8 md:mb-10 bg-black/20 border border-white/5 p-5 sm:p-6 md:p-8">
                 <div className="flex items-center justify-between mb-6">
                     <FormLabel>Service Architecture (LIVE Preview)</FormLabel>
                     <button 
@@ -613,7 +613,7 @@ export function SocialImpactForm({ content, onChange }: { content: any, onChange
         <div className="animate-fade-in">
             <FormSectionHeader title="YeMillions Charity" icon={Heart} description="Three-tier social impact framework." />
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6 mb-6 sm:mb-8 md:mb-10">
                 <FieldGroup label="Label">
                     <DarkInput value={c.label || ''} onChange={e => update('label', e.target.value)} />
                 </FieldGroup>

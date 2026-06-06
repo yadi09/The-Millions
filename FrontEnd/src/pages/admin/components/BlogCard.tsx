@@ -38,21 +38,22 @@ export function BlogCard({ post, onEdit, onDelete }: BlogCardProps) {
     const isPublished = post.status === 'published';
 
     return (
-        <Card className="bg-white/5 border-white/10 backdrop-blur-md rounded-none hover:border-millions-accent/30 transition-all duration-500 group animate-fade-in-up">
-            <div className="p-4 md:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
-                {/* Visual Icon */}
-                <div className="hidden sm:flex w-12 h-12 bg-white/5 border border-white/10 flex-shrink-0 items-center justify-center text-millions-accent group-hover:border-millions-accent/50 transition-colors">
-                    <FileText className="w-6 h-6" />
+        <Card className="bg-white/5 border-white/10 backdrop-blur-md rounded-none hover:border-millions-accent/30 active:bg-white/[0.08] transition-all duration-300 group animate-fade-in-up">
+            <div className="p-4 sm:p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-3 sm:gap-4 md:gap-8">
+                {/* Visual icon — hidden on the smallest screens to keep the title prominent */}
+                <div className="hidden sm:flex w-10 h-10 md:w-12 md:h-12 bg-white/5 border border-white/10 flex-shrink-0 items-center justify-center text-millions-accent group-hover:border-millions-accent/50 transition-colors">
+                    <FileText className="w-5 h-5 md:w-6 md:h-6" />
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
-                        <h3 className="font-cormorant text-[1.3rem] text-white font-light leading-snug truncate group-hover:text-millions-accent transition-colors italic">
+                    {/* Title + status: stack on mobile, badge below title; horizontal on sm+ */}
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-3 mb-2 sm:mb-3">
+                        <h3 className="font-cormorant text-[1.15rem] sm:text-[1.25rem] md:text-[1.3rem] text-white font-light leading-snug line-clamp-2 group-hover:text-millions-accent transition-colors italic min-w-0 flex-1">
                             {post.title}
                         </h3>
                         <Badge
-                            className={`w-fit text-[0.6rem] px-2 py-0.5 uppercase tracking-wider rounded-none border shadow-none font-jost font-light ${isPublished
+                            className={`w-fit shrink-0 text-[0.55rem] sm:text-[0.6rem] px-2 py-0.5 uppercase tracking-wider rounded-none border shadow-none font-jost font-light sm:mt-1 ${isPublished
                                 ? 'bg-millions-accent/10 text-millions-accent border-millions-accent/20'
                                 : 'bg-white/5 text-white/30 border-white/5'
                                 }`}
@@ -60,15 +61,15 @@ export function BlogCard({ post, onEdit, onDelete }: BlogCardProps) {
                             {post.status}
                         </Badge>
                     </div>
-                    <div className="flex items-center gap-x-4 gap-y-2 text-[0.7rem] text-white/30 font-jost uppercase tracking-[0.15em] flex-wrap font-light">
+                    <div className="flex items-center gap-x-3 sm:gap-x-4 gap-y-1.5 text-[0.65rem] sm:text-[0.7rem] text-white/30 font-jost uppercase tracking-[0.15em] flex-wrap font-light">
                         <span className="text-millions-accent/50 italic lowercase">#{post.category}</span>
-                        <span className="flex items-center gap-2">
-                            <Calendar size={12} className="text-white/10" />
+                        <span className="flex items-center gap-1.5 sm:gap-2">
+                            <Calendar size={11} className="text-white/10 shrink-0" />
                             {post.date ? new Date(post.date).toLocaleDateString() : new Date(post.createdAt).toLocaleDateString()}
                         </span>
                         {post.views !== undefined && (
-                            <span className="flex items-center gap-2">
-                                <Eye size={12} className="text-white/10" />
+                            <span className="flex items-center gap-1.5 sm:gap-2">
+                                <Eye size={11} className="text-white/10 shrink-0" />
                                 {post.views} views
                             </span>
                         )}

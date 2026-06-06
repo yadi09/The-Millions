@@ -11,7 +11,14 @@ export const MobileHeader = ({ onMenuClick }: MobileHeaderProps) => {
     const getPageTitle = () => {
         const path = location.pathname;
         if (path === '/admin') return 'Dashboard';
-        if (path.startsWith('/admin/blog')) return 'Blog Posts';
+        if (path.startsWith('/admin/inbox')) return 'Inbox';
+        if (path.startsWith('/admin/blog/edit')) return 'Edit Post';
+        if (path.startsWith('/admin/blog/new')) return 'New Post';
+        if (path.startsWith('/admin/blog')) return 'Blog';
+        if (path.startsWith('/admin/services/edit')) return 'Edit Service';
+        if (path.startsWith('/admin/services/new')) return 'New Service';
+        if (path.startsWith('/admin/services')) return 'Services';
+        if (path.startsWith('/admin/testimonials')) return 'Testimonials';
         if (path.startsWith('/admin/pages')) return 'Pages';
         if (path.startsWith('/admin/settings')) return 'Settings';
         return 'Admin';

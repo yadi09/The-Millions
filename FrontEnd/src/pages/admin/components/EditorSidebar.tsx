@@ -76,18 +76,18 @@ const EditorSidebar = ({ sections, activeSectionId, onSelectSection }: EditorSid
                             key={section.id}
                             onClick={() => handleSelect(section.id)}
                             className={`
-                                flex items-center gap-6 px-10 py-6 text-[0.7rem] uppercase tracking-[0.15em] transition-all duration-300 w-full border-b border-white/5 group relative overflow-hidden font-light
+                                flex items-center gap-4 md:gap-6 px-5 py-4 md:px-10 md:py-6 text-[0.65rem] md:text-[0.7rem] uppercase tracking-[0.15em] transition-all duration-300 w-full border-b border-white/5 group relative overflow-hidden font-light text-left
                                 ${isActive
                                     ? 'bg-white/5 text-millions-accent font-bold border-l-2 border-l-millions-accent border-b-white/5'
-                                    : 'text-white/30 hover:bg-white/5 hover:text-white'
+                                    : 'text-white/30 hover:bg-white/5 active:bg-white/[0.08] hover:text-white'
                                 }
                             `}
                         >
-                            <span className={`transition-colors duration-300 ${isActive ? 'text-millions-accent' : 'text-white/10 group-hover:text-millions-accent/40'}`}>
+                            <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-millions-accent' : 'text-white/10 group-hover:text-millions-accent/40'}`}>
                                 {getIconForType(section.type)}
                             </span>
-                            <span className="font-jost">{section.type.replace('-', ' ')}</span>
-                            
+                            <span className="font-jost capitalize break-words">{section.type.replace('-', ' ')}</span>
+
                             {isActive && (
                                 <div className="absolute right-0 top-0 h-full w-[1px] bg-millions-accent shadow-[0_0_15px_rgba(201,168,76,0.3)]" />
                             )}

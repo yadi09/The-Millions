@@ -3,7 +3,7 @@ import { getToken, clearAuth } from '../../utils/authUtils';
 import type { Page, UpdatePageRequest } from '../../types';
 import { type Testimonial, type SubmitTestimonialRequest, type TestimonialStatus } from '../../types/testimonial';
 import type { Service } from '../../types/service';
-import type { ContactMessage, GetContactMessagesResponse, ContactStatus } from '../../types/contact';
+import type { ContactMessage, GetContactMessagesResponse, ContactStatus, ContactSource } from '../../types/contact';
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_BASE_URL,
@@ -215,14 +215,15 @@ export const apiSlice = createApi({
     }),
 
     // --- ADMIN CONTACT MESSAGES ENDPOINTS ---
-    getContactMessages: builder.query<GetContactMessagesResponse, { page?: number; limit?: number; status?: ContactStatus; search?: string }>({
+    getContactMessages: builder.query<GetContactMessagesResponse, { page?: number; limit?: number; status?: ContactStatus; source?: ContactSource; search?: string }>({
       query: (params) => {
         const query = new URLSearchParams();
         if (params.page) query.append('page', params.page.toString());
         if (params.limit) query.append('limit', params.limit.toString());
         if (params.status) query.append('status', params.status);
+        if (params.source) query.append('source', params.source);
         if (params.search) query.append('search', params.search);
-        
+
         return `/admin/contact-messages?${query.toString()}`;
       },
       providesTags: ['ContactMessage'],
@@ -233,6 +234,14 @@ export const apiSlice = createApi({
         url: `/admin/contact-messages/${id}/status`,
         method: 'PUT',
         body: { status },
+      }),
+      invalidatesTags: ['ContactMessage'],
+    }),
+
+    deleteContactMessage: builder.mutation<{ id: string; deleted: boolean }, string>({
+      query: (id) => ({
+        url: `/admin/contact-messages/${id}`,
+        method: 'DELETE',
       }),
       invalidatesTags: ['ContactMessage'],
     }),
@@ -278,6 +287,7 @@ export const {
   useSubmitContactMutation,
   useGetContactMessagesQuery,
   useUpdateContactMessageStatusMutation,
+  useDeleteContactMessageMutation,
   useGetFooterQuery,
   useUpdateFooterMutation,
 } = apiSlice;

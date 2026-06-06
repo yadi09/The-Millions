@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ContactStatus, Prisma } from '@prisma/client';
+import { ContactStatus, ContactSource, Prisma } from '@prisma/client';
 import { prisma } from "../../lib/prisma.js";
 
 export async function getContactMessages(
@@ -22,6 +22,11 @@ export async function getContactMessages(
         ? (req.query.status as ContactStatus)
         : undefined;
 
+    const source =
+      typeof req.query.source === 'string'
+        ? (req.query.source as ContactSource)
+        : undefined;
+
     const search =
       typeof req.query.search === 'string'
         ? req.query.search
@@ -38,6 +43,10 @@ export async function getContactMessages(
 
     if (status) {
       whereClause.status = status;
+    }
+
+    if (source) {
+      whereClause.source = source;
     }
 
     if (search) {
@@ -113,6 +122,8 @@ export async function getContactMessages(
         : undefined,
 
       status: msg.status,
+      source: msg.source,
+      metadata: msg.metadata ?? undefined,
       createdAt: msg.createdAt,
     }));
 
@@ -132,6 +143,48 @@ export async function getContactMessages(
     return res.status(500).json({
       message: 'Internal server error',
     });
+  }
+}
+
+/**
+ * DELETE /api/admin/contact-messages/:id
+ *
+ * Hard-deletes the row. Intentional: simpler than soft-delete and satisfies
+ * GDPR right-to-erasure for data subject requests. The frontend wraps the
+ * call in a confirmation modal so misclicks don't lose data.
+ */
+export async function deleteContactMessage(
+  req: Request,
+  res: Response,
+) {
+  try {
+    const rawId = req.params.id;
+    const id =
+      typeof rawId === 'string'
+        ? rawId
+        : Array.isArray(rawId)
+        ? rawId[0]
+        : undefined;
+
+    if (!id) {
+      return res.status(400).json({ message: 'Invalid id' });
+    }
+
+    const existing = await prisma.contactMessage.findUnique({ where: { id } });
+    if (!existing) {
+      return res.status(404).json({ message: 'Contact message not found' });
+    }
+
+    await prisma.contactMessage.delete({ where: { id } });
+
+    return res.status(200).json({
+      id,
+      deleted: true,
+      message: 'Contact message deleted',
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
 }
 
@@ -216,6 +269,8 @@ export async function updateContactMessageStatus(
         : undefined,
 
       status: msg.status,
+      source: msg.source,
+      metadata: msg.metadata ?? undefined,
       createdAt: msg.createdAt,
     });
   } catch (error) {

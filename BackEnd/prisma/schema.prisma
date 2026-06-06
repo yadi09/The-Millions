@@ -118,11 +118,14 @@ model ContactMessage {
     email     String
     phone     String?
     message   String
-    serviceId String
+    serviceId String?
     status    ContactStatus @default(NEW)
+    source    ContactSource @default(WEB_FORM)
+    metadata  Json?    // Extra structured info from non-form sources (AI agent
+                       // submissions store budget/urgency/conversationRef/etc here)
 
-    service   Service  @relation(fields: [serviceId], references: [id])
-    
+    service   Service? @relation(fields: [serviceId], references: [id])
+
     createdAt DateTime @default(now())
 }
 
@@ -187,4 +190,11 @@ enum ContactStatus {
   NEW
   READ
   REPLIED
+  PENDING_REVIEW    // AI-agent-collected lead, awaiting human approval
+}
+
+enum ContactSource {
+  WEB_FORM      // submitted via /api/contact (the public website form)
+  AI_AGENT      // submitted via /api/agent/leads (WhatsApp bot, etc.)
+  MANUAL        // entered directly by an admin
 }
