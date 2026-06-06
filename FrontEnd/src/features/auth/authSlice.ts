@@ -4,12 +4,17 @@ import { setToken, removeToken, getToken } from '../../utils/authUtils';
 
 /**
  * Authentication API slice using RTK Query
- * Handles login requests to the backend
+ * Handles login + credential-change requests
  */
 export const authApi = createApi({
     reducerPath: 'authApi',
     baseQuery: fetchBaseQuery({
         baseUrl: import.meta.env.VITE_API_BASE_URL,
+        prepareHeaders: (headers) => {
+            const token = getToken();
+            if (token) headers.set('authorization', `Bearer ${token}`);
+            return headers;
+        },
     }),
     endpoints: (builder) => ({
         // Login mutation - POST /auth/login
@@ -22,16 +27,46 @@ export const authApi = createApi({
                 method: 'POST',
                 body: credentials,
             }),
-            // On successful login, save token to localStorage
             async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
-                    // Save token to localStorage
                     setToken(data.token);
-                    // Update auth state
                     dispatch(setCredentials({ user: data.user, token: data.token }));
-                } catch (error) {
-                    // Error handling is done in the component
+                } catch {
+                    // Component handles errors
+                }
+            },
+        }),
+
+        // Change the authenticated admin's password
+        changePassword: builder.mutation<
+            { message: string },
+            { currentPassword: string; newPassword: string }
+        >({
+            query: (body) => ({
+                url: '/auth/change-password',
+                method: 'POST',
+                body,
+            }),
+        }),
+
+        // Change the authenticated admin's email — returns a fresh JWT
+        changeEmail: builder.mutation<
+            { token: string; user: { id: string; email: string } },
+            { currentPassword: string; newEmail: string }
+        >({
+            query: (body) => ({
+                url: '/auth/change-email',
+                method: 'POST',
+                body,
+            }),
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    setToken(data.token);
+                    dispatch(setCredentials({ user: { email: data.user.email }, token: data.token }));
+                } catch {
+                    // Component handles errors
                 }
             },
         }),
@@ -86,4 +121,8 @@ export const { setCredentials, logout } = authSlice.actions;
 export const authReducer = authSlice.reducer;
 
 // Export hooks for components
-export const { useLoginMutation } = authApi;
+export const {
+    useLoginMutation,
+    useChangePasswordMutation,
+    useChangeEmailMutation,
+} = authApi;
