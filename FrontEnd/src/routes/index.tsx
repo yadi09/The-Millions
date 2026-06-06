@@ -16,6 +16,7 @@ import ServicesManagement from "../pages/admin/ServicesManagement";
 import ServiceEditor from "../pages/admin/ServiceEditor";
 import Landing from "../pages/Landing";
 import InboxManagement from "../pages/admin/InboxManagement";
+import AdminSettings from "../pages/admin/Settings";
 
 const PublicLayout = () => (
     <Layout>
@@ -63,6 +64,7 @@ export const AppRoutes = () => (
             <Route path="services/new" element={<ServiceEditor />} />
             <Route path="services/edit/:id" element={<ServiceEditor />} />
             <Route path="testimonials" element={<TestimonialsManagement />} />
+            <Route path="settings" element={<AdminSettings />} />
 
             {/* Deprecated — content editing now lives on the live site via
                 inline editing (visit /?edit=1 as an admin). These routes
@@ -73,7 +75,6 @@ export const AppRoutes = () => (
             <Route path="pages" element={<DeprecatedRedirect />} />
             <Route path="pages/:slug" element={<DeprecatedRedirect />} />
             <Route path="dashboard" element={<DeprecatedRedirect />} />
-            <Route path="settings" element={<DeprecatedRedirect />} />
 
             {/* Catch any other /admin/* nonsense too. */}
             <Route path="*" element={<DeprecatedRedirect />} />
