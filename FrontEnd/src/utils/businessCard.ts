@@ -406,15 +406,25 @@ async function renderLuxeFront(d: DrawCtx, card: BusinessCardData) {
     d.ctx.fillStyle = COLOR_GOLD;
     d.ctx.fillRect(rightX, d.cardY + d.cardH * 0.55, d.cardW * 0.1, Math.max(1, d.cardH * 0.005));
 
-    // Contact lines
-    const lines: string[] = [];
-    if (card.phoneMobile) lines.push(`M  ${card.phoneMobile}`);
-    if (card.phoneOffice) lines.push(`T  ${card.phoneOffice}`);
-    if (card.email) lines.push(`E  ${card.email}`);
-    if (card.website) lines.push(`W  ${card.website.replace(/^https?:\/\//, "")}`);
+    // Contact lines — label in gold tracked small caps, value in cream regular.
+    // Rendering label + value as separate draw calls keeps the value column
+    // visually aligned across rows despite the proportional font.
+    const lines: { label: string; value: string }[] = [];
+    if (card.phoneMobile) lines.push({ label: "MOBILE", value: card.phoneMobile });
+    if (card.phoneOffice) lines.push({ label: "OFFICE", value: card.phoneOffice });
+    if (card.email) lines.push({ label: "EMAIL", value: card.email });
+    if (card.website) lines.push({ label: "WEB", value: card.website.replace(/^https?:\/\//, "") });
+
     const lineSize = d.cardH * 0.045;
+    const labelSize = lineSize * 0.72;
+    const valueColX = rightX + d.cardW * 0.13;
     lines.forEach((ln, i) => {
-        drawText(d.ctx, ln, rightX, d.cardY + d.cardH * 0.66 + i * lineSize * 1.45, {
+        const y = d.cardY + d.cardH * 0.66 + i * lineSize * 1.45;
+        drawText(d.ctx, ln.label, rightX, y, {
+            font: FONT_BODY, size: labelSize, weight: 500, color: COLOR_GOLD,
+            letterSpacing: `${labelSize * 0.18}px`,
+        });
+        drawText(d.ctx, ln.value, valueColX, y, {
             font: FONT_BODY, size: lineSize, weight: 400, color: "#e8e2d3",
         });
     });
