@@ -162,12 +162,70 @@ async function loadImage(src: string): Promise<HTMLImageElement> {
 }
 
 async function qrDataUrl(content: string, sizePx: number, dark: string, light: string): Promise<string> {
+    // qrcode library expects hex strings (#RRGGBB or #RRGGBBAA) — CSS rgba()
+    // syntax silently fails and throws downstream. Always pass hex.
     return QRCode.toDataURL(content, {
         margin: 0,
         width: sizePx,
         errorCorrectionLevel: "M",
         color: { dark, light },
     });
+}
+
+// Single source of truth for drawing a QR on the back of a card. Generates
+// the QR with high-contrast colors (dark on light) for scan reliability,
+// draws a colored pad behind it for a clean quiet-zone, and optionally
+// writes a "SCAN TO ..." label below. Returns false (without throwing) on
+// any failure so the rest of the card still renders.
+async function drawQrPanel(
+    ctx: CanvasRenderingContext2D,
+    card: BusinessCardData,
+    centerX: number,
+    centerY: number,
+    qrSize: number,
+    opts: {
+        padColor?: string;
+        labelText?: string;
+        labelColor?: string;
+        labelSize?: number;
+        labelTracking?: number;
+    } = {}
+): Promise<boolean> {
+    try {
+        const pad = opts.padColor ?? COLOR_CREAM;
+        const dataUrl = await qrDataUrl(
+            generateVcard(card),
+            Math.round(qrSize * 4),
+            COLOR_DARK,
+            pad
+        );
+        const img = await loadImage(dataUrl);
+
+        const padSize = qrSize * 1.18;
+        const padX = centerX - padSize / 2;
+        const padY = centerY - padSize / 2;
+        ctx.fillStyle = pad;
+        ctx.fillRect(padX, padY, padSize, padSize);
+        ctx.drawImage(img, centerX - qrSize / 2, centerY - qrSize / 2, qrSize, qrSize);
+
+        if (opts.labelText) {
+            const lblSize = opts.labelSize ?? 14;
+            drawText(ctx, opts.labelText, centerX, padY + padSize + lblSize * 1.8, {
+                font: FONT_BODY,
+                size: lblSize,
+                weight: 500,
+                color: opts.labelColor ?? COLOR_GOLD,
+                align: "center",
+                letterSpacing: `${opts.labelTracking ?? lblSize * 0.4}px`,
+            });
+        }
+        return true;
+    } catch (e) {
+        // Swallow — print/preview should never die because the QR is finicky.
+        // The card still goes out, just without the scan code.
+        console.error("QR render failed; continuing without it", e);
+        return false;
+    }
 }
 
 // Card layout constants. Everything below uses *card-visible* coordinates;
@@ -230,81 +288,82 @@ function fillBackground(d: DrawCtx, color: string) {
 // Template renderers -------------------------------------------------------
 
 async function renderMinimalFront(d: DrawCtx, card: BusinessCardData) {
+    // Letterhead-style symmetric layout: gold ruled bands top + bottom, centered
+    // typography, balanced whitespace. The kind of card you'd put in a leather
+    // wallet without embarrassment.
     fillBackground(d, COLOR_CREAM);
 
-    // Mark in top-left corner of safe area
-    const markSize = d.cardH * 0.18;
-    drawMark(d.ctx, d.safeX + markSize / 2, d.safeY + markSize / 2, markSize, COLOR_DARK, COLOR_GOLD);
+    // Top mark, small, centered
+    const markSize = d.cardH * 0.13;
+    drawMark(d.ctx, d.cardX + d.cardW / 2, d.safeY + markSize / 2 + d.cardH * 0.02, markSize, COLOR_DARK, COLOR_GOLD);
 
-    // Name centered
-    const nameSize = d.cardH * 0.18;
-    drawText(d.ctx, card.name || "Your Name", d.cardX + d.cardW / 2, d.cardY + d.cardH * 0.52, {
-        font: FONT_HEADING, size: nameSize, weight: 600, color: COLOR_DARK, align: "center", baseline: "middle",
+    // Upper gold rule — full safe-width, hair-thin
+    const upperRuleY = d.safeY + markSize + d.cardH * 0.06;
+    d.ctx.fillStyle = COLOR_GOLD;
+    d.ctx.fillRect(d.safeX, upperRuleY, d.safeW, Math.max(1, d.cardH * 0.003));
+
+    // Name — big, dark, centered
+    const nameY = upperRuleY + d.cardH * 0.13;
+    drawText(d.ctx, card.name || "Your Name", d.cardX + d.cardW / 2, nameY, {
+        font: FONT_HEADING, size: d.cardH * 0.17, weight: 600, color: COLOR_DARK, align: "center", baseline: "middle",
     });
 
-    // Title below name
+    // Short gold accent under the name
+    const accentY = nameY + d.cardH * 0.11;
+    d.ctx.fillStyle = COLOR_GOLD;
+    d.ctx.fillRect(d.cardX + d.cardW / 2 - d.cardW * 0.04, accentY, d.cardW * 0.08, Math.max(1, d.cardH * 0.006));
+
+    // Title — italic-feel small caps, gold
     if (card.title) {
-        drawText(d.ctx, card.title.toUpperCase(), d.cardX + d.cardW / 2, d.cardY + d.cardH * 0.62, {
-            font: FONT_BODY, size: d.cardH * 0.045, weight: 500, color: COLOR_GOLD, align: "center",
-            letterSpacing: `${d.cardH * 0.012}px`,
+        drawText(d.ctx, card.title.toUpperCase(), d.cardX + d.cardW / 2, accentY + d.cardH * 0.07, {
+            font: FONT_BODY, size: d.cardH * 0.042, weight: 500, color: COLOR_GOLD, align: "center",
+            letterSpacing: `${d.cardH * 0.022}px`,
         });
     }
 
-    // Gold divider
-    const dividerY = d.cardY + d.cardH * 0.72;
+    // Lower gold rule
+    const lowerRuleY = d.cardY + d.cardH * 0.74;
     d.ctx.fillStyle = COLOR_GOLD;
-    d.ctx.fillRect(d.cardX + d.cardW * 0.4, dividerY, d.cardW * 0.2, Math.max(1, d.cardH * 0.004));
+    d.ctx.fillRect(d.safeX, lowerRuleY, d.safeW, Math.max(1, d.cardH * 0.003));
 
-    // Contact lines at bottom — 2 cols if we have enough
+    // Contact lines — centered, single column, tightly stacked
     const lines: string[] = [];
     if (card.phoneMobile) lines.push(card.phoneMobile);
     if (card.phoneOffice) lines.push(card.phoneOffice);
     if (card.email) lines.push(card.email);
     if (card.website) lines.push(card.website.replace(/^https?:\/\//, ""));
 
-    const lineSize = d.cardH * 0.045;
-    const baselineY = d.cardY + d.cardH * 0.86;
+    const lineSize = d.cardH * 0.04;
     const lineGap = lineSize * 1.5;
-    // Two columns
-    const col1 = lines.slice(0, 2);
-    const col2 = lines.slice(2);
-    col1.forEach((ln, i) => {
-        drawText(d.ctx, ln, d.cardX + d.cardW * 0.5 - d.cardW * 0.02, baselineY + i * lineGap, {
-            font: FONT_BODY, size: lineSize, weight: 400, color: COLOR_DARK, align: "right",
-        });
-    });
-    col2.forEach((ln, i) => {
-        drawText(d.ctx, ln, d.cardX + d.cardW * 0.5 + d.cardW * 0.02, baselineY + i * lineGap, {
-            font: FONT_BODY, size: lineSize, weight: 400, color: COLOR_DARK, align: "left",
+    // Anchor block to vertical center of the remaining bottom strip
+    const blockTop = lowerRuleY + d.cardH * 0.07;
+    lines.slice(0, 4).forEach((ln, i) => {
+        drawText(d.ctx, ln, d.cardX + d.cardW / 2, blockTop + i * lineGap, {
+            font: FONT_BODY, size: lineSize, weight: 400, color: COLOR_DARK, align: "center",
         });
     });
 }
 
 async function renderMinimalBack(d: DrawCtx, card: BusinessCardData) {
     fillBackground(d, COLOR_DARK);
-    // Wordmark top-centered
-    const wmWidth = d.cardW * 0.45;
-    drawWordmark(d.ctx, d.cardX + d.cardW / 2 - wmWidth / 2, d.cardY + d.cardH * 0.1, wmWidth, COLOR_GOLD);
 
-    // QR code center
+    // Wordmark — top centered, prominent
+    const wmW = d.cardW * 0.5;
+    drawWordmark(d.ctx, d.cardX + d.cardW / 2 - wmW / 2, d.cardY + d.cardH * 0.08, wmW, COLOR_GOLD);
+
+    // QR centered with cream pad + scan label
     if (card.showQrCode !== false) {
-        const qrSize = Math.min(d.cardH * 0.46, d.cardW * 0.32);
-        const qrUrl = await qrDataUrl(generateVcard(card), Math.round(qrSize * 4), COLOR_DARK, COLOR_GOLD);
-        const qr = await loadImage(qrUrl);
-        const qrX = d.cardX + d.cardW / 2 - qrSize / 2;
-        const qrY = d.cardY + d.cardH * 0.36;
-        // Light cream pad behind QR for scan reliability
-        d.ctx.fillStyle = COLOR_CREAM;
-        d.ctx.fillRect(qrX - qrSize * 0.08, qrY - qrSize * 0.08, qrSize * 1.16, qrSize * 1.16);
-        d.ctx.drawImage(qr, qrX, qrY, qrSize, qrSize);
-
-        drawText(d.ctx, "SCAN TO CONNECT", d.cardX + d.cardW / 2, qrY + qrSize + d.cardH * 0.08, {
-            font: FONT_BODY, size: d.cardH * 0.035, weight: 500, color: COLOR_GOLD, align: "center",
-            letterSpacing: `${d.cardH * 0.014}px`,
+        const qrSize = Math.min(d.cardH * 0.44, d.cardW * 0.28);
+        await drawQrPanel(d.ctx, card, d.cardX + d.cardW / 2, d.cardY + d.cardH * 0.6, qrSize, {
+            padColor: COLOR_CREAM,
+            labelText: "SCAN TO CONNECT",
+            labelColor: COLOR_GOLD,
+            labelSize: d.cardH * 0.032,
+            labelTracking: d.cardH * 0.016,
         });
     } else if (card.tagline) {
-        drawText(d.ctx, card.tagline, d.cardX + d.cardW / 2, d.cardY + d.cardH * 0.6, {
-            font: FONT_HEADING, size: d.cardH * 0.07, color: COLOR_GOLD, align: "center", baseline: "middle",
+        drawText(d.ctx, card.tagline, d.cardX + d.cardW / 2, d.cardY + d.cardH * 0.62, {
+            font: FONT_HEADING, size: d.cardH * 0.08, color: COLOR_GOLD, align: "center", baseline: "middle",
         });
     }
 }
@@ -362,25 +421,36 @@ async function renderLuxeFront(d: DrawCtx, card: BusinessCardData) {
 }
 
 async function renderLuxeBack(d: DrawCtx, card: BusinessCardData) {
+    // Layout: M mark + tagline top half, QR + label bottom half. Mark shrinks
+    // from the previous oversize so the QR has room to actually be useful.
     fillBackground(d, COLOR_DARK);
-    // Big M mark center
-    const markSize = d.cardH * 0.42;
-    drawMark(d.ctx, d.cardX + d.cardW / 2, d.cardY + d.cardH * 0.4, markSize, null, COLOR_GOLD);
 
-    // Underline
+    // M mark — top section, moderate size
+    const markSize = d.cardH * 0.24;
+    drawMark(d.ctx, d.cardX + d.cardW / 2, d.safeY + markSize / 2 + d.cardH * 0.02, markSize, null, COLOR_GOLD);
+
+    // Short gold underline below mark
+    const underlineY = d.safeY + markSize + d.cardH * 0.07;
     d.ctx.fillStyle = COLOR_GOLD;
-    d.ctx.fillRect(d.cardX + d.cardW * 0.42, d.cardY + d.cardH * 0.65, d.cardW * 0.16, Math.max(1, d.cardH * 0.005));
+    d.ctx.fillRect(d.cardX + d.cardW / 2 - d.cardW * 0.05, underlineY, d.cardW * 0.1, Math.max(1, d.cardH * 0.005));
 
-    drawText(d.ctx, "CHARTERED ACCOUNTANTS", d.cardX + d.cardW / 2, d.cardY + d.cardH * 0.74, {
-        font: FONT_BODY, size: d.cardH * 0.038, weight: 500, color: COLOR_GOLD, align: "center",
-        letterSpacing: `${d.cardH * 0.02}px`,
+    // Tagline below underline — falls back to a sensible default
+    const tagline = (card.tagline || "CHARTERED ACCOUNTANTS").toUpperCase();
+    drawText(d.ctx, tagline, d.cardX + d.cardW / 2, underlineY + d.cardH * 0.07, {
+        font: FONT_BODY, size: d.cardH * 0.034, weight: 500, color: COLOR_GOLD, align: "center",
+        letterSpacing: `${d.cardH * 0.018}px`,
     });
 
+    // QR + label in the lower half
     if (card.showQrCode !== false) {
-        const qrSize = d.cardH * 0.22;
-        const qrUrl = await qrDataUrl(generateVcard(card), Math.round(qrSize * 4), COLOR_GOLD, "rgba(0,0,0,0)");
-        const qr = await loadImage(qrUrl);
-        d.ctx.drawImage(qr, d.safeX + d.safeW - qrSize, d.safeY + d.safeH - qrSize, qrSize, qrSize);
+        const qrSize = d.cardH * 0.38;
+        await drawQrPanel(d.ctx, card, d.cardX + d.cardW / 2, d.cardY + d.cardH * 0.7, qrSize, {
+            padColor: COLOR_CREAM,
+            labelText: "SCAN TO CONNECT",
+            labelColor: COLOR_GOLD,
+            labelSize: d.cardH * 0.03,
+            labelTracking: d.cardH * 0.014,
+        });
     }
 }
 
@@ -428,25 +498,40 @@ async function renderModernFront(d: DrawCtx, card: BusinessCardData) {
 }
 
 async function renderModernBack(d: DrawCtx, card: BusinessCardData) {
+    // Gold field with two zones: M mark left, QR + label right, separated by
+    // a vertical dark-green rule. Optional tagline runs above the rule.
     fillBackground(d, COLOR_GOLD);
-    // Big M in dark green center-left
-    const markSize = d.cardH * 0.55;
-    drawMark(d.ctx, d.cardX + d.cardW * 0.32, d.cardY + d.cardH * 0.5, markSize, null, COLOR_DARK);
 
-    if (card.showQrCode !== false) {
-        const qrSize = d.cardH * 0.36;
-        const qrUrl = await qrDataUrl(generateVcard(card), Math.round(qrSize * 4), COLOR_DARK, "rgba(0,0,0,0)");
-        const qr = await loadImage(qrUrl);
-        // White pad behind for max contrast
-        const padX = d.cardX + d.cardW * 0.62 - qrSize * 0.08;
-        const padY = d.cardY + d.cardH / 2 - qrSize / 2 - qrSize * 0.08;
-        d.ctx.fillStyle = COLOR_WHITE;
-        d.ctx.fillRect(padX, padY, qrSize * 1.16, qrSize * 1.16);
-        d.ctx.drawImage(qr, d.cardX + d.cardW * 0.62, d.cardY + d.cardH / 2 - qrSize / 2, qrSize, qrSize);
-
-        drawText(d.ctx, "SCAN TO SAVE CONTACT", d.cardX + d.cardW * 0.62 + qrSize / 2, d.cardY + d.cardH * 0.88, {
+    // Optional tagline at very top
+    if (card.tagline) {
+        drawText(d.ctx, card.tagline.toUpperCase(), d.cardX + d.cardW / 2, d.safeY + d.cardH * 0.06, {
             font: FONT_BODY, size: d.cardH * 0.032, weight: 500, color: COLOR_DARK, align: "center",
-            letterSpacing: `${d.cardH * 0.012}px`,
+            letterSpacing: `${d.cardH * 0.018}px`,
+        });
+    }
+
+    // Left zone: big M
+    const markSize = d.cardH * 0.50;
+    drawMark(d.ctx, d.cardX + d.cardW * 0.27, d.cardY + d.cardH * 0.52, markSize, null, COLOR_DARK);
+
+    // Vertical rule between zones
+    d.ctx.fillStyle = COLOR_DARK;
+    d.ctx.fillRect(
+        d.cardX + d.cardW * 0.50,
+        d.cardY + d.cardH * 0.22,
+        Math.max(1, d.cardH * 0.003),
+        d.cardH * 0.56
+    );
+
+    // Right zone: QR with cream pad + dark "SCAN TO CONNECT" label
+    if (card.showQrCode !== false) {
+        const qrSize = d.cardH * 0.42;
+        await drawQrPanel(d.ctx, card, d.cardX + d.cardW * 0.74, d.cardY + d.cardH * 0.52, qrSize, {
+            padColor: COLOR_CREAM,
+            labelText: "SCAN TO CONNECT",
+            labelColor: COLOR_DARK,
+            labelSize: d.cardH * 0.028,
+            labelTracking: d.cardH * 0.014,
         });
     }
 }
