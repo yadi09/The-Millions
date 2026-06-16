@@ -610,29 +610,11 @@ export async function renderCardSide(
 
 // PDF export ---------------------------------------------------------------
 
-function addCropMarks(doc: jsPDF, w: number, h: number, bleed: number) {
-    doc.setDrawColor(0, 0, 0);
-    doc.setLineWidth(0.1);
-    const armLen = 2; // mm
-    const gap = 0.5;
-    // Top-left
-    doc.line(0, bleed, bleed - gap, bleed);
-    doc.line(bleed, 0, bleed, bleed - gap);
-    // Top-right
-    doc.line(w - bleed + gap, bleed, Math.min(w, w - bleed + armLen + gap), bleed);
-    doc.line(w - bleed, 0, w - bleed, bleed - gap);
-    // Bottom-left
-    doc.line(0, h - bleed, bleed - gap, h - bleed);
-    doc.line(bleed, h - bleed + gap, bleed, h);
-    // Bottom-right
-    doc.line(w - bleed + gap, h - bleed, w - bleed + armLen + gap, h - bleed);
-    doc.line(w - bleed, h - bleed + gap, w - bleed, h);
-}
-
 export async function exportCardPdf(card: BusinessCardData & { showQrCode?: boolean }, template: Template) {
+    // Page is 91×61mm = 85×55mm trim + 3mm bleed on each side. Print shops
+    // trim by the PDF's media-box dimensions, not by drawn crop marks.
     const W_MM = 91;
     const H_MM = 61;
-    const TRIM_MM = 3;
     const DPI = 300;
     const pxW = Math.round((W_MM * DPI) / 25.4);
     const pxH = Math.round((H_MM * DPI) / 25.4);
@@ -647,11 +629,9 @@ export async function exportCardPdf(card: BusinessCardData & { showQrCode?: bool
 
     const doc = new jsPDF({ unit: "mm", format: [W_MM, H_MM], orientation: "landscape" });
     doc.addImage(frontPng, "PNG", 0, 0, W_MM, H_MM, undefined, "FAST");
-    addCropMarks(doc, W_MM, H_MM, TRIM_MM);
 
     doc.addPage([W_MM, H_MM], "landscape");
     doc.addImage(backPng, "PNG", 0, 0, W_MM, H_MM, undefined, "FAST");
-    addCropMarks(doc, W_MM, H_MM, TRIM_MM);
 
     const filename = `the-millions-card-${card.name.replace(/[^a-z0-9]+/gi, "_") || "untitled"}.pdf`;
     doc.save(filename);

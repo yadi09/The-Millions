@@ -216,7 +216,7 @@ const BusinessCardBuilder = () => {
                     Edit · Save · Export
                 </div>
                 <p className="mt-4 sm:mt-5 text-white/40 font-jost text-[0.75rem] sm:text-[0.8rem] leading-relaxed max-w-xl">
-                    Edit your details, pick a template, and export a print-ready PDF (85×55mm with 3mm bleed and crop marks).
+                    Edit your details, pick a template, and export a print-ready PDF (85×55mm card with 3mm bleed).
                     The back includes a QR code that adds you to a phone's contacts when scanned.
                 </p>
             </div>
@@ -398,7 +398,7 @@ const BusinessCardBuilder = () => {
                 <CardContent className="p-5 sm:p-6">
                     <SectionLabel>Print tips</SectionLabel>
                     <ul className="text-white/50 font-jost text-[0.75rem] sm:text-[0.8rem] leading-relaxed space-y-2">
-                        <li><span className="text-millions-accent">PDF</span> ships at 91×61mm with 3mm bleed + crop marks — paste this straight into MOO, Vistaprint, or any local print shop and tell them "trim to crop marks". Output is 300 DPI.</li>
+                        <li><span className="text-millions-accent">PDF</span> is 91×61mm at 300 DPI — that's an 85×55mm card with 3mm bleed on every side. Print shops trim to the card size automatically based on the file dimensions; just tell MOO/Vistaprint/local "85×55mm with 3mm bleed".</li>
                         <li><span className="text-millions-accent">QR on the back</span> encodes a full vCard so scanning adds you to a phone's contacts with one tap.</li>
                         <li><span className="text-millions-accent">vCard file (.vcf)</span> is the same data as the QR — attach it to your email signature for the desktop equivalent.</li>
                     </ul>
