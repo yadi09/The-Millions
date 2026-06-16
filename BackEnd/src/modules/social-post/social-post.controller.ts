@@ -34,13 +34,16 @@ export async function upsertMyPostController(req: AuthRequest, res: Response) {
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
     const parsed = upsertSocialPostSchema.safeParse(req.body);
     if (!parsed.success) {
+        // Log the formatted error so it's visible in container logs when a
+        // client save fails — the response body alone is hard to read.
+        console.error("[social-post] validation error:", JSON.stringify(parsed.error.format()));
         return res.status(400).json({ message: "Validation error", errors: parsed.error.format() });
     }
     try {
         const post = await upsertMyPost(userId, parsed.data);
         res.json(post);
     } catch (error) {
-        console.error(error);
+        console.error("[social-post] upsert error:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 }

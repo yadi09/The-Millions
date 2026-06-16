@@ -148,7 +148,14 @@ const SocialPostBuilder = () => {
             setForm((f) => ({ ...f, id: saved.id, title: saved.title }));
             toast.success("Draft saved.");
         } catch (e: any) {
-            toast.error(e?.data?.message || "Save failed.");
+            // Surface enough detail for the user (and for me, when debugging)
+            // to see what actually failed — generic "save failed" hides the
+            // root cause when it's a validation or network issue.
+            console.error("[social-post] save failed:", e);
+            const status = e?.status;
+            const detail = e?.data?.message || e?.error || e?.message;
+            const msg = status ? `Save failed (${status})${detail ? ` — ${detail}` : ""}` : detail || "Save failed.";
+            toast.error(msg);
         }
     };
 
