@@ -305,13 +305,78 @@ async function renderQuote(
     h: number,
     imageUrl?: string | null
 ): Promise<void> {
+    // Layout strategy: ANCHOR the bottom block (wordmark → attribution →
+    // accent → stars) at the bottom of the canvas with fixed gaps, ANCHOR
+    // the decorative quote glyph near the top, then let the quote text fill
+    // the remaining middle. If the quote needs more vertical space than
+    // available, shrink the font progressively until it fits — no more
+    // attribution colliding with the wordmark on long testimonials.
     await fillPostBackground(ctx, w, h, imageUrl, COLOR_DARK);
 
     const L = layoutFor(platform, w, h);
+    const safeW = w * 0.78;
+    const rating = Math.min(5, Math.max(0, Math.floor(content.rating ?? 0)));
 
-    // Big decorative opening quote glyph — sits behind/above the quote
+    // ----- BOTTOM BLOCK (anchored upward from the bottom edge) -----
+    const wmW = platform === "story" ? w * 0.35 : w * 0.22;
+    const wmH = wmW / 4;
+    const wmCenterY = h - L.vPad - wmH / 2;
+    const wmTopY = wmCenterY - wmH / 2;
+
+    // Attribution — wraps if long
+    const attrSize = h * 0.022;
+    const attrLines = content.attribution
+        ? wrapText(ctx, content.attribution.toUpperCase(), w * 0.82, FONT_BODY, attrSize, 500)
+        : [];
+    const attrLineH = attrSize * 1.5;
+    const attrBlockH = attrLines.length * attrLineH;
+    const attrToWmGap = h * 0.045;
+    const attrBottomY = wmTopY - attrToWmGap;
+    const attrTopY = attrBottomY - attrBlockH;
+
+    // Accent rule
+    const accentH = L.accentH;
+    const accentToAttrGap = attrLines.length > 0 ? h * 0.025 : h * 0.04;
+    const accentBottomY = (attrLines.length > 0 ? attrTopY : attrBottomY) - accentToAttrGap;
+    const accentTopY = accentBottomY - accentH;
+
+    // Star row (only when rating > 0)
+    const starSize = h * 0.04;
+    const starToAccentGap = h * 0.03;
+    const starsBottomY = accentTopY - starToAccentGap;
+    const starsTopY = starsBottomY - starSize;
+
+    // ----- TOP DECORATIVE QUOTE GLYPH (anchored near top) -----
     const decorSize = Math.min(w, h) * (platform === "story" ? 0.22 : 0.28);
-    drawText(ctx, "“", w / 2, h * 0.27, {
+    const decorCenterY = L.vPad + decorSize * 0.4;
+    const decorBottomY = decorCenterY + decorSize * 0.2;
+
+    // ----- QUOTE ZONE: the space between the decor and the bottom block -----
+    const quoteZoneTopY = decorBottomY + h * 0.02;
+    const quoteZoneBottomY = (rating > 0 ? starsTopY : accentTopY) - h * 0.025;
+    const quoteZoneHeight = Math.max(h * 0.2, quoteZoneBottomY - quoteZoneTopY);
+
+    // Pick the largest font size that fits within the quote zone. Wrap then
+    // shrink iteratively — keeps short quotes big and dramatic, long
+    // testimonials legible without ever colliding with the bottom block.
+    let quoteSize = platform === "story" ? h * 0.048 : h * 0.072;
+    const minQuoteSize = platform === "story" ? h * 0.026 : h * 0.035;
+    let quoteLines = wrapText(ctx, content.quote || "Your quote here.", safeW, FONT_HEADING, quoteSize, 400);
+    let lineH = quoteSize * 1.18;
+    let safety = 0;
+    while (quoteLines.length * lineH > quoteZoneHeight && quoteSize > minQuoteSize && safety < 50) {
+        quoteSize *= 0.94;
+        quoteLines = wrapText(ctx, content.quote || "Your quote here.", safeW, FONT_HEADING, quoteSize, 400);
+        lineH = quoteSize * 1.18;
+        safety++;
+    }
+    const quoteBlockH = quoteLines.length * lineH;
+    // Vertically center the quote within its zone
+    const quoteTopY = quoteZoneTopY + (quoteZoneHeight - quoteBlockH) / 2;
+
+    // ----- DRAW (back to front: decor → quote → stars → accent → attribution → wordmark) -----
+
+    drawText(ctx, "“", w / 2, decorCenterY, {
         font: FONT_HEADING,
         size: decorSize,
         weight: 600,
@@ -319,21 +384,6 @@ async function renderQuote(
         align: "center",
         baseline: "middle",
     });
-
-    // The quote — large, regular weight (italic feel via the typeface) Cormorant
-    const quoteSize = platform === "story" ? h * 0.048 : h * 0.072;
-    const quoteMaxW = w * 0.78;
-    const quoteLines = wrapText(
-        ctx,
-        content.quote || "Your quote here.",
-        quoteMaxW,
-        FONT_HEADING,
-        quoteSize,
-        400
-    );
-    const lineH = quoteSize * 1.18;
-    const quoteBlockH = quoteLines.length * lineH;
-    const quoteTopY = h / 2 - quoteBlockH / 2;
 
     quoteLines.forEach((line, i) => {
         drawText(ctx, line, w / 2, quoteTopY + i * lineH, {
@@ -346,16 +396,9 @@ async function renderQuote(
         });
     });
 
-    // Star row — only renders when the post came from a testimonial.
-    // Acts as a visual trust signal between the quote and the attribution.
-    const rating = Math.min(5, Math.max(0, Math.floor(content.rating ?? 0)));
-    let cursorBelowQuote = quoteTopY + quoteBlockH + h * 0.035;
     if (rating > 0) {
-        const starSize = h * 0.04;
         const stars = "★".repeat(rating);
-        drawText(ctx, stars, w / 2, cursorBelowQuote, {
-            // Use FONT_BODY so the star glyph picks up the system Unicode font
-            // consistently instead of fighting Cormorant's coverage.
+        drawText(ctx, stars, w / 2, starsTopY, {
             font: FONT_BODY,
             size: starSize,
             weight: 500,
@@ -364,31 +407,25 @@ async function renderQuote(
             baseline: "top",
             letterSpacing: `${starSize * 0.15}px`,
         });
-        cursorBelowQuote += starSize + h * 0.025;
     }
 
-    // Gold accent under the quote (or under the stars when present)
-    const accentY = cursorBelowQuote;
     ctx.fillStyle = COLOR_GOLD;
     const accentW = w * 0.06;
-    ctx.fillRect(w / 2 - accentW / 2, accentY, accentW, L.accentH);
+    ctx.fillRect(w / 2 - accentW / 2, accentTopY, accentW, accentH);
 
-    // Attribution
-    if (content.attribution) {
-        drawText(ctx, content.attribution.toUpperCase(), w / 2, accentY + L.accentH + h * 0.025, {
+    attrLines.forEach((line, i) => {
+        drawText(ctx, line, w / 2, attrTopY + i * attrLineH, {
             font: FONT_BODY,
-            size: h * 0.022,
+            size: attrSize,
             weight: 500,
             color: COLOR_GOLD,
             align: "center",
             baseline: "top",
             letterSpacing: `${h * 0.007}px`,
         });
-    }
+    });
 
-    // Bottom wordmark — small but legible
-    const wmW = platform === "story" ? w * 0.35 : w * 0.22;
-    drawWordmarkCentered(ctx, w / 2, h - L.vPad - wmW / 8, wmW, COLOR_GOLD);
+    drawWordmarkCentered(ctx, w / 2, wmCenterY, wmW, COLOR_GOLD);
 }
 
 // --- STAT --------------------------------------------------------------------
