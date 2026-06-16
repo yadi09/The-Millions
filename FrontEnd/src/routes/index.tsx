@@ -17,6 +17,7 @@ import ServiceEditor from "../pages/admin/ServiceEditor";
 import Landing from "../pages/Landing";
 import InboxManagement from "../pages/admin/InboxManagement";
 import AdminSettings from "../pages/admin/Settings";
+import BrandAssets from "../pages/admin/BrandAssets";
 
 const PublicLayout = () => (
     <Layout>
@@ -64,6 +65,7 @@ export const AppRoutes = () => (
             <Route path="services/new" element={<ServiceEditor />} />
             <Route path="services/edit/:id" element={<ServiceEditor />} />
             <Route path="testimonials" element={<TestimonialsManagement />} />
+            <Route path="brand" element={<BrandAssets />} />
             <Route path="settings" element={<AdminSettings />} />
 
             {/* Deprecated — content editing now lives on the live site via
