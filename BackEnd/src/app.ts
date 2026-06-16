@@ -15,6 +15,7 @@ import footerRoutes from "./modules/footer/footer.routes.js";
 import testimonialsRoutes from "./modules/testimonials/testimonials.routes.js";
 import adminTestimonialsRoutes from "./modules/testimonials/admin.testimonials.routes.js";
 import agentRoutes from "./modules/agent/agent.routes.js";
+import businessCardRoutes from "./modules/business-card/business-card.routes.js";
 import swaggerRoutes from "./routes/swagger.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { notFoundHandler } from "./middlewares/notFound.middleware.js";
@@ -63,6 +64,7 @@ app.use("/api/footer", footerRoutes);
 app.use("/api/testimonials", testimonialsRoutes);
 app.use("/api/admin/testimonials", adminTestimonialsRoutes);
 app.use("/api/agent", agentRoutes);
+app.use("/api/business-card", businessCardRoutes);
 app.use("/api-docs", swaggerRoutes);
 
 app.use(notFoundHandler);

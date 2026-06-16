@@ -20,6 +20,7 @@ export const MobileHeader = ({ onMenuClick }: MobileHeaderProps) => {
         if (path.startsWith('/admin/services')) return 'Services';
         if (path.startsWith('/admin/testimonials')) return 'Testimonials';
         if (path.startsWith('/admin/pages')) return 'Pages';
+        if (path.startsWith('/admin/business-card')) return 'Business Card';
         if (path.startsWith('/admin/brand')) return 'Brand Assets';
         if (path.startsWith('/admin/settings')) return 'Settings';
         return 'Admin';

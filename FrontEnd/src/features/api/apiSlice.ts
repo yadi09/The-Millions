@@ -37,7 +37,7 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage'],
+  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage', 'BusinessCard'],
   baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
     getPage: builder.query<Page, string>({
@@ -260,6 +260,16 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ['Footer'],
     }),
+
+    // Business card — one per authenticated user. 204 = no card yet.
+    getMyBusinessCard: builder.query<any | null, void>({
+      query: () => ({ url: '/business-card/me', responseHandler: async (r) => (r.status === 204 ? null : r.json()) }),
+      providesTags: ['BusinessCard'],
+    }),
+    upsertMyBusinessCard: builder.mutation<any, any>({
+      query: (data) => ({ url: '/business-card/me', method: 'PUT', body: data }),
+      invalidatesTags: ['BusinessCard'],
+    }),
   }),
 });
 
@@ -290,4 +300,6 @@ export const {
   useDeleteContactMessageMutation,
   useGetFooterQuery,
   useUpdateFooterMutation,
+  useGetMyBusinessCardQuery,
+  useUpsertMyBusinessCardMutation,
 } = apiSlice;

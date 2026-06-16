@@ -17,116 +17,145 @@ model Page {
 }
 
 model Section {
-  id        String   @id @default(uuid())
-  pageId    String
-  type      String
-  order     Int
-  content   Json
+  id      String @id @default(uuid())
+  pageId  String
+  type    String
+  order   Int
+  content Json
 
-  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
 
 model Footer {
-  id                String   @id @default(cuid())
-  phone             String[]
-  email             String
-  address           String[]
-  websiteUrl        String?
-  socialMedia       Json
-  copyright         String
-  showContactBlock  Boolean  @default(true)
+  id               String   @id @default(cuid())
+  phone            String[]
+  email            String
+  address          String[]
+  websiteUrl       String?
+  socialMedia      Json
+  copyright        String
+  showContactBlock Boolean  @default(true)
 
   // Admin-editable fields previously hardcoded in the controller
-  contactLabel      String?
-  contactTitle      String?
-  contactSubTitle   String?
-  buttonText        String?
-  logoText          String?
-  location          String?
+  contactLabel    String?
+  contactTitle    String?
+  contactSubTitle String?
+  buttonText      String?
+  logoText        String?
+  location        String?
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("footer")
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  roles     UserRole[]
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  createdAt    DateTime      @default(now())
+  roles        UserRole[]
+  businessCard BusinessCard?
 }
 
 model UserRole {
   userId String
   roleId String
-  user   User @relation(fields: [userId], references: [id])
-  role   Role @relation(fields: [roleId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  role   Role   @relation(fields: [roleId], references: [id])
+
   @@id([userId, roleId])
 }
 
 model Role {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  permissions Json   // Array of permission strings like ["pages:create", "pages:edit"]
+  id          String     @id @default(uuid())
+  name        String     @unique
+  permissions Json // Array of permission strings like ["pages:create", "pages:edit"]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  users       UserRole[]
+}
+
+model BusinessCard {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Personal
+  name    String
+  title   String?
+  tagline String?
+
+  // Contact
+  email       String?
+  phoneMobile String?
+  phoneOffice String?
+  website     String?
+  address     String[]
+
+  // Design
+  template   String  @default("minimal") // "minimal" | "luxe" | "modern"
+  showQrCode Boolean @default(true)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  users     UserRole[]
+
+  @@map("business_card")
 }
 
 model SidebarItem {
-  id        String   @id @default(uuid())
+  id        String        @id @default(uuid())
   label     String
   icon      String
   route     String
-  roles     Json   // Array of role names that can see this item
+  roles     Json // Array of role names that can see this item
   order     Int
   parentId  String?
   children  SidebarItem[] @relation("SidebarChildren")
-  parent    SidebarItem? @relation("SidebarChildren", fields: [parentId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  parent    SidebarItem?  @relation("SidebarChildren", fields: [parentId], references: [id])
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 }
 
 model Widget {
-  id        String   @id @default(uuid())
-  type      String   // e.g., "stat", "list", "chart"
-  title     String
-  endpoint  String   // Backend endpoint to fetch data for this widget
-  refreshInterval Int   // in seconds
-  roles     Json   // Array of role names
-  order     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(uuid())
+  type            String // e.g., "stat", "list", "chart"
+  title           String
+  endpoint        String // Backend endpoint to fetch data for this widget
+  refreshInterval Int // in seconds
+  roles           Json // Array of role names
+  order           Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Setting {
   id        String   @id @default(uuid())
   key       String   @unique
-  value     Json   // Can be string, number, boolean, object
-  type      String   // "string", "number", "boolean", "object"
-  group     String   // e.g., "general", "seo", "contact"
+  value     Json // Can be string, number, boolean, object
+  type      String // "string", "number", "boolean", "object"
+  group     String // e.g., "general", "seo", "contact"
   updatedAt DateTime @updatedAt
 }
 
 model ContactMessage {
-    id        String   @id @default(uuid())
-    fullName  String
-    email     String
-    phone     String?
-    message   String
-    serviceId String?
-    status    ContactStatus @default(NEW)
-    source    ContactSource @default(WEB_FORM)
-    metadata  Json?    // Extra structured info from non-form sources (AI agent
-                       // submissions store budget/urgency/conversationRef/etc here)
+  id        String        @id @default(uuid())
+  fullName  String
+  email     String
+  phone     String?
+  message   String
+  serviceId String?
+  status    ContactStatus @default(NEW)
+  source    ContactSource @default(WEB_FORM)
+  metadata  Json? // Extra structured info from non-form sources (AI agent
+  // submissions store budget/urgency/conversationRef/etc here)
 
-    service   Service? @relation(fields: [serviceId], references: [id])
+  service Service? @relation(fields: [serviceId], references: [id])
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 }
 
 model Service {
@@ -139,22 +168,22 @@ model Service {
 }
 
 model Testimonial {
-  id               String   @id @default(uuid())
+  id               String            @id @default(uuid())
   name             String
   email            String?
   role             String
   company          String
   image            String?
-  rating           Int      @default(5)
+  rating           Int               @default(5)
   category         String?
-  content          String   @db.Text
+  content          String            @db.Text
   results          String?
-  videoTestimonial Boolean  @default(false)
+  videoTestimonial Boolean           @default(false)
   location         String?
   status           TestimonialStatus @default(PENDING)
-  order            Int      @default(0)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  order            Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
 enum TestimonialStatus {
@@ -164,19 +193,19 @@ enum TestimonialStatus {
 }
 
 model BlogPost {
-  id           String   @id @default(uuid())
-  title        String
-  slug         String   @unique
-  category     String
-  coverImage   String?
-  excerpt      String
-  content      String   @db.Text
-  status       BlogStatus @default(DRAFT)
-  author       String
-  publishedAt  DateTime?
-  tags         String[]
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String     @id @default(uuid())
+  title       String
+  slug        String     @unique
+  category    String
+  coverImage  String?
+  excerpt     String
+  content     String     @db.Text
+  status      BlogStatus @default(DRAFT)
+  author      String
+  publishedAt DateTime?
+  tags        String[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   @@map("blog_posts")
 }
@@ -190,11 +219,11 @@ enum ContactStatus {
   NEW
   READ
   REPLIED
-  PENDING_REVIEW    // AI-agent-collected lead, awaiting human approval
+  PENDING_REVIEW // AI-agent-collected lead, awaiting human approval
 }
 
 enum ContactSource {
-  WEB_FORM      // submitted via /api/contact (the public website form)
-  AI_AGENT      // submitted via /api/agent/leads (WhatsApp bot, etc.)
-  MANUAL        // entered directly by an admin
+  WEB_FORM // submitted via /api/contact (the public website form)
+  AI_AGENT // submitted via /api/agent/leads (WhatsApp bot, etc.)
+  MANUAL // entered directly by an admin
 }
