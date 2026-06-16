@@ -20,6 +20,7 @@ export type TipListContent = {
     headline: string;
     items: string[];
     cta: string;
+    categoryTag: string;
 };
 
 export type QuoteContent = {
@@ -191,7 +192,10 @@ async function renderTipList(
     const safeW = w - L.hPad * 2;
     const safeH = h - L.vPad * 2;
 
-    // Brand strip (top-left mark + word, right-aligned category tag)
+    // Brand strip (top-left mark + word, optional right-aligned category tag).
+    // Tag is editable per draft so the same template covers tax tips, payroll
+    // tips, VAT guides, year-end reminders, etc. — leave blank to drop it.
+    const tag = (content.categoryTag || "").trim().toUpperCase();
     const stripBottom = drawBrandStrip(
         ctx,
         safeX,
@@ -199,8 +203,8 @@ async function renderTipList(
         L.markSize,
         COLOR_GOLD,
         COLOR_DARK,
-        "TAX TIPS",
-        safeX + safeW
+        tag || undefined,
+        tag ? safeX + safeW : undefined
     );
 
     // Headline — top-aligned baseline so the gap above is exactly what we set.
@@ -504,6 +508,7 @@ export function defaultContent(type: TemplateType): Content {
                 "Don't forget the marriage allowance if your partner earns less than £12,570.",
             ],
             cta: "the-millions.co.uk",
+            categoryTag: "TAX TIPS",
         };
     }
     if (type === "quote") {

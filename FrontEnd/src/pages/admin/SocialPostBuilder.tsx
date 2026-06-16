@@ -482,6 +482,15 @@ const TipListForm = ({ content, onChange }: { content: TipListContent; onChange:
     return (
         <div className="space-y-5">
             <div>
+                <SectionLabel>Category tag (top-right corner — blank to hide)</SectionLabel>
+                <DarkInput
+                    value={content.categoryTag ?? ""}
+                    onChange={(e) => onChange({ ...content, categoryTag: e.target.value })}
+                    placeholder="TAX TIPS"
+                    maxLength={30}
+                />
+            </div>
+            <div>
                 <SectionLabel>Headline</SectionLabel>
                 <DarkInput
                     value={content.headline}

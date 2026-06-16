@@ -6,6 +6,7 @@ const tipListContent = z.object({
     headline: z.string().max(120).default(""),
     items: z.array(z.string().max(280)).max(8).default([]),
     cta: z.string().max(80).optional().default(""),
+    categoryTag: z.string().max(30).optional().default(""),
 });
 
 const quoteContent = z.object({
