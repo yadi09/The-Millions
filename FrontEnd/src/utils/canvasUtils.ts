@@ -73,29 +73,38 @@ export function drawText(
 }
 
 // Wraps text to fit within maxWidth, returning the lines. Caller draws them.
+// Pass letterSpacing if the rendered text will have any — otherwise the
+// measurement underestimates width and the caller draws lines that overflow.
 export function wrapText(
     ctx: CanvasRenderingContext2D,
     text: string,
     maxWidth: number,
     font: string,
     fontSize: number,
-    fontWeight: number = 400
+    fontWeight: number = 400,
+    letterSpacing: string = "0px"
 ): string[] {
     ctx.font = `${fontWeight} ${fontSize}px ${font}`;
-    const words = text.split(/\s+/);
-    const lines: string[] = [];
-    let current = "";
-    for (const word of words) {
-        const trial = current ? `${current} ${word}` : word;
-        if (ctx.measureText(trial).width <= maxWidth) {
-            current = trial;
-        } else {
-            if (current) lines.push(current);
-            current = word;
+    const prevLs = (ctx as any).letterSpacing;
+    (ctx as any).letterSpacing = letterSpacing;
+    try {
+        const words = text.split(/\s+/);
+        const lines: string[] = [];
+        let current = "";
+        for (const word of words) {
+            const trial = current ? `${current} ${word}` : word;
+            if (ctx.measureText(trial).width <= maxWidth) {
+                current = trial;
+            } else {
+                if (current) lines.push(current);
+                current = word;
+            }
         }
+        if (current) lines.push(current);
+        return lines;
+    } finally {
+        (ctx as any).letterSpacing = prevLs;
     }
-    if (current) lines.push(current);
-    return lines;
 }
 
 // Brand mark — the "M" in a rounded square (or transparent outline).

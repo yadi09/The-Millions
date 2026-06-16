@@ -323,11 +323,32 @@ async function renderQuote(
     const wmCenterY = h - L.vPad - wmH / 2;
     const wmTopY = wmCenterY - wmH / 2;
 
-    // Attribution — wraps if long
-    const attrSize = h * 0.022;
-    const attrLines = content.attribution
-        ? wrapText(ctx, content.attribution.toUpperCase(), w * 0.82, FONT_BODY, attrSize, 500)
-        : [];
+    // Attribution — wraps if long. wrapText must know about letter-spacing
+    // because the rendered width is otherwise ~40% wider than what the wrapper
+    // would measure with default 0px spacing. We also auto-shrink the font if
+    // an individual line (e.g. one un-splittable segment like a long company
+    // name) still doesn't fit at the default size.
+    const attrMaxW = w * 0.82;
+    const attrLetterSpacing = h * 0.004; // softer than the 0.007 that was overflowing
+    let attrSize = h * 0.022;
+    const minAttrSize = h * 0.014;
+    let attrLines: string[] = [];
+    if (content.attribution) {
+        const upper = content.attribution.toUpperCase();
+        let safety = 0;
+        while (safety < 30) {
+            attrLines = wrapText(ctx, upper, attrMaxW, FONT_BODY, attrSize, 500, `${attrLetterSpacing}px`);
+            // Check the widest wrapped line — if even one overflows (because a
+            // single word is too long to break), shrink and retry.
+            ctx.font = `500 ${attrSize}px ${FONT_BODY}`;
+            (ctx as any).letterSpacing = `${attrLetterSpacing}px`;
+            const widest = attrLines.reduce((m, ln) => Math.max(m, ctx.measureText(ln).width), 0);
+            (ctx as any).letterSpacing = "0px";
+            if (widest <= attrMaxW || attrSize <= minAttrSize) break;
+            attrSize *= 0.93;
+            safety++;
+        }
+    }
     const attrLineH = attrSize * 1.5;
     const attrBlockH = attrLines.length * attrLineH;
     const attrToWmGap = h * 0.045;
@@ -421,7 +442,7 @@ async function renderQuote(
             color: COLOR_GOLD,
             align: "center",
             baseline: "top",
-            letterSpacing: `${h * 0.007}px`,
+            letterSpacing: `${attrLetterSpacing}px`,
         });
     });
 
