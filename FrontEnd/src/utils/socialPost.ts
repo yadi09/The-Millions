@@ -1,7 +1,6 @@
 import {
     COLOR_DARK,
     COLOR_GOLD,
-    COLOR_CREAM,
     COLOR_WHITE,
     FONT_HEADING,
     FONT_BODY,
@@ -87,8 +86,95 @@ async function fillPostBackground(
     ctx.fillRect(0, 0, w, h);
 }
 
-// --- TIP LIST ----------------------------------------------------------------
+// Per-platform layout knobs. Story is portrait so it gets tighter margins
+// vertically; LinkedIn is landscape so it gets tighter top/bottom and more
+// room for the headline column. Square sits in between.
+type Layout = {
+    hPad: number; // horizontal padding
+    vPad: number; // vertical padding
+    markSize: number;
+    headlineSize: number;
+    bodySize: number;
+    accentH: number;
+};
 
+function layoutFor(platform: Platform, w: number, h: number): Layout {
+    if (platform === "linkedin") {
+        return {
+            hPad: w * 0.06,
+            vPad: h * 0.09,
+            markSize: h * 0.075,
+            headlineSize: h * 0.095,
+            bodySize: h * 0.044,
+            accentH: Math.max(4, h * 0.012),
+        };
+    }
+    if (platform === "square") {
+        return {
+            hPad: w * 0.075,
+            vPad: h * 0.075,
+            markSize: h * 0.06,
+            headlineSize: h * 0.075,
+            bodySize: h * 0.04,
+            accentH: Math.max(4, h * 0.01),
+        };
+    }
+    // story (1080×1920) — portrait, very tall content area
+    return {
+        hPad: w * 0.075,
+        vPad: h * 0.05,
+        markSize: h * 0.045,
+        headlineSize: h * 0.05,
+        bodySize: h * 0.026,
+        accentH: Math.max(4, h * 0.007),
+    };
+}
+
+// Shared brand strip — small filled-square mark + wordmark, baseline-
+// correct so it never collides with the headline below. `accent` is the
+// colour of the M-square and the wordmark text (they read as one unit).
+// `contrast` is the M letter colour — opposite of the square so the M
+// remains visible. Returns the strip's bottom y so callers can position
+// content beneath it cleanly.
+function drawBrandStrip(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    markSize: number,
+    accent: string,
+    contrast: string,
+    rightLabel?: string,
+    rightX?: number
+): number {
+    // Mark — filled square in `accent`, M letter in `contrast`
+    drawMark(ctx, x + markSize / 2, y + markSize / 2, markSize, accent, contrast);
+    // Wordmark text — same colour as the M square so they read as one mark
+    drawText(ctx, "THE MILLIONS.", x + markSize * 1.45, y + markSize / 2, {
+        font: FONT_HEADING,
+        size: markSize * 0.5,
+        weight: 600,
+        color: accent,
+        baseline: "middle",
+        letterSpacing: `${markSize * 0.03}px`,
+    });
+    if (rightLabel && rightX !== undefined) {
+        drawText(ctx, rightLabel, rightX, y + markSize / 2, {
+            font: FONT_BODY,
+            size: markSize * 0.35,
+            weight: 500,
+            color: accent,
+            align: "right",
+            baseline: "middle",
+            letterSpacing: `${markSize * 0.05}px`,
+        });
+    }
+    return y + markSize;
+}
+
+// --- TIP LIST ----------------------------------------------------------------
+// Dark green background, structured grid: brand strip at top, big white
+// headline, bold gold accent block, numbered tips below with generous
+// leading, CTA pinned to the bottom edge of the safe area.
 async function renderTipList(
     ctx: CanvasRenderingContext2D,
     content: TipListContent,
@@ -99,73 +185,106 @@ async function renderTipList(
 ): Promise<void> {
     await fillPostBackground(ctx, w, h, imageUrl, COLOR_DARK);
 
-    // Safe area — 6% inset on each side
-    const safeX = w * 0.06;
-    const safeY = h * 0.06;
-    const safeW = w * 0.88;
-    const safeH = h * 0.88;
+    const L = layoutFor(platform, w, h);
+    const safeX = L.hPad;
+    const safeY = L.vPad;
+    const safeW = w - L.hPad * 2;
+    const safeH = h - L.vPad * 2;
 
-    // Top brand strip
-    const markSize = Math.min(w, h) * 0.07;
-    drawMark(ctx, safeX + markSize / 2, safeY + markSize / 2, markSize, COLOR_GOLD, COLOR_DARK);
-    drawText(ctx, "THE MILLIONS.", safeX + markSize + markSize * 0.4, safeY + markSize * 0.62, {
-        font: FONT_HEADING, size: markSize * 0.42, weight: 600, color: COLOR_GOLD,
-        letterSpacing: `${markSize * 0.02}px`,
-    });
+    // Brand strip (top-left mark + word, right-aligned category tag)
+    const stripBottom = drawBrandStrip(
+        ctx,
+        safeX,
+        safeY,
+        L.markSize,
+        COLOR_GOLD,
+        COLOR_DARK,
+        "TAX TIPS",
+        safeX + safeW
+    );
 
-    // Headline — large, italic Cormorant
-    const headlineSize = platform === "story" ? h * 0.05 : h * 0.085;
-    const headlineY = safeY + markSize + h * 0.05;
-    const headlineLines = wrapText(ctx, content.headline || "Your Headline", safeW, FONT_HEADING, headlineSize, 600);
+    // Headline — top-aligned baseline so the gap above is exactly what we set.
+    const headlineTopY = stripBottom + h * 0.06;
+    const headlineLineHeight = L.headlineSize * 1.08;
+    const headlineLines = wrapText(
+        ctx,
+        content.headline || "Your Headline",
+        safeW,
+        FONT_HEADING,
+        L.headlineSize,
+        600
+    );
     headlineLines.forEach((line, i) => {
-        drawText(ctx, line, safeX, headlineY + i * headlineSize * 1.05, {
-            font: FONT_HEADING, size: headlineSize, weight: 600, color: COLOR_WHITE,
+        drawText(ctx, line, safeX, headlineTopY + i * headlineLineHeight, {
+            font: FONT_HEADING,
+            size: L.headlineSize,
+            weight: 600,
+            color: COLOR_WHITE,
+            baseline: "top",
         });
     });
 
-    // Gold accent under headline
-    const headlineBlockH = headlineLines.length * headlineSize * 1.05;
-    const accentY = headlineY + headlineBlockH + h * 0.025;
+    // Gold accent — a real block, not a hairline
+    const headlineBottomY = headlineTopY + headlineLines.length * headlineLineHeight;
+    const accentY = headlineBottomY + h * 0.025;
     ctx.fillStyle = COLOR_GOLD;
-    ctx.fillRect(safeX, accentY, w * 0.1, Math.max(2, h * 0.006));
+    ctx.fillRect(safeX, accentY, w * 0.08, L.accentH);
 
-    // Items — numbered list
-    const itemStartY = accentY + h * 0.05;
-    const itemSize = platform === "story" ? h * 0.028 : h * 0.045;
-    const numberSize = itemSize * 1.2;
-    const items = content.items.filter((x) => x && x.trim()).slice(0, 5);
-    let cursorY = itemStartY;
-    const lineGap = itemSize * 1.5;
+    // Numbered tips
+    const tipsTopY = accentY + L.accentH + h * 0.04;
+    const numberSize = L.bodySize * 1.55;
+    const numberColumnW = numberSize * 1.7;
+    const items = content.items.filter((s) => s && s.trim()).slice(0, 5);
+    let cursorY = tipsTopY;
+    const tipGap = h * 0.025;
 
     items.forEach((item, i) => {
-        // Number
+        // Number — italic Cormorant in gold
         drawText(ctx, String(i + 1).padStart(2, "0"), safeX, cursorY, {
-            font: FONT_HEADING, size: numberSize, weight: 600, color: COLOR_GOLD,
+            font: FONT_HEADING,
+            size: numberSize,
+            weight: 400,
+            color: COLOR_GOLD,
+            baseline: "top",
         });
-        // Text — wrap if needed
-        const textX = safeX + w * 0.075;
-        const textWidth = safeW - w * 0.075;
-        const itemLines = wrapText(ctx, item, textWidth, FONT_BODY, itemSize, 400);
-        itemLines.forEach((line, j) => {
-            drawText(ctx, line, textX, cursorY + j * itemSize * 1.3, {
-                font: FONT_BODY, size: itemSize, weight: 400, color: COLOR_WHITE,
+        // Tip body — wrapped
+        const tipLines = wrapText(ctx, item, safeW - numberColumnW, FONT_BODY, L.bodySize, 400);
+        const bodyTopOffset = numberSize * 0.18; // align body roughly with the number
+        tipLines.forEach((line, j) => {
+            drawText(ctx, line, safeX + numberColumnW, cursorY + bodyTopOffset + j * L.bodySize * 1.4, {
+                font: FONT_BODY,
+                size: L.bodySize,
+                weight: 400,
+                color: COLOR_WHITE,
+                baseline: "top",
             });
         });
-        cursorY += Math.max(numberSize, itemLines.length * itemSize * 1.3) + lineGap * 0.4;
+        const blockH = Math.max(numberSize, bodyTopOffset + tipLines.length * L.bodySize * 1.4);
+        cursorY += blockH + tipGap;
     });
 
-    // CTA at bottom
+    // CTA pinned to safe bottom — small rule above it for elegance
     if (content.cta) {
         const ctaSize = h * 0.022;
-        drawText(ctx, content.cta.toUpperCase(), safeX, safeY + safeH - ctaSize * 0.5, {
-            font: FONT_BODY, size: ctaSize, weight: 500, color: COLOR_GOLD,
-            letterSpacing: `${ctaSize * 0.2}px`, baseline: "alphabetic",
+        const ctaY = safeY + safeH;
+        // Thin gold rule above the CTA
+        ctx.fillStyle = COLOR_GOLD;
+        ctx.fillRect(safeX, ctaY - ctaSize * 1.8, w * 0.04, Math.max(1, h * 0.002));
+        drawText(ctx, content.cta.toUpperCase(), safeX, ctaY, {
+            font: FONT_BODY,
+            size: ctaSize,
+            weight: 500,
+            color: COLOR_GOLD,
+            baseline: "bottom",
+            letterSpacing: `${ctaSize * 0.22}px`,
         });
     }
 }
 
 // --- QUOTE -------------------------------------------------------------------
-
+// Dramatic centered layout on dark green. The opening quote glyph is itself
+// a large decorative element. Wordmark anchors the bottom for brand recall
+// when the post gets reshared without context.
 async function renderQuote(
     ctx: CanvasRenderingContext2D,
     content: QuoteContent,
@@ -176,46 +295,73 @@ async function renderQuote(
 ): Promise<void> {
     await fillPostBackground(ctx, w, h, imageUrl, COLOR_DARK);
 
-    const safeX = w * 0.1;
-    const safeY = h * 0.1;
-    const safeW = w * 0.8;
+    const L = layoutFor(platform, w, h);
 
-    // Big decorative quote mark
-    const quoteMarkSize = Math.min(w, h) * 0.18;
-    drawText(ctx, "“", safeX - quoteMarkSize * 0.1, safeY + quoteMarkSize, {
-        font: FONT_HEADING, size: quoteMarkSize, weight: 600, color: COLOR_GOLD,
+    // Big decorative opening quote glyph — sits behind/above the quote
+    const decorSize = Math.min(w, h) * (platform === "story" ? 0.22 : 0.28);
+    drawText(ctx, "“", w / 2, h * 0.27, {
+        font: FONT_HEADING,
+        size: decorSize,
+        weight: 600,
+        color: "rgba(201, 168, 76, 0.18)",
+        align: "center",
+        baseline: "middle",
     });
 
-    // Quote text — centered vertically
-    const quoteSize = platform === "story" ? h * 0.045 : h * 0.075;
-    const quoteLines = wrapText(ctx, content.quote || "Your quote here.", safeW, FONT_HEADING, quoteSize, 600);
-    const totalH = quoteLines.length * quoteSize * 1.15;
-    const blockTopY = h / 2 - totalH / 2;
+    // The quote — large, regular weight (italic feel via the typeface) Cormorant
+    const quoteSize = platform === "story" ? h * 0.048 : h * 0.072;
+    const quoteMaxW = w * 0.78;
+    const quoteLines = wrapText(
+        ctx,
+        content.quote || "Your quote here.",
+        quoteMaxW,
+        FONT_HEADING,
+        quoteSize,
+        400
+    );
+    const lineH = quoteSize * 1.18;
+    const quoteBlockH = quoteLines.length * lineH;
+    const quoteTopY = h / 2 - quoteBlockH / 2;
+
     quoteLines.forEach((line, i) => {
-        drawText(ctx, line, w / 2, blockTopY + i * quoteSize * 1.15 + quoteSize * 0.8, {
-            font: FONT_HEADING, size: quoteSize, weight: 600, color: COLOR_WHITE, align: "center",
+        drawText(ctx, line, w / 2, quoteTopY + i * lineH, {
+            font: FONT_HEADING,
+            size: quoteSize,
+            weight: 400,
+            color: COLOR_WHITE,
+            align: "center",
+            baseline: "top",
         });
     });
 
-    // Gold accent below quote
-    const accentY = blockTopY + totalH + h * 0.05;
+    // Gold accent under the quote
+    const accentY = quoteTopY + quoteBlockH + h * 0.04;
     ctx.fillStyle = COLOR_GOLD;
-    ctx.fillRect(w / 2 - w * 0.05, accentY, w * 0.1, Math.max(2, h * 0.005));
+    const accentW = w * 0.06;
+    ctx.fillRect(w / 2 - accentW / 2, accentY, accentW, L.accentH);
 
     // Attribution
     if (content.attribution) {
-        drawText(ctx, content.attribution.toUpperCase(), w / 2, accentY + h * 0.045, {
-            font: FONT_BODY, size: h * 0.022, weight: 500, color: COLOR_GOLD, align: "center",
-            letterSpacing: `${h * 0.006}px`,
+        drawText(ctx, content.attribution.toUpperCase(), w / 2, accentY + L.accentH + h * 0.025, {
+            font: FONT_BODY,
+            size: h * 0.022,
+            weight: 500,
+            color: COLOR_GOLD,
+            align: "center",
+            baseline: "top",
+            letterSpacing: `${h * 0.007}px`,
         });
     }
 
-    // Wordmark bottom
-    drawWordmarkCentered(ctx, w / 2, h - h * 0.08, w * 0.25, COLOR_GOLD);
+    // Bottom wordmark — small but legible
+    const wmW = platform === "story" ? w * 0.35 : w * 0.22;
+    drawWordmarkCentered(ctx, w / 2, h - L.vPad - wmW / 8, wmW, COLOR_GOLD);
 }
 
 // --- STAT --------------------------------------------------------------------
-
+// Inverse palette to differentiate from the other two templates: GOLD field,
+// dark green ink. Big serif number is the hero. Brand bar in dark on top,
+// label + sublabel centered below, brand URL pinned to bottom.
 async function renderStat(
     ctx: CanvasRenderingContext2D,
     content: StatContent,
@@ -224,52 +370,86 @@ async function renderStat(
     h: number,
     imageUrl?: string | null
 ): Promise<void> {
-    await fillPostBackground(ctx, w, h, imageUrl, COLOR_DARK);
+    if (imageUrl) {
+        // With a custom background, fall back to dark so text contrast survives.
+        await fillPostBackground(ctx, w, h, imageUrl, COLOR_DARK);
+    } else {
+        ctx.fillStyle = COLOR_GOLD;
+        ctx.fillRect(0, 0, w, h);
+    }
 
-    const safeX = w * 0.08;
-    const safeY = h * 0.08;
-    const safeW = w * 0.84;
+    const inkColor = imageUrl ? COLOR_GOLD : COLOR_DARK;
+    const bgInk = imageUrl ? COLOR_DARK : COLOR_GOLD; // for the M-mark's body
 
-    // Top brand mark
-    const markSize = Math.min(w, h) * 0.07;
-    drawMark(ctx, safeX + markSize / 2, safeY + markSize / 2, markSize, COLOR_GOLD, COLOR_DARK);
-    drawText(ctx, "THE MILLIONS.", safeX + markSize + markSize * 0.4, safeY + markSize * 0.62, {
-        font: FONT_HEADING, size: markSize * 0.42, weight: 600, color: COLOR_GOLD,
-        letterSpacing: `${markSize * 0.02}px`,
+    const L = layoutFor(platform, w, h);
+    const safeX = L.hPad;
+    const safeY = L.vPad;
+    const safeW = w - L.hPad * 2;
+    const safeH = h - L.vPad * 2;
+
+    // Top brand strip (dark mark on gold bg, no right tag)
+    drawBrandStrip(ctx, safeX, safeY, L.markSize, inkColor, bgInk);
+
+    // BIG number — the hero
+    const numberSize = platform === "story" ? h * 0.16 : h * 0.24;
+    const numberCenterY = h / 2 - h * 0.04;
+    drawText(ctx, content.number || "00", w / 2, numberCenterY, {
+        font: FONT_HEADING,
+        size: numberSize,
+        weight: 600,
+        color: inkColor,
+        align: "center",
+        baseline: "middle",
     });
 
-    // BIG number — center
-    const numberSize = platform === "story" ? h * 0.13 : h * 0.22;
-    const centerY = h / 2 - h * 0.05;
-    drawText(ctx, content.number || "00", w / 2, centerY, {
-        font: FONT_HEADING, size: numberSize, weight: 600, color: COLOR_GOLD, align: "center", baseline: "middle",
-    });
+    // Dark accent rule under number
+    const accentY = numberCenterY + numberSize * 0.52;
+    ctx.fillStyle = inkColor;
+    const accentW = w * 0.08;
+    ctx.fillRect(w / 2 - accentW / 2, accentY, accentW, L.accentH);
 
-    // Gold accent
-    const accentY = centerY + numberSize * 0.55;
-    ctx.fillStyle = COLOR_GOLD;
-    ctx.fillRect(w / 2 - w * 0.06, accentY, w * 0.12, Math.max(2, h * 0.006));
-
-    // Label
-    const labelSize = platform === "story" ? h * 0.032 : h * 0.05;
-    const labelLines = wrapText(ctx, content.label || "Your label", safeW, FONT_HEADING, labelSize, 400);
+    // Label — italic Cormorant
+    const labelSize = platform === "story" ? h * 0.034 : h * 0.05;
+    const labelTopY = accentY + L.accentH + h * 0.035;
+    const labelLines = wrapText(ctx, content.label || "Your label", safeW * 0.9, FONT_HEADING, labelSize, 400);
     labelLines.forEach((line, i) => {
-        drawText(ctx, line, w / 2, accentY + h * 0.06 + i * labelSize * 1.2, {
-            font: FONT_HEADING, size: labelSize, weight: 400, color: COLOR_WHITE, align: "center",
+        drawText(ctx, line, w / 2, labelTopY + i * labelSize * 1.22, {
+            font: FONT_HEADING,
+            size: labelSize,
+            weight: 400,
+            color: inkColor,
+            align: "center",
+            baseline: "top",
         });
     });
 
-    // Sublabel
+    // Sublabel — body type, more muted
     if (content.sublabel) {
-        const sublabelSize = platform === "story" ? h * 0.02 : h * 0.026;
-        const blockEndY = accentY + h * 0.06 + labelLines.length * labelSize * 1.2;
-        const sublabelLines = wrapText(ctx, content.sublabel, safeW * 0.85, FONT_BODY, sublabelSize, 400);
-        sublabelLines.forEach((line, i) => {
-            drawText(ctx, line, w / 2, blockEndY + h * 0.04 + i * sublabelSize * 1.4, {
-                font: FONT_BODY, size: sublabelSize, weight: 400, color: COLOR_CREAM, align: "center",
+        const sublabelSize = platform === "story" ? h * 0.022 : h * 0.026;
+        const subTopY = labelTopY + labelLines.length * labelSize * 1.22 + h * 0.03;
+        const subLines = wrapText(ctx, content.sublabel, safeW * 0.75, FONT_BODY, sublabelSize, 400);
+        subLines.forEach((line, i) => {
+            drawText(ctx, line, w / 2, subTopY + i * sublabelSize * 1.45, {
+                font: FONT_BODY,
+                size: sublabelSize,
+                weight: 400,
+                color: inkColor,
+                align: "center",
+                baseline: "top",
             });
         });
     }
+
+    // Bottom URL line, very small
+    drawText(ctx, "THE-MILLIONS.CO.UK", w / 2, safeY + safeH, {
+        font: FONT_BODY,
+        size: h * 0.02,
+        weight: 500,
+        color: inkColor,
+        align: "center",
+        baseline: "bottom",
+        letterSpacing: `${h * 0.006}px`,
+    });
 }
 
 // --- ENTRYPOINT --------------------------------------------------------------
