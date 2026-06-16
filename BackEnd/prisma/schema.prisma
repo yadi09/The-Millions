@@ -59,6 +59,7 @@ model User {
   createdAt    DateTime      @default(now())
   roles        UserRole[]
   businessCard BusinessCard?
+  socialPosts  SocialPost[]
 }
 
 model UserRole {
@@ -77,6 +78,31 @@ model Role {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   users       UserRole[]
+}
+
+model SocialPost {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Layout config
+  templateType String   // "tip-list" | "quote" | "stat"
+  platform     String   // "linkedin" | "square" | "story"
+
+  // Content blob — shape varies by templateType (validated client + server side)
+  content      Json
+
+  // Optional uploaded background image
+  imageUrl     String?
+
+  // Library title (for the draft list)
+  title        String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId, updatedAt])
+  @@map("social_post")
 }
 
 model BusinessCard {

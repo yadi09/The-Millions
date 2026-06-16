@@ -16,6 +16,7 @@ import testimonialsRoutes from "./modules/testimonials/testimonials.routes.js";
 import adminTestimonialsRoutes from "./modules/testimonials/admin.testimonials.routes.js";
 import agentRoutes from "./modules/agent/agent.routes.js";
 import businessCardRoutes from "./modules/business-card/business-card.routes.js";
+import socialPostRoutes from "./modules/social-post/social-post.routes.js";
 import swaggerRoutes from "./routes/swagger.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { notFoundHandler } from "./middlewares/notFound.middleware.js";
@@ -65,6 +66,7 @@ app.use("/api/testimonials", testimonialsRoutes);
 app.use("/api/admin/testimonials", adminTestimonialsRoutes);
 app.use("/api/agent", agentRoutes);
 app.use("/api/business-card", businessCardRoutes);
+app.use("/api/social-posts", socialPostRoutes);
 app.use("/api-docs", swaggerRoutes);
 
 app.use(notFoundHandler);

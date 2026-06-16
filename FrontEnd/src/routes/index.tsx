@@ -19,6 +19,7 @@ import InboxManagement from "../pages/admin/InboxManagement";
 import AdminSettings from "../pages/admin/Settings";
 import BrandAssets from "../pages/admin/BrandAssets";
 import BusinessCardBuilder from "../pages/admin/BusinessCardBuilder";
+import SocialPostBuilder from "../pages/admin/SocialPostBuilder";
 import ModernizationProposal from "../pages/proposal/ModernizationProposal";
 
 const PublicLayout = () => (
@@ -72,6 +73,7 @@ export const AppRoutes = () => (
             <Route path="testimonials" element={<TestimonialsManagement />} />
             <Route path="brand" element={<BrandAssets />} />
             <Route path="business-card" element={<BusinessCardBuilder />} />
+            <Route path="social-posts" element={<SocialPostBuilder />} />
             <Route path="settings" element={<AdminSettings />} />
 
             {/* Deprecated — content editing now lives on the live site via

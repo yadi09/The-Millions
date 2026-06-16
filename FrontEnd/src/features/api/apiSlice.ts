@@ -37,7 +37,7 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage', 'BusinessCard'],
+  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage', 'BusinessCard', 'SocialPost'],
   baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
     getPage: builder.query<Page, string>({
@@ -270,6 +270,23 @@ export const apiSlice = createApi({
       query: (data) => ({ url: '/business-card/me', method: 'PUT', body: data }),
       invalidatesTags: ['BusinessCard'],
     }),
+
+    // Social posts — per-user draft library
+    getMySocialPosts: builder.query<any[], void>({
+      query: () => '/social-posts',
+      providesTags: (result) =>
+        result
+          ? [...result.map((p) => ({ type: 'SocialPost' as const, id: p.id })), { type: 'SocialPost' as const, id: 'LIST' }]
+          : [{ type: 'SocialPost' as const, id: 'LIST' }],
+    }),
+    upsertSocialPost: builder.mutation<any, any>({
+      query: (data) => ({ url: '/social-posts', method: 'POST', body: data }),
+      invalidatesTags: [{ type: 'SocialPost' as const, id: 'LIST' }],
+    }),
+    deleteSocialPost: builder.mutation<{ id: string; deleted: boolean }, string>({
+      query: (id) => ({ url: `/social-posts/${id}`, method: 'DELETE' }),
+      invalidatesTags: [{ type: 'SocialPost' as const, id: 'LIST' }],
+    }),
   }),
 });
 
@@ -302,4 +319,7 @@ export const {
   useUpdateFooterMutation,
   useGetMyBusinessCardQuery,
   useUpsertMyBusinessCardMutation,
+  useGetMySocialPostsQuery,
+  useUpsertSocialPostMutation,
+  useDeleteSocialPostMutation,
 } = apiSlice;
