@@ -19,6 +19,7 @@ import InboxManagement from "../pages/admin/InboxManagement";
 import AdminSettings from "../pages/admin/Settings";
 import BrandAssets from "../pages/admin/BrandAssets";
 import BusinessCardBuilder from "../pages/admin/BusinessCardBuilder";
+import ModernizationProposal from "../pages/proposal/ModernizationProposal";
 
 const PublicLayout = () => (
     <Layout>
@@ -46,6 +47,9 @@ export const AppRoutes = () => (
 
         {/* Admin Login Route (Public) */}
         <Route path="/admin/login" element={<AdminLogin />} />
+
+        {/* Standalone proposal pages (public, no layout chrome — meant to be shared as direct links) */}
+        <Route path="/proposal/modernization" element={<ModernizationProposal />} />
 
         {/* Protected Admin Routes */}
         <Route path="/admin" element={
