@@ -37,12 +37,24 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage', 'BusinessCard', 'SocialPost'],
+  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage', 'BusinessCard', 'SocialPost', 'Visibility'],
   baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
-    getPage: builder.query<Page, string>({
-      query: (slug) => `/pages/${slug}`,
-      providesTags: (_result, _error, slug) => [{ type: 'Page', id: slug }],
+    // Accepts a bare slug string for the simple public case, OR an object
+    // with { slug, preview: true } for admin / preview-mode fetches that
+    // need to bypass section-visibility filtering. The ?preview=1 query
+    // is verified server-side against the bearer token before it's
+    // honoured, so the public string variant is always safe.
+    getPage: builder.query<Page, string | { slug: string; preview?: boolean }>({
+      query: (arg) => {
+        const slug = typeof arg === 'string' ? arg : arg.slug;
+        const preview = typeof arg === 'object' && arg.preview ? '?preview=1' : '';
+        return `/pages/${slug}${preview}`;
+      },
+      providesTags: (_result, _error, arg) => {
+        const slug = typeof arg === 'string' ? arg : arg.slug;
+        return [{ type: 'Page', id: slug }];
+      },
     }),
 
     updatePage: builder.mutation<Page, UpdatePageRequest>({
@@ -287,6 +299,35 @@ export const apiSlice = createApi({
       query: (id) => ({ url: `/social-posts/${id}`, method: 'DELETE' }),
       invalidatesTags: [{ type: 'SocialPost' as const, id: 'LIST' }],
     }),
+
+    // ----- Visibility -----
+    // Public read — used by the route gates on the public site to decide
+    // whether to render a page or fall back to ComingSoon.
+    getPublicVisibility: builder.query<{ pages: Record<string, boolean> }, void>({
+      query: () => '/visibility',
+      providesTags: ['Visibility'],
+    }),
+    // Admin read — full state including section visibility, used by the
+    // Site Visibility admin page.
+    getAdminVisibility: builder.query<{
+      pages: Record<string, boolean>;
+      sectionsByPageSlug: Record<string, {
+        pageId: string;
+        title: string;
+        sections: { id: string; type: string; order: number; visible: boolean }[];
+      }>;
+    }, void>({
+      query: () => '/admin/visibility',
+      providesTags: ['Visibility'],
+    }),
+    setPageVisibility: builder.mutation<{ key: string; visible: boolean }, { key: string; visible: boolean }>({
+      query: (body) => ({ url: '/admin/visibility/page', method: 'PUT', body }),
+      invalidatesTags: ['Visibility', 'Page'],
+    }),
+    setSectionVisibility: builder.mutation<{ id: string; visible: boolean }, { id: string; visible: boolean }>({
+      query: ({ id, visible }) => ({ url: `/admin/visibility/section/${id}`, method: 'PUT', body: { visible } }),
+      invalidatesTags: ['Visibility', 'Page'],
+    }),
   }),
 });
 
@@ -322,4 +363,8 @@ export const {
   useGetMySocialPostsQuery,
   useUpsertSocialPostMutation,
   useDeleteSocialPostMutation,
+  useGetPublicVisibilityQuery,
+  useGetAdminVisibilityQuery,
+  useSetPageVisibilityMutation,
+  useSetSectionVisibilityMutation,
 } = apiSlice;

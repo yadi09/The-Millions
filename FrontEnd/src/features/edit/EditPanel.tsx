@@ -61,7 +61,9 @@ function footerResponseToRaw(footerData: any): Record<string, unknown> {
 
 export function EditPanel() {
   const { isEditing, selectedSection, selectSection, setSaveStatus } = useEditMode();
-  const { data: pageData } = useGetPageQuery(ACTIVE_PAGE_SLUG);
+  // Inline editor (admin-only) — fetch with preview so hidden sections
+  // stay editable from the live site without flipping them on first.
+  const { data: pageData } = useGetPageQuery({ slug: ACTIVE_PAGE_SLUG, preview: true });
   const [updatePage] = useUpdatePageMutation();
 
   const schema = selectedSection ? getSchemaForType(selectedSection) : undefined;

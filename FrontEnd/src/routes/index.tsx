@@ -20,6 +20,8 @@ import AdminSettings from "../pages/admin/Settings";
 import BrandAssets from "../pages/admin/BrandAssets";
 import BusinessCardBuilder from "../pages/admin/BusinessCardBuilder";
 import SocialPostBuilder from "../pages/admin/SocialPostBuilder";
+import SiteVisibility from "../pages/admin/SiteVisibility";
+import VisibilityGate from "../components/VisibilityGate";
 
 const PublicLayout = () => (
     <Layout>
@@ -34,14 +36,17 @@ const DeprecatedRedirect = () => <Navigate to={ADMIN_DEFAULT} replace />;
 
 export const AppRoutes = () => (
     <Routes>
-        {/* Public Routes */}
+        {/* Public Routes — each gated by the page-visibility toggle.
+            Individual blog posts (/blog/:slug) are intentionally NOT gated
+            via the blog key because they have their own DRAFT / PUBLISHED
+            status; gating them here would double-filter. */}
         <Route element={<PublicLayout />}>
-            <Route path="/" element={<Landing />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/" element={<VisibilityGate pageKey="home"><Landing /></VisibilityGate>} />
+            <Route path="/contact" element={<VisibilityGate pageKey="contact"><ContactPage /></VisibilityGate>} />
+            <Route path="/blog" element={<VisibilityGate pageKey="blog"><BlogPage /></VisibilityGate>} />
             <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/testimonials" element={<TestimonialsPage />} />
-            <Route path="/submit-testimonial" element={<SubmitTestimonial />} />
+            <Route path="/testimonials" element={<VisibilityGate pageKey="testimonials"><TestimonialsPage /></VisibilityGate>} />
+            <Route path="/submit-testimonial" element={<VisibilityGate pageKey="submit-testimonial"><SubmitTestimonial /></VisibilityGate>} />
             <Route path="*" element={<ComingSoonPage />} />
         </Route>
 
@@ -70,6 +75,7 @@ export const AppRoutes = () => (
             <Route path="brand" element={<BrandAssets />} />
             <Route path="business-card" element={<BusinessCardBuilder />} />
             <Route path="social-posts" element={<SocialPostBuilder />} />
+            <Route path="visibility" element={<SiteVisibility />} />
             <Route path="settings" element={<AdminSettings />} />
 
             {/* Deprecated — content editing now lives on the live site via

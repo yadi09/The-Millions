@@ -34,7 +34,8 @@ const HOME_ARCHITECTURE_STRUCTURE = [
 ];
 
 const HomeArchitectureEditor = () => {
-    const { data: pageData, isLoading, error } = useGetPageQuery('home');
+    // Admin editor — always include hidden sections so they're editable.
+    const { data: pageData, isLoading, error } = useGetPageQuery({ slug: 'home', preview: true });
     const [updatePage, { isLoading: isSaving }] = useUpdatePageMutation();
 
     const [localPageData, setLocalPageData] = useState<Page | null>(null);

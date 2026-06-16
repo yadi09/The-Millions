@@ -1,3 +1,5 @@
+import { useSearchParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { HeroSection } from '../components/landing/HeroSection';
 import { PhilosophySection } from '../components/landing/PhilosophySection';
 import { OverviewSection } from '../components/landing/OverviewSection';
@@ -11,9 +13,17 @@ import { LeadershipSection } from '../components/landing/LeadershipSection';
 import { FutureVisionSection } from '../components/landing/FutureVisionSection';
 import { landingContent } from '../data/landingContent';
 import { useGetPageQuery } from '../features/api/apiSlice';
+import type { RootState } from '../app/store';
 
 const Landing = () => {
-  const { data: pageData } = useGetPageQuery('home');
+  // Admin preview override: append ?preview=1 to the URL while logged in
+  // to see sections that are toggled off (so they can be reviewed before
+  // being flipped live). Server-side verifies the token, so a non-admin
+  // appending ?preview=1 still gets the filtered view.
+  const [searchParams] = useSearchParams();
+  const isAuthed = useSelector((s: RootState) => s.auth.isAuthenticated);
+  const preview = searchParams.get('preview') === '1' && isAuthed;
+  const { data: pageData } = useGetPageQuery({ slug: 'home', preview });
 
   const getSectionContent = (type: string, fallbackKey: keyof typeof landingContent): any => {
     const section = pageData?.sections?.find(s => s.type === type);

@@ -17,11 +17,12 @@ model Page {
 }
 
 model Section {
-  id      String @id @default(uuid())
+  id      String  @id @default(uuid())
   pageId  String
   type    String
   order   Int
   content Json
+  visible Boolean @default(true)
 
   page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
 

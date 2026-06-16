@@ -1,14 +1,21 @@
 import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { useGetPageQuery, useGetTestimonialsQuery } from "../../features/api/apiSlice";
 import { Loader2, Star, Quote, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { SubPageHero } from "../../components/SubPageHero";
 import { cn } from "../../components/lib/utils";
 import type { Testimonial } from "../../types/testimonial";
+import type { RootState } from "../../app/store";
 
 const TESTIMONIALS_PER_PAGE = 9;
 
 export default function TestimonialsPage() {
-    const { data: pageData, isLoading: pageLoading } = useGetPageQuery("testimonials");
+    // Same preview-override pattern as the Landing page.
+    const [searchParams] = useSearchParams();
+    const isAuthed = useSelector((s: RootState) => s.auth.isAuthenticated);
+    const preview = searchParams.get("preview") === "1" && isAuthed;
+    const { data: pageData, isLoading: pageLoading } = useGetPageQuery({ slug: "testimonials", preview });
     const { data: testimonials, isLoading: testimonialsLoading } = useGetTestimonialsQuery({ role: "public" });
 
     const [filter, setFilter] = useState<string>("All");

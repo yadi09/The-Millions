@@ -14,7 +14,9 @@ interface PageEditorContentProps {
 }
 
 const PageEditorContent = ({ slug, onClose, isModal = false }: PageEditorContentProps) => {
-    const { data: pageData, isLoading, error } = useGetPageQuery(slug || '');
+    // Admin editor — always include hidden sections (the brothers need to
+    // see and edit them even when toggled off on the public site).
+    const { data: pageData, isLoading, error } = useGetPageQuery({ slug: slug || '', preview: true });
     const [updatePage, { isLoading: isSaving }] = useUpdatePageMutation();
 
     const [localPageData, setLocalPageData] = useState<Page | null>(null);
