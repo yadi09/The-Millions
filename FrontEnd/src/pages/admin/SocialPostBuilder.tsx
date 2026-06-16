@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import {
     Loader2,
@@ -11,6 +12,11 @@ import {
     FileText,
     Quote,
     BarChart3,
+    MessageSquareQuote,
+    Star,
+    ChevronDown,
+    ChevronUp,
+    Check,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
@@ -19,8 +25,10 @@ import {
     useUpsertSocialPostMutation,
     useDeleteSocialPostMutation,
     useUploadImageMutation,
+    useGetTestimonialsQuery,
 } from "../../features/api/apiSlice";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
+import type { Testimonial } from "../../types/testimonial";
 import {
     renderSocialPost,
     exportSocialPostPng,
@@ -83,11 +91,16 @@ const initialForm = (): Form => ({
     title: null,
 });
 
+// Optional Router-state payload — set by the "Create LinkedIn Post" button
+// on the Testimonials admin page so this builder opens pre-filled.
+type DeeplinkState = { testimonial?: Testimonial };
+
 const SocialPostBuilder = () => {
     const { data: posts = [], isLoading: loadingPosts } = useGetMySocialPostsQuery();
     const [upsert, { isLoading: saving }] = useUpsertSocialPostMutation();
     const [deletePost] = useDeleteSocialPostMutation();
     const [uploadImage, { isLoading: uploadingImage }] = useUploadImageMutation();
+    const location = useLocation();
 
     const [form, setForm] = useState<Form>(initialForm());
     const [exporting, setExporting] = useState(false);
@@ -95,6 +108,32 @@ const SocialPostBuilder = () => {
 
     const previewRef = useRef<HTMLCanvasElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Deeplink consumption — when the user clicks "Create LinkedIn Post"
+    // from a testimonial, we navigate here with the testimonial in router
+    // state and pre-fill a Quote draft. We track the testimonial id we've
+    // already consumed so re-renders don't keep clobbering edits, but a
+    // DIFFERENT testimonial (back-and-forth flow) does re-seed.
+    const consumedDeeplinkRef = useRef<string | null>(null);
+    useEffect(() => {
+        const state = location.state as DeeplinkState | null;
+        const t = state?.testimonial;
+        if (!t || consumedDeeplinkRef.current === t.id) return;
+        consumedDeeplinkRef.current = t.id;
+        setForm({
+            templateType: "quote",
+            platform: "linkedin",
+            content: {
+                quote: t.content,
+                attribution: formatTestimonialAttribution(t),
+                rating: t.rating,
+                sourceTestimonialId: t.id,
+            },
+            imageUrl: null,
+            title: `Client testimonial — ${t.name}`,
+        });
+        toast.success(`Pre-filled from ${t.name}'s testimonial — edit and save.`);
+    }, [location.state]);
 
     // Redraw preview on every form change. Preview width is fixed; height
     // derives from the platform's native aspect ratio.
@@ -552,29 +591,212 @@ const TipListForm = ({ content, onChange }: { content: TipListContent; onChange:
     );
 };
 
-const QuoteForm = ({ content, onChange }: { content: QuoteContent; onChange: (c: QuoteContent) => void }) => (
-    <div className="space-y-5">
-        <div>
-            <SectionLabel>Quote</SectionLabel>
-            <DarkTextarea
-                value={content.quote}
-                onChange={(e) => onChange({ ...content, quote: e.target.value })}
-                placeholder="Most directors overpay on dividends by £2,000 every year."
-                rows={3}
-                maxLength={280}
-            />
+// Format a Testimonial into the on-poster attribution string.
+// Keeps it short enough to fit on one line without spilling into the wordmark.
+function formatTestimonialAttribution(t: Testimonial): string {
+    const role = t.role?.trim();
+    const company = t.company?.trim();
+    if (role && company) return `${t.name}, ${role} @ ${company}`;
+    if (role) return `${t.name}, ${role}`;
+    if (company) return `${t.name}, ${company}`;
+    return t.name;
+}
+
+const QuoteForm = ({ content, onChange }: { content: QuoteContent; onChange: (c: QuoteContent) => void }) => {
+    const [showPicker, setShowPicker] = useState(false);
+    // Approved-only — we don't want the brothers picking pending ones, and
+    // rejected ones definitely shouldn't appear here.
+    const { data: testimonials = [], isLoading } = useGetTestimonialsQuery({ role: "admin" });
+    const approved = (testimonials as Testimonial[]).filter((t) => t.status === "APPROVED");
+
+    const pickTestimonial = (t: Testimonial) => {
+        onChange({
+            ...content,
+            quote: t.content,
+            attribution: formatTestimonialAttribution(t),
+            rating: t.rating,
+            sourceTestimonialId: t.id,
+        });
+        setShowPicker(false);
+        toast.success(`Filled from "${t.name}" — edit if you need to trim.`);
+    };
+
+    const clearSource = () => {
+        onChange({ ...content, rating: undefined, sourceTestimonialId: undefined });
+    };
+
+    const sourcedFrom = content.sourceTestimonialId
+        ? approved.find((t) => t.id === content.sourceTestimonialId)
+        : null;
+
+    return (
+        <div className="space-y-5">
+            {/* Testimonial picker — collapsible inline panel.
+                Sits ABOVE the quote field so it reads as the "primary action"
+                for this template type. */}
+            <div className="bg-millions-accent/5 border border-millions-accent/20 p-3 sm:p-4">
+                <button
+                    type="button"
+                    onClick={() => setShowPicker((s) => !s)}
+                    className="w-full flex items-center justify-between gap-3 text-left group"
+                >
+                    <div className="flex items-center gap-3 min-w-0">
+                        <MessageSquareQuote className="w-4 h-4 text-millions-accent shrink-0" />
+                        <div className="min-w-0">
+                            <p className="text-[0.7rem] sm:text-[0.75rem] font-jost text-white font-medium uppercase tracking-[0.15em]">
+                                Use a client testimonial
+                            </p>
+                            <p className="text-[0.6rem] font-jost text-white/40 mt-0.5 truncate">
+                                {sourcedFrom
+                                    ? `Sourced from ${sourcedFrom.name}`
+                                    : `${approved.length} approved · auto-fills quote, attribution, and star rating`}
+                            </p>
+                        </div>
+                    </div>
+                    {showPicker ? (
+                        <ChevronUp className="w-4 h-4 text-millions-accent shrink-0" />
+                    ) : (
+                        <ChevronDown className="w-4 h-4 text-millions-accent shrink-0" />
+                    )}
+                </button>
+
+                {showPicker && (
+                    <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-millions-accent/20">
+                        {isLoading ? (
+                            <div className="flex items-center justify-center py-6">
+                                <Loader2 className="w-5 h-5 text-millions-accent animate-spin" />
+                            </div>
+                        ) : approved.length === 0 ? (
+                            <p className="text-[0.75rem] font-jost text-white/40 italic py-4 text-center">
+                                No approved testimonials yet. Approve some in the Testimonials page first.
+                            </p>
+                        ) : (
+                            <ul className="space-y-2 max-h-72 overflow-y-auto custom-scrollbar pr-1">
+                                {approved.map((t) => {
+                                    const isPicked = content.sourceTestimonialId === t.id;
+                                    return (
+                                        <li
+                                            key={t.id}
+                                            onClick={() => pickTestimonial(t)}
+                                            className={`flex items-start gap-3 p-3 cursor-pointer transition-all border ${
+                                                isPicked
+                                                    ? "bg-millions-accent/10 border-millions-accent/40"
+                                                    : "bg-white/[0.02] border-white/5 hover:border-millions-accent/30 hover:bg-white/[0.04]"
+                                            }`}
+                                        >
+                                            {/* Avatar */}
+                                            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-white/5 border border-white/5 shrink-0 overflow-hidden">
+                                                {t.image ? (
+                                                    <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-white/30 font-cormorant text-base">
+                                                        {t.name.charAt(0)}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {/* Content */}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between gap-2 flex-wrap">
+                                                    <span className="text-[0.75rem] font-jost text-white font-medium truncate">
+                                                        {t.name}
+                                                        {(t.role || t.company) && (
+                                                            <span className="text-white/40 font-normal">
+                                                                {" "}
+                                                                · {[t.role, t.company].filter(Boolean).join(", ")}
+                                                            </span>
+                                                        )}
+                                                    </span>
+                                                    {/* Star rating */}
+                                                    <span className="inline-flex items-center gap-0.5 text-millions-accent text-[0.65rem]">
+                                                        {Array.from({ length: Math.max(0, Math.min(5, t.rating)) }).map((_, i) => (
+                                                            <Star key={i} className="w-3 h-3 fill-millions-accent text-millions-accent" />
+                                                        ))}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[0.7rem] font-jost text-white/50 leading-snug mt-1 line-clamp-2">
+                                                    {t.content}
+                                                </p>
+                                                {isPicked && (
+                                                    <div className="inline-flex items-center gap-1 mt-1.5 text-[0.55rem] font-jost text-millions-accent uppercase tracking-[0.2em] font-bold">
+                                                        <Check className="w-3 h-3" /> Selected
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            <div>
+                <SectionLabel>Quote</SectionLabel>
+                <DarkTextarea
+                    value={content.quote}
+                    onChange={(e) => onChange({ ...content, quote: e.target.value })}
+                    placeholder="Most directors overpay on dividends by £2,000 every year."
+                    rows={3}
+                    maxLength={280}
+                />
+                {content.quote.length > 0 && content.quote.length > 200 && (
+                    <p className="text-[0.6rem] font-jost text-amber-300/70 mt-1.5">
+                        Quote is {content.quote.length} chars — tightening it under ~150 reads better on a poster.
+                    </p>
+                )}
+            </div>
+            <div>
+                <SectionLabel>Attribution</SectionLabel>
+                <DarkInput
+                    value={content.attribution}
+                    onChange={(e) => onChange({ ...content, attribution: e.target.value })}
+                    placeholder="Mark Million, Senior Partner"
+                    maxLength={120}
+                />
+            </div>
+            <div>
+                <SectionLabel>Star rating (0 hides the row)</SectionLabel>
+                <div className="flex items-center gap-2">
+                    {[0, 1, 2, 3, 4, 5].map((n) => {
+                        const active = (content.rating ?? 0) === n;
+                        return (
+                            <button
+                                key={n}
+                                type="button"
+                                onClick={() =>
+                                    onChange({
+                                        ...content,
+                                        rating: n === 0 ? undefined : n,
+                                        // If the user manually changes the rating after picking,
+                                        // drop the source link — they're customising.
+                                        sourceTestimonialId: active ? content.sourceTestimonialId : undefined,
+                                    })
+                                }
+                                className={`w-9 h-9 flex items-center justify-center border transition-all ${
+                                    active
+                                        ? "bg-millions-accent text-millions-dark border-millions-accent font-bold"
+                                        : "bg-white/5 text-white/40 border-white/5 hover:border-millions-accent/30 hover:text-white"
+                                }`}
+                            >
+                                <span className="text-[0.75rem] font-jost font-bold">{n}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+                {sourcedFrom && (
+                    <button
+                        type="button"
+                        onClick={clearSource}
+                        className="text-[0.6rem] font-jost text-white/40 hover:text-millions-accent mt-2 uppercase tracking-[0.15em]"
+                    >
+                        Clear testimonial source
+                    </button>
+                )}
+            </div>
         </div>
-        <div>
-            <SectionLabel>Attribution (optional)</SectionLabel>
-            <DarkInput
-                value={content.attribution}
-                onChange={(e) => onChange({ ...content, attribution: e.target.value })}
-                placeholder="Mark Million, Senior Partner"
-                maxLength={120}
-            />
-        </div>
-    </div>
-);
+    );
+};
 
 const StatForm = ({ content, onChange }: { content: StatContent; onChange: (c: StatContent) => void }) => (
     <div className="space-y-5">

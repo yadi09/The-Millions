@@ -26,6 +26,14 @@ export type TipListContent = {
 export type QuoteContent = {
     quote: string;
     attribution: string;
+    // Optional star count (1–5). When set, the renderer draws a row of
+    // gold stars between the quote and the attribution. Auto-populated
+    // when the brother picks a real testimonial from the library.
+    rating?: number;
+    // Tracks which testimonial drove this draft (analytics, future
+    // "refresh from source" features). The backend stores it as opaque
+    // JSON so no migration needed.
+    sourceTestimonialId?: string;
 };
 
 export type StatContent = {
@@ -338,8 +346,29 @@ async function renderQuote(
         });
     });
 
-    // Gold accent under the quote
-    const accentY = quoteTopY + quoteBlockH + h * 0.04;
+    // Star row — only renders when the post came from a testimonial.
+    // Acts as a visual trust signal between the quote and the attribution.
+    const rating = Math.min(5, Math.max(0, Math.floor(content.rating ?? 0)));
+    let cursorBelowQuote = quoteTopY + quoteBlockH + h * 0.035;
+    if (rating > 0) {
+        const starSize = h * 0.04;
+        const stars = "★".repeat(rating);
+        drawText(ctx, stars, w / 2, cursorBelowQuote, {
+            // Use FONT_BODY so the star glyph picks up the system Unicode font
+            // consistently instead of fighting Cormorant's coverage.
+            font: FONT_BODY,
+            size: starSize,
+            weight: 500,
+            color: COLOR_GOLD,
+            align: "center",
+            baseline: "top",
+            letterSpacing: `${starSize * 0.15}px`,
+        });
+        cursorBelowQuote += starSize + h * 0.025;
+    }
+
+    // Gold accent under the quote (or under the stars when present)
+    const accentY = cursorBelowQuote;
     ctx.fillStyle = COLOR_GOLD;
     const accentW = w * 0.06;
     ctx.fillRect(w / 2 - accentW / 2, accentY, accentW, L.accentH);

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     useGetTestimonialsQuery,
     useUpdateTestimonialStatusMutation,
@@ -7,7 +8,7 @@ import {
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
-import { Check, Trash2, ArrowUp, Link2, Copy, Loader2, ChevronLeft, ChevronRight, XCircle, RotateCcw } from "lucide-react";
+import { Check, Trash2, ArrowUp, Link2, Copy, Loader2, ChevronLeft, ChevronRight, XCircle, RotateCcw, Sparkles } from "lucide-react";
 import type { Testimonial } from "../../types/testimonial";
 import { toast } from 'sonner';
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
@@ -15,9 +16,16 @@ import { ConfirmModal } from "../../components/ui/ConfirmModal";
 const ITEMS_PER_PAGE = 4;
 
 export default function TestimonialsManagement() {
+    const navigate = useNavigate();
     const { data: testimonials, isLoading } = useGetTestimonialsQuery({ role: 'admin' });
     const [updateStatus] = useUpdateTestimonialStatusMutation();
     const [deleteTestimonial] = useDeleteTestimonialMutation();
+
+    // Deeplink → the Social Post Builder pre-fills a Quote draft with this
+    // testimonial's content, attribution, and star rating.
+    const handleCreateSocialPost = (t: Testimonial) => {
+        navigate('/admin/social-posts', { state: { testimonial: t } });
+    };
     const [activeView, setActiveView] = useState<'PENDING' | 'APPROVED' | 'REJECTED'>('PENDING');
     const [currentPage, setCurrentPage] = useState(1);
     const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -169,6 +177,9 @@ export default function TestimonialsManagement() {
                                         Featured ({t.order})
                                     </Button>
                                 )}
+                                <Button onClick={() => handleCreateSocialPost(t)} variant="outline" className="w-full border-millions-accent/30 text-millions-accent hover:bg-millions-accent text-millions-accent hover:text-millions-dark rounded-none uppercase text-[0.6rem] sm:text-[0.65rem] tracking-[0.15em] sm:tracking-[0.2em] font-medium h-11 transition-all">
+                                    <Sparkles className="w-4 h-4 mr-2" /> Create<span className="hidden sm:inline"> Post</span>
+                                </Button>
                                 <Button onClick={() => handleReject(t.id)} variant="outline" className="w-full border-red-400/20 text-red-400/70 hover:bg-red-400/5 hover:text-red-400 rounded-none uppercase text-[0.6rem] sm:text-[0.65rem] tracking-[0.15em] sm:tracking-[0.2em] font-medium h-11 transition-all">
                                     <XCircle className="w-4 h-4 mr-2" /> Reject
                                 </Button>
