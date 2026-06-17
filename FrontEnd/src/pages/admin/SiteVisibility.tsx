@@ -86,7 +86,11 @@ const ToggleSwitch = ({
 };
 
 const SiteVisibility = () => {
-    const { data, isLoading } = useGetAdminVisibilityQuery();
+    // Pull refetch out so we can force-refresh after a mutation in case
+    // tag invalidation doesn't kick the query (sometimes happens when
+    // multiple components mount the same query — the cached promise gets
+    // reused before invalidation processes).
+    const { data, isLoading, refetch } = useGetAdminVisibilityQuery();
     const [setPageVis, { isLoading: pageBusy }] = useSetPageVisibilityMutation();
     const [setSectionVis, { isLoading: sectionBusy }] = useSetSectionVisibilityMutation();
     // Track which page rows have their sections expanded
@@ -95,6 +99,10 @@ const SiteVisibility = () => {
     const handlePageToggle = async (key: string, next: boolean) => {
         try {
             await setPageVis({ key, visible: next }).unwrap();
+            // Belt-and-braces: even though invalidatesTags should refetch,
+            // explicitly trigger a refetch so the toggle always reflects
+            // the saved server state.
+            refetch();
             toast.success(`${key === "submit-testimonial" ? "Submit Testimonial" : key.charAt(0).toUpperCase() + key.slice(1)} page is now ${next ? "live" : "hidden"}.`);
         } catch (e: any) {
             toast.error(e?.data?.message || "Failed to update page visibility.");
@@ -104,6 +112,7 @@ const SiteVisibility = () => {
     const handleSectionToggle = async (id: string, next: boolean, label: string) => {
         try {
             await setSectionVis({ id, visible: next }).unwrap();
+            refetch();
             toast.success(`Section "${label}" is now ${next ? "live" : "hidden"}.`);
         } catch (e: any) {
             toast.error(e?.data?.message || "Failed to update section visibility.");

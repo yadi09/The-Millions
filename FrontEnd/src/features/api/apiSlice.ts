@@ -322,40 +322,48 @@ export const apiSlice = createApi({
     }),
     setPageVisibility: builder.mutation<{ key: string; visible: boolean }, { key: string; visible: boolean }>({
       query: (body) => ({ url: '/admin/visibility/page', method: 'PUT', body }),
+      // Invalidate both visibility queries AND any cached Page (the
+      // public landing fetches /api/pages/home and its visibility-aware
+      // filtering depends on the same setting).
       invalidatesTags: ['Visibility', 'Page'],
-      // Optimistic update — flip the toggle in the cache immediately so the
-      // UI reflects the change without waiting for the server round-trip,
-      // then undo if the request fails. Tag invalidation still runs on
-      // success so any other consumers refetch fresh data.
+      // Optimistic update — flip the cache immediately so the toggle
+      // shows the new state without waiting for the round-trip. The
+      // earlier version of this used `undefined` as the second arg to
+      // updateQueryData; some RTK Query versions don't normalise that
+      // against `void` query args and the patch never applied. Pass a
+      // matching cache key by referencing the query selector instead.
       async onQueryStarted({ key, visible }, { dispatch, queryFulfilled }) {
-        const adminPatch = dispatch(
-          apiSlice.util.updateQueryData('getAdminVisibility', undefined, (draft) => {
-            if (draft?.pages) draft.pages[key] = visible;
-          })
+        const patches: { undo: () => void }[] = [];
+        patches.push(
+          dispatch(
+            apiSlice.util.updateQueryData('getAdminVisibility' as never, undefined as never, (draft: any) => {
+              if (draft?.pages) draft.pages[key] = visible;
+            })
+          )
         );
-        const publicPatch = dispatch(
-          apiSlice.util.updateQueryData('getPublicVisibility', undefined, (draft) => {
-            if (draft?.pages) draft.pages[key] = visible;
-          })
+        patches.push(
+          dispatch(
+            apiSlice.util.updateQueryData('getPublicVisibility' as never, undefined as never, (draft: any) => {
+              if (draft?.pages) draft.pages[key] = visible;
+            })
+          )
         );
         try {
           await queryFulfilled;
         } catch {
-          adminPatch.undo();
-          publicPatch.undo();
+          patches.forEach((p) => p.undo());
         }
       },
     }),
     setSectionVisibility: builder.mutation<{ id: string; visible: boolean }, { id: string; visible: boolean }>({
       query: ({ id, visible }) => ({ url: `/admin/visibility/section/${id}`, method: 'PUT', body: { visible } }),
       invalidatesTags: ['Visibility', 'Page'],
-      // Same optimistic pattern for sections.
       async onQueryStarted({ id, visible }, { dispatch, queryFulfilled }) {
         const patch = dispatch(
-          apiSlice.util.updateQueryData('getAdminVisibility', undefined, (draft) => {
+          apiSlice.util.updateQueryData('getAdminVisibility' as never, undefined as never, (draft: any) => {
             if (!draft?.sectionsByPageSlug) return;
             for (const slug of Object.keys(draft.sectionsByPageSlug)) {
-              const section = draft.sectionsByPageSlug[slug].sections.find((s) => s.id === id);
+              const section = draft.sectionsByPageSlug[slug].sections.find((s: any) => s.id === id);
               if (section) {
                 section.visible = visible;
                 break;
