@@ -323,10 +323,52 @@ export const apiSlice = createApi({
     setPageVisibility: builder.mutation<{ key: string; visible: boolean }, { key: string; visible: boolean }>({
       query: (body) => ({ url: '/admin/visibility/page', method: 'PUT', body }),
       invalidatesTags: ['Visibility', 'Page'],
+      // Optimistic update — flip the toggle in the cache immediately so the
+      // UI reflects the change without waiting for the server round-trip,
+      // then undo if the request fails. Tag invalidation still runs on
+      // success so any other consumers refetch fresh data.
+      async onQueryStarted({ key, visible }, { dispatch, queryFulfilled }) {
+        const adminPatch = dispatch(
+          apiSlice.util.updateQueryData('getAdminVisibility', undefined, (draft) => {
+            if (draft?.pages) draft.pages[key] = visible;
+          })
+        );
+        const publicPatch = dispatch(
+          apiSlice.util.updateQueryData('getPublicVisibility', undefined, (draft) => {
+            if (draft?.pages) draft.pages[key] = visible;
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          adminPatch.undo();
+          publicPatch.undo();
+        }
+      },
     }),
     setSectionVisibility: builder.mutation<{ id: string; visible: boolean }, { id: string; visible: boolean }>({
       query: ({ id, visible }) => ({ url: `/admin/visibility/section/${id}`, method: 'PUT', body: { visible } }),
       invalidatesTags: ['Visibility', 'Page'],
+      // Same optimistic pattern for sections.
+      async onQueryStarted({ id, visible }, { dispatch, queryFulfilled }) {
+        const patch = dispatch(
+          apiSlice.util.updateQueryData('getAdminVisibility', undefined, (draft) => {
+            if (!draft?.sectionsByPageSlug) return;
+            for (const slug of Object.keys(draft.sectionsByPageSlug)) {
+              const section = draft.sectionsByPageSlug[slug].sections.find((s) => s.id === id);
+              if (section) {
+                section.visible = visible;
+                break;
+              }
+            }
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patch.undo();
+        }
+      },
     }),
   }),
 });

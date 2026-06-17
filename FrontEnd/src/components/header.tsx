@@ -1,14 +1,41 @@
 import { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useSearchParams } from "react-router-dom"
+import { useSelector } from "react-redux"
+import { useGetPublicVisibilityQuery } from "../features/api/apiSlice"
+import type { RootState } from "../app/store"
+
+// Map nav-item names to the visibility key that gates the destination
+// page. Items without an entry here are always shown (e.g. in-page
+// anchors that scroll to a Home section — those sections have their own
+// per-section visibility but the link itself is fine to keep, the
+// anchor will simply do nothing if the section is hidden).
+const NAV_VISIBILITY_KEY: Record<string, string> = {
+  Testimonials: "testimonials",
+  Blog: "blog",
+  Contact: "contact",
+}
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const location = useLocation()
+  const { data: visibility } = useGetPublicVisibilityQuery()
+  const [searchParams] = useSearchParams()
+  const isAuthed = useSelector((s: RootState) => s.auth.isAuthenticated)
+  const previewMode = searchParams.get("preview") === "1" && isAuthed
 
   const isHome = location.pathname === "/"
 
-  const navigation = [
+  // Hide nav links that point to pages currently toggled off. Admins
+  // browsing with ?preview=1 still see everything so they can verify.
+  const isLinkVisible = (name: string): boolean => {
+    if (previewMode) return true
+    const key = NAV_VISIBILITY_KEY[name]
+    if (!key) return true
+    return visibility?.pages?.[key] !== false
+  }
+
+  const allNavigation = [
     { name: "About", href: "/#philosophy" },
     { name: "Services", href: "/#services" },
     { name: "Impact", href: "/#impact" },
@@ -16,6 +43,8 @@ export function Header() {
     { name: "Testimonials", href: "/testimonials" },
     { name: "Blog", href: "/blog" },
   ]
+  const navigation = allNavigation.filter((n) => isLinkVisible(n.name))
+  const showContact = isLinkVisible("Contact")
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,25 +86,29 @@ export function Header() {
               </Link>
             </li>
           ))}
-          {/* Contact Link */}
-          <li>
-            <Link
-              to="/contact"
-              className="text-white/65 hover:text-millions-accent text-[0.75rem] tracking-[0.12em] uppercase transition-colors font-jost"
-            >
-              Contact
-            </Link>
-          </li>
+          {/* Contact Link — hidden when the page is toggled off */}
+          {showContact && (
+            <li>
+              <Link
+                to="/contact"
+                className="text-white/65 hover:text-millions-accent text-[0.75rem] tracking-[0.12em] uppercase transition-colors font-jost"
+              >
+                Contact
+              </Link>
+            </li>
+          )}
         </ul>
 
         {/* Nav CTA / Burger */}
         <div className="flex items-center gap-4">
-          <Link
-            to="/contact"
-            className="hidden lg:block bg-transparent border border-millions-accent text-millions-accent px-[1.3rem] py-[0.5rem] text-[0.72rem] tracking-[0.1em] uppercase hover:bg-millions-accent hover:text-millions-dark transition-all duration-300 font-jost"
-          >
-            WhatsApp Us
-          </Link>
+          {showContact && (
+            <Link
+              to="/contact"
+              className="hidden lg:block bg-transparent border border-millions-accent text-millions-accent px-[1.3rem] py-[0.5rem] text-[0.72rem] tracking-[0.1em] uppercase hover:bg-millions-accent hover:text-millions-dark transition-all duration-300 font-jost"
+            >
+              WhatsApp Us
+            </Link>
+          )}
 
           {/* Burger Button */}
           <button
@@ -115,23 +148,27 @@ export function Header() {
                 {item.name}
               </Link>
             ))}
-            <Link
-              to="/contact"
-              onClick={() => setIsMenuOpen(false)}
-              className="text-white/70 hover:text-millions-accent font-cormorant text-xl font-light tracking-widest transition-all py-2 border-b border-white/5"
-            >
-              Contact
-            </Link>
+            {showContact && (
+              <Link
+                to="/contact"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-white/70 hover:text-millions-accent font-cormorant text-xl font-light tracking-widest transition-all py-2 border-b border-white/5"
+              >
+                Contact
+              </Link>
+            )}
           </nav>
 
           <div className="mt-auto pt-10">
-            <Link
-              to="/contact"
-              onClick={() => setIsMenuOpen(false)}
-              className="w-full bg-millions-accent text-millions-dark px-6 py-4 text-[0.75rem] tracking-[0.15em] font-bold uppercase font-jost flex items-center justify-center transition-all hover:bg-white"
-            >
-              WhatsApp Us
-            </Link>
+            {showContact && (
+              <Link
+                to="/contact"
+                onClick={() => setIsMenuOpen(false)}
+                className="w-full bg-millions-accent text-millions-dark px-6 py-4 text-[0.75rem] tracking-[0.15em] font-bold uppercase font-jost flex items-center justify-center transition-all hover:bg-white"
+              >
+                WhatsApp Us
+              </Link>
+            )}
             <p className="mt-6 text-[0.6rem] text-white/20 uppercase tracking-[0.2em] font-light text-center">
               Professional Advisory Sync
             </p>
