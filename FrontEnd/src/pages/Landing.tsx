@@ -78,19 +78,30 @@ const Landing = () => {
   // contact form's service-category dropdown — a separate concern.
   const servicesContent = getSectionContent('services', 'services');
 
+  // Visibility-aware section rendering: the backend filters out hidden
+  // sections from /api/pages/home, so a section's absence from
+  // pageData.sections means "toggled off — don't render". Until the
+  // page query has resolved (pageData is undefined), render everything
+  // from fallback so the first paint isn't blank. Once data arrives,
+  // the brothers' on/off toggles take effect.
+  const visibleTypes: Set<string> | null = pageData?.sections
+    ? new Set(pageData.sections.map((s) => s.type))
+    : null;
+  const show = (type: string): boolean => visibleTypes === null || visibleTypes.has(type);
+
   return (
     <div className="flex flex-col">
-      <HeroSection content={getSectionContent('hero', 'hero')} />
-      <PhilosophySection content={getSectionContent('philosophy', 'philosophy')} />
-      <OverviewSection content={getSectionContent('overview', 'overview')} />
-      <MissionVisionSection content={getSectionContent('mission-vision', 'missionVision')} />
-      <ValuesSection content={getSectionContent('values', 'values')} />
-      <ImpactModelSection content={getSectionContent('impact-model', 'impactModel')} />
-      <ServicesSection content={servicesContent} />
-      <GeographySection content={getSectionContent('geography', 'geography')} />
-      <SocialImpactSection content={getSectionContent('social-impact', 'socialImpact')} />
-      <LeadershipSection content={getSectionContent('leadership', 'leadership')} />
-      <FutureVisionSection content={getSectionContent('future-vision', 'futureVision')} />
+      {show('hero') && <HeroSection content={getSectionContent('hero', 'hero')} />}
+      {show('philosophy') && <PhilosophySection content={getSectionContent('philosophy', 'philosophy')} />}
+      {show('overview') && <OverviewSection content={getSectionContent('overview', 'overview')} />}
+      {show('mission-vision') && <MissionVisionSection content={getSectionContent('mission-vision', 'missionVision')} />}
+      {show('values') && <ValuesSection content={getSectionContent('values', 'values')} />}
+      {show('impact-model') && <ImpactModelSection content={getSectionContent('impact-model', 'impactModel')} />}
+      {show('services') && <ServicesSection content={servicesContent} />}
+      {show('geography') && <GeographySection content={getSectionContent('geography', 'geography')} />}
+      {show('social-impact') && <SocialImpactSection content={getSectionContent('social-impact', 'socialImpact')} />}
+      {show('leadership') && <LeadershipSection content={getSectionContent('leadership', 'leadership')} />}
+      {show('future-vision') && <FutureVisionSection content={getSectionContent('future-vision', 'futureVision')} />}
     </div>
   );
 };
