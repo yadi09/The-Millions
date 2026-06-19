@@ -61,6 +61,14 @@ services:
         condition: service_started
     environment:
       SERVER_NAME: ${SERVER_NAME}
+      # Optional knobs — see deploy/nginx/templates/default.conf.template
+      # CANONICAL_HOST: the hostname to redirect TO (e.g. www.the-millions.co.uk)
+      # APEX_REDIRECT_FROM: hostname to redirect FROM (e.g. the-millions.co.uk).
+      # Default to a placeholder hostname so the rendered apex-redirect block
+      # is syntactically valid but never matches any real Host header. To
+      # enable the redirect, set both vars in deploy/.env.
+      CANONICAL_HOST: ${CANONICAL_HOST:-apex.disabled.local}
+      APEX_REDIRECT_FROM: ${APEX_REDIRECT_FROM:-apex.disabled.local}
       BACKEND_UPSTREAM: backend:4000
     ports:
       - "80:80"

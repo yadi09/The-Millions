@@ -1,16 +1,26 @@
 # nginx config rendered at container start via envsubst.
 # Knobs (set in docker-compose):
-#   $SERVER_NAME            — primary hostname for vhost matching (e.g. themillions.co.uk or _ for IP)
-#   $BACKEND_UPSTREAM       — host:port of the backend container (default: backend:4000)
+#   $SERVER_NAME           — space-separated list of every hostname this vhost serves
+#                             (e.g. "the-millions.co.uk www.the-millions.co.uk staging.the-millions.co.uk"
+#                              or "_" for the EC2 IP-only dry-run)
+#   $CANONICAL_HOST        — preferred public hostname. If $APEX_REDIRECT_FROM is set,
+#                             requests to that hostname are 301'd to https://${CANONICAL_HOST}.
+#                             Leave empty to disable the canonical redirect.
+#   $APEX_REDIRECT_FROM    — hostname that should 301 → CANONICAL_HOST (e.g. the-millions.co.uk).
+#                             Leave empty when there's nothing to redirect (e.g. staging-only).
+#   $BACKEND_UPSTREAM      — host:port of the backend container (default: backend:4000)
 #
 # The cert path is fixed at /etc/nginx/certs/ — see issue-cert.sh for how the
 # files get there (Let's Encrypt for a real domain, self-signed for the IP-only
 # EC2 dry-run).
 
 # ----- HTTP → redirect to HTTPS (and serve ACME challenge during cert issuance)
+# Listens default_server so it answers for any hostname pointed at this box,
+# which is important for first-time cert issuance: the new hostname doesn't
+# need to be in SERVER_NAME yet for certbot's HTTP-01 challenge to work.
 server {
-    listen 80;
-    server_name ${SERVER_NAME};
+    listen 80 default_server;
+    server_name _;
 
     # Used by certbot in webroot mode. Empty on first boot; populated during
     # cert issuance. Safe to keep always.
@@ -23,9 +33,24 @@ server {
     }
 }
 
-# ----- HTTPS
+# ----- HTTPS apex redirect ($APEX_REDIRECT_FROM → $CANONICAL_HOST)
+# Renders to a server_name of "" when APEX_REDIRECT_FROM is empty (staging-only
+# deploys), which nginx treats as "never matches" — i.e. effectively disabled.
 server {
     listen 443 ssl;
+    http2 on;
+    server_name ${APEX_REDIRECT_FROM};
+
+    ssl_certificate     /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    return 301 https://${CANONICAL_HOST}$request_uri;
+}
+
+# ----- HTTPS — main vhost (serves every hostname in $SERVER_NAME)
+server {
+    listen 443 ssl default_server;
     http2 on;
     server_name ${SERVER_NAME};
 
