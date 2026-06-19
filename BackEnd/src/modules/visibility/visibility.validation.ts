@@ -21,4 +21,8 @@ export const toggleSectionSchema = z.object({
     visible: z.boolean(),
 });
 
+export const toggleMaintenanceSchema = z.object({
+    on: z.boolean(),
+});
+
 export type PageKey = z.infer<typeof pageKeySchema>;

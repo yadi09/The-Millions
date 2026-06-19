@@ -22,11 +22,14 @@ import BusinessCardBuilder from "../pages/admin/BusinessCardBuilder";
 import SocialPostBuilder from "../pages/admin/SocialPostBuilder";
 import SiteVisibility from "../pages/admin/SiteVisibility";
 import VisibilityGate from "../components/VisibilityGate";
+import MaintenanceGate from "../components/MaintenanceGate";
 
 const PublicLayout = () => (
-    <Layout>
-        <Outlet />
-    </Layout>
+    <MaintenanceGate>
+        <Layout>
+            <Outlet />
+        </Layout>
+    </MaintenanceGate>
 );
 
 // The default landing inside the admin shell. All deprecated admin routes

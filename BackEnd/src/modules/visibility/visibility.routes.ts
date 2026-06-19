@@ -5,6 +5,7 @@ import {
     getAdminVisibilityController,
     setPageVisibilityController,
     setSectionVisibilityController,
+    setMaintenanceController,
 } from "./visibility.controller.js";
 
 /**
@@ -26,3 +27,4 @@ adminVisibilityRouter.use(authenticate);
 adminVisibilityRouter.get("/", getAdminVisibilityController);
 adminVisibilityRouter.put("/page", setPageVisibilityController);
 adminVisibilityRouter.put("/section/:id", setSectionVisibilityController);
+adminVisibilityRouter.put("/maintenance", setMaintenanceController);

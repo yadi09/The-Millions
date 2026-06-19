@@ -302,14 +302,16 @@ export const apiSlice = createApi({
 
     // ----- Visibility -----
     // Public read — used by the route gates on the public site to decide
-    // whether to render a page or fall back to ComingSoon.
-    getPublicVisibility: builder.query<{ pages: Record<string, boolean> }, void>({
+    // whether to render a page or fall back to ComingSoon. Includes
+    // site-wide maintenance flag so the MaintenanceGate can short-circuit
+    // the entire public layout in one place.
+    getPublicVisibility: builder.query<{ pages: Record<string, boolean>; maintenance: boolean }, void>({
       query: () => '/visibility',
       providesTags: ['Visibility'],
     }),
-    // Admin read — full state including section visibility, used by the
-    // Site Visibility admin page.
+    // Admin read — full state including section visibility AND maintenance.
     getAdminVisibility: builder.query<{
+      maintenance: boolean;
       pages: Record<string, boolean>;
       sectionsByPageSlug: Record<string, {
         pageId: string;
@@ -345,6 +347,34 @@ export const apiSlice = createApi({
           dispatch(
             apiSlice.util.updateQueryData('getPublicVisibility' as never, undefined as never, (draft: any) => {
               if (draft?.pages) draft.pages[key] = visible;
+            })
+          )
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patches.forEach((p) => p.undo());
+        }
+      },
+    }),
+    // Site-wide maintenance toggle. When on, MaintenanceGate renders
+    // ComingSoonPage for every non-admin visitor on every public route.
+    setMaintenanceMode: builder.mutation<{ on: boolean }, { on: boolean }>({
+      query: (body) => ({ url: '/admin/visibility/maintenance', method: 'PUT', body }),
+      invalidatesTags: ['Visibility'],
+      async onQueryStarted({ on }, { dispatch, queryFulfilled }) {
+        const patches: { undo: () => void }[] = [];
+        patches.push(
+          dispatch(
+            apiSlice.util.updateQueryData('getAdminVisibility' as never, undefined as never, (draft: any) => {
+              if (draft) draft.maintenance = on;
+            })
+          )
+        );
+        patches.push(
+          dispatch(
+            apiSlice.util.updateQueryData('getPublicVisibility' as never, undefined as never, (draft: any) => {
+              if (draft) draft.maintenance = on;
             })
           )
         );
@@ -417,4 +447,5 @@ export const {
   useGetAdminVisibilityQuery,
   useSetPageVisibilityMutation,
   useSetSectionVisibilityMutation,
+  useSetMaintenanceModeMutation,
 } = apiSlice;

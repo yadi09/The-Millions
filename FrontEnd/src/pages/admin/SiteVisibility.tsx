@@ -13,12 +13,15 @@ import {
     Send,
     LayoutGrid,
     Info,
+    AlertTriangle,
+    Power,
 } from "lucide-react";
 import { Card, CardContent } from "../../components/ui/card";
 import {
     useGetAdminVisibilityQuery,
     useSetPageVisibilityMutation,
     useSetSectionVisibilityMutation,
+    useSetMaintenanceModeMutation,
 } from "../../features/api/apiSlice";
 
 // Public-route catalogue. Order matters — this is the order they appear
@@ -93,8 +96,26 @@ const SiteVisibility = () => {
     const { data, isLoading, refetch } = useGetAdminVisibilityQuery();
     const [setPageVis, { isLoading: pageBusy }] = useSetPageVisibilityMutation();
     const [setSectionVis, { isLoading: sectionBusy }] = useSetSectionVisibilityMutation();
+    const [setMaintenance, { isLoading: maintenanceBusy }] = useSetMaintenanceModeMutation();
     // Track which page rows have their sections expanded
     const [expandedPages, setExpandedPages] = useState<Record<string, boolean>>({});
+
+    const maintenanceOn = data?.maintenance === true;
+
+    const handleMaintenanceToggle = async (next: boolean) => {
+        try {
+            await setMaintenance({ on: next }).unwrap();
+            refetch();
+            toast.success(
+                next
+                    ? "Maintenance mode ON — visitors now see Coming Soon."
+                    : "Maintenance mode OFF — site is live again.",
+                { duration: next ? 6000 : 4000 }
+            );
+        } catch (e: any) {
+            toast.error(e?.data?.message || "Failed to toggle maintenance mode.");
+        }
+    };
 
     const handlePageToggle = async (key: string, next: boolean) => {
         try {
@@ -136,6 +157,55 @@ const SiteVisibility = () => {
                     Append <span className="text-millions-accent">?preview=1</span> to any URL while logged in to see hidden content yourself before flipping it live.
                 </p>
             </div>
+
+            {/* Maintenance mode — the master kill-switch for the whole site.
+                Stays at the top of the page and uses warning colours when ON
+                so the brothers never forget they left it on. */}
+            <Card
+                className={`rounded-none transition-colors ${
+                    maintenanceOn
+                        ? "bg-amber-500/10 border-amber-400/40"
+                        : "bg-white/5 border-white/5"
+                }`}
+            >
+                <CardContent className="p-5 sm:p-6 md:p-7">
+                    <div className="flex items-start gap-4 sm:gap-5">
+                        <div
+                            className={`w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center shrink-0 border ${
+                                maintenanceOn
+                                    ? "bg-amber-500/20 border-amber-400/50"
+                                    : "bg-millions-accent/5 border-millions-accent/20"
+                            }`}
+                        >
+                            {maintenanceOn ? (
+                                <AlertTriangle className="w-5 h-5 text-amber-300" />
+                            ) : (
+                                <Power className="w-5 h-5 text-millions-accent" />
+                            )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <h2 className="font-cormorant text-xl sm:text-2xl text-white font-light italic leading-none">Maintenance mode</h2>
+                                {maintenanceOn && (
+                                    <span className="text-[0.55rem] font-jost text-amber-300 uppercase tracking-[0.25em] font-bold bg-amber-500/15 border border-amber-400/40 px-2 py-0.5">
+                                        Active
+                                    </span>
+                                )}
+                            </div>
+                            <p className="text-[0.75rem] sm:text-[0.8rem] font-jost text-white/50 leading-relaxed mt-2 max-w-xl">
+                                {maintenanceOn
+                                    ? "The entire public site shows the Coming Soon screen. You and the other admins still see live content for editing, with a banner reminder. Per-page toggles below are ignored until you flip this off."
+                                    : "Flip this on while you're editing major content. Visitors land on the Coming Soon screen across every public page until you switch it back. Your edits stay visible to you via the preview flag."}
+                            </p>
+                        </div>
+                        <ToggleSwitch
+                            on={maintenanceOn}
+                            disabled={maintenanceBusy || isLoading}
+                            onChange={handleMaintenanceToggle}
+                        />
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Preview tip card */}
             <Card className="bg-millions-accent/5 border-millions-accent/20 rounded-none">
