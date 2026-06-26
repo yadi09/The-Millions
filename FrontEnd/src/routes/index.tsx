@@ -23,6 +23,8 @@ import SocialPostBuilder from "../pages/admin/SocialPostBuilder";
 import SiteVisibility from "../pages/admin/SiteVisibility";
 import VisibilityGate from "../components/VisibilityGate";
 import MaintenanceGate from "../components/MaintenanceGate";
+import FeedbackWalkthrough from "../pages/feedback/FeedbackWalkthrough";
+import FeedbackResults from "../pages/admin/FeedbackResults";
 
 const PublicLayout = () => (
     <MaintenanceGate>
@@ -56,6 +58,11 @@ export const AppRoutes = () => (
         {/* Admin Login Route (Public) */}
         <Route path="/admin/login" element={<AdminLogin />} />
 
+        {/* Non-public feedback walkthrough — share this URL with the firm
+            owners; not linked from anywhere on the public site. Renders
+            standalone (no nav/footer chrome, no maintenance gate). */}
+        <Route path="/feedback/walkthrough" element={<FeedbackWalkthrough />} />
+
         {/* Protected Admin Routes */}
         <Route path="/admin" element={
             <ProtectedRoute>
@@ -79,6 +86,7 @@ export const AppRoutes = () => (
             <Route path="business-card" element={<BusinessCardBuilder />} />
             <Route path="social-posts" element={<SocialPostBuilder />} />
             <Route path="visibility" element={<SiteVisibility />} />
+            <Route path="feedback" element={<FeedbackResults />} />
             <Route path="settings" element={<AdminSettings />} />
 
             {/* Deprecated — content editing now lives on the live site via

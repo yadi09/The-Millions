@@ -37,7 +37,7 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage', 'BusinessCard', 'SocialPost', 'Visibility'],
+  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage', 'BusinessCard', 'SocialPost', 'Visibility', 'Feedback'],
   baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
     // Accepts a bare slug string for the simple public case, OR an object
@@ -408,6 +408,27 @@ export const apiSlice = createApi({
         }
       },
     }),
+
+    // ----- Feedback -----
+    // Public POST — anyone with the walkthrough URL can submit. No auth.
+    submitFeedback: builder.mutation<{ id: string; createdAt: string }, any>({
+      query: (body) => ({ url: '/feedback', method: 'POST', body }),
+      invalidatesTags: ['Feedback'],
+    }),
+    // Admin list — populates the results dashboard.
+    listFeedback: builder.query<any[], void>({
+      query: () => '/admin/feedback',
+      providesTags: ['Feedback'],
+    }),
+    // Admin detail — one full submission with all responses.
+    getFeedback: builder.query<any, string>({
+      query: (id) => `/admin/feedback/${id}`,
+      providesTags: (_r, _e, id) => [{ type: 'Feedback', id }],
+    }),
+    deleteFeedback: builder.mutation<{ id: string; deleted: boolean }, string>({
+      query: (id) => ({ url: `/admin/feedback/${id}`, method: 'DELETE' }),
+      invalidatesTags: ['Feedback'],
+    }),
   }),
 });
 
@@ -448,4 +469,8 @@ export const {
   useSetPageVisibilityMutation,
   useSetSectionVisibilityMutation,
   useSetMaintenanceModeMutation,
+  useSubmitFeedbackMutation,
+  useListFeedbackQuery,
+  useGetFeedbackQuery,
+  useDeleteFeedbackMutation,
 } = apiSlice;

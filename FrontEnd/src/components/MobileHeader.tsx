@@ -23,6 +23,7 @@ export const MobileHeader = ({ onMenuClick }: MobileHeaderProps) => {
         if (path.startsWith('/admin/business-card')) return 'Business Card';
         if (path.startsWith('/admin/social-posts')) return 'Social Posts';
         if (path.startsWith('/admin/visibility')) return 'Site Visibility';
+        if (path.startsWith('/admin/feedback')) return 'Feedback';
         if (path.startsWith('/admin/brand')) return 'Brand Assets';
         if (path.startsWith('/admin/settings')) return 'Settings';
         return 'Admin';

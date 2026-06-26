@@ -106,6 +106,21 @@ model SocialPost {
   @@map("social_post")
 }
 
+model FeedbackSubmission {
+  id             String   @id @default(uuid())
+  submittedBy    String
+  overallRating  Int?
+  overallComment String?  @db.Text
+  // Per-feature responses keyed by stable feature id. Stored as JSON so we
+  // can add or rename items in the catalogue without a migration.
+  // Shape: { [featureId]: { status: 'worked'|'struggled'|'broken'|'skipped', comment?: string } }
+  responses      Json
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("feedback_submission")
+}
+
 model BusinessCard {
   id     String @id @default(uuid())
   userId String @unique
