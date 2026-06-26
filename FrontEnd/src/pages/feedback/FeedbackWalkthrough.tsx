@@ -13,6 +13,8 @@ import {
     Loader2,
     Star,
     PartyPopper,
+    UserCheck,
+    ChevronLeft,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import {
@@ -24,6 +26,26 @@ import {
 import { useSubmitFeedbackMutation } from "../../features/api/apiSlice";
 
 type ResponseMap = Record<string, { status: ResponseStatus; comment?: string }>;
+
+// The firm has two partners — each gets their own form slot, their own
+// localStorage draft, and their name auto-fills on submit. If a third
+// owner ever joins, add an entry here.
+type OwnerKey = "mark" | "seleshi";
+
+const OWNERS: { key: OwnerKey; name: string; title: string; intro: string }[] = [
+    {
+        key: "mark",
+        name: "Mark Million",
+        title: "Partner",
+        intro: "Walk through the admin in your own time. Your answers save automatically.",
+    },
+    {
+        key: "seleshi",
+        name: "Seleshi Million",
+        title: "Partner",
+        intro: "Walk through the admin in your own time. Your answers save automatically.",
+    },
+];
 
 const STATUS_ICON: Record<ResponseStatus, any> = {
     worked: Check,
@@ -51,43 +73,216 @@ const STATUS_TONE_CLASSES: Record<ResponseStatus, { active: string; idle: string
     },
 };
 
-const STORAGE_KEY = "the-millions-feedback-draft-v1";
+// Per-owner draft keys. Bumped to v2 because the new schema includes
+// only what's specific to one owner (no submittedBy field — the picker
+// chooses that).
+const draftKey = (owner: OwnerKey) => `the-millions-feedback-draft-v2-${owner}`;
+// Tracks which owners have submitted so the picker can show a "DONE"
+// badge next to a name that already has feedback in. Reset on submit.
+const SUBMITTED_OWNERS_KEY = "the-millions-feedback-submitted-owners";
+
+function readSubmittedOwners(): Set<OwnerKey> {
+    try {
+        const raw = localStorage.getItem(SUBMITTED_OWNERS_KEY);
+        if (!raw) return new Set();
+        return new Set(JSON.parse(raw));
+    } catch {
+        return new Set();
+    }
+}
+
+function markOwnerSubmitted(owner: OwnerKey) {
+    try {
+        const current = readSubmittedOwners();
+        current.add(owner);
+        localStorage.setItem(SUBMITTED_OWNERS_KEY, JSON.stringify([...current]));
+    } catch {
+        // quota / disabled — fine
+    }
+}
 
 const FeedbackWalkthrough = () => {
-    const [submittedBy, setSubmittedBy] = useState("");
+    const [activeOwner, setActiveOwner] = useState<OwnerKey | null>(null);
+    const [submittedOwners, setSubmittedOwners] = useState<Set<OwnerKey>>(readSubmittedOwners());
+    const [submitted, setSubmitted] = useState(false);
+
+    if (submitted && activeOwner) {
+        return (
+            <ThankYouScreen
+                owner={OWNERS.find((o) => o.key === activeOwner)!}
+                otherOwnerPending={OWNERS.some((o) => o.key !== activeOwner && !submittedOwners.has(o.key))}
+                onSwitchOwner={(next) => {
+                    setActiveOwner(next);
+                    setSubmitted(false);
+                }}
+                onDone={() => {
+                    setActiveOwner(null);
+                    setSubmitted(false);
+                }}
+            />
+        );
+    }
+
+    if (!activeOwner) {
+        return (
+            <OwnerPicker
+                submittedOwners={submittedOwners}
+                onPick={setActiveOwner}
+            />
+        );
+    }
+
+    return (
+        <WalkthroughForm
+            owner={OWNERS.find((o) => o.key === activeOwner)!}
+            onBack={() => setActiveOwner(null)}
+            onSubmitted={() => {
+                markOwnerSubmitted(activeOwner);
+                setSubmittedOwners(readSubmittedOwners());
+                setSubmitted(true);
+            }}
+        />
+    );
+};
+
+// ----- Picker screen ---------------------------------------------------------
+
+const OwnerPicker = ({
+    submittedOwners,
+    onPick,
+}: {
+    submittedOwners: Set<OwnerKey>;
+    onPick: (k: OwnerKey) => void;
+}) => (
+    <div className="min-h-screen bg-millions-dark text-white selection:bg-millions-accent selection:text-millions-dark flex flex-col">
+        <section className="relative px-6 sm:px-10 md:px-16 py-12 sm:py-16 md:py-20 overflow-hidden flex-1 flex items-center">
+            <div className="absolute inset-0 bg-[url('/grid-subtle.svg')] bg-repeat opacity-[0.025] pointer-events-none" />
+            <div className="absolute -top-32 -right-32 w-[500px] h-[500px] bg-millions-accent/8 rounded-full blur-[140px] pointer-events-none" />
+            <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] bg-millions-accent/5 rounded-full blur-[140px] pointer-events-none" />
+
+            <div className="relative max-w-3xl mx-auto w-full">
+                <div className="flex flex-col items-center mb-10 sm:mb-12">
+                    <span className="font-cormorant text-[0.65rem] sm:text-[0.7rem] font-light tracking-[0.4em] text-white/40 uppercase">the</span>
+                    <span className="font-cormorant text-2xl sm:text-3xl font-semibold text-white">MILLIONS.</span>
+                </div>
+
+                <div className="inline-flex items-center gap-3 text-millions-accent text-[0.6rem] sm:text-[0.7rem] tracking-[0.3em] uppercase mb-5">
+                    <div className="w-6 h-[1px] bg-millions-accent/40" />
+                    A walkthrough
+                    <div className="w-6 h-[1px] bg-millions-accent/40" />
+                </div>
+
+                <h1 className="font-cormorant text-[clamp(2rem,6vw,4rem)] font-light leading-[1.05] mb-5 sm:mb-6 text-center">
+                    Who's <em className="italic text-millions-accent">filling this out?</em>
+                </h1>
+
+                <p className="font-jost text-[0.85rem] sm:text-[0.95rem] leading-relaxed text-white/60 max-w-xl mx-auto text-center mb-10 sm:mb-14">
+                    Pick yourself below. Each of you gets your own form — your answers save in this
+                    browser as you go, so you can come back to it later. Both of you can fill it in
+                    independently; I'll see both responses on my end.
+                </p>
+
+                <div className="grid sm:grid-cols-2 gap-4 sm:gap-5 max-w-xl mx-auto">
+                    {OWNERS.map((owner) => {
+                        const isDone = submittedOwners.has(owner.key);
+                        const hasDraft = (() => {
+                            try {
+                                return !!localStorage.getItem(draftKey(owner.key));
+                            } catch {
+                                return false;
+                            }
+                        })();
+                        return (
+                            <button
+                                key={owner.key}
+                                type="button"
+                                onClick={() => onPick(owner.key)}
+                                className="group bg-white/5 border border-white/10 hover:border-millions-accent/40 active:bg-white/[0.08] transition-all p-6 sm:p-7 text-left"
+                            >
+                                <div className="flex items-start justify-between gap-3 mb-4 sm:mb-5">
+                                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-millions-accent/10 border border-millions-accent/30 flex items-center justify-center shrink-0 group-hover:bg-millions-accent/20 transition-colors">
+                                        <UserCheck className="w-5 h-5 sm:w-6 sm:h-6 text-millions-accent" />
+                                    </div>
+                                    {isDone && (
+                                        <span className="text-[0.5rem] font-jost text-emerald-300 uppercase tracking-[0.25em] font-bold bg-emerald-500/10 border border-emerald-400/30 px-2 py-0.5">
+                                            Done
+                                        </span>
+                                    )}
+                                    {!isDone && hasDraft && (
+                                        <span className="text-[0.5rem] font-jost text-amber-300 uppercase tracking-[0.25em] font-bold bg-amber-500/10 border border-amber-400/30 px-2 py-0.5">
+                                            Draft
+                                        </span>
+                                    )}
+                                </div>
+                                <h3 className="font-cormorant text-2xl sm:text-3xl text-white font-light italic leading-tight mb-1">
+                                    {owner.name}
+                                </h3>
+                                <p className="text-[0.6rem] sm:text-[0.65rem] font-jost text-millions-accent uppercase tracking-[0.2em] mb-3">
+                                    {owner.title}
+                                </p>
+                                <p className="text-[0.75rem] sm:text-[0.8rem] font-jost text-white/40 leading-relaxed">
+                                    {isDone ? "You've already submitted feedback. Tap to send another round." : owner.intro}
+                                </p>
+                                <div className="mt-4 pt-3 border-t border-white/5 text-[0.6rem] font-jost text-millions-accent uppercase tracking-[0.2em] flex items-center gap-2">
+                                    {isDone ? "Submit again" : hasDraft ? "Continue draft" : "Start walkthrough"} →
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+        </section>
+    </div>
+);
+
+// ----- Walkthrough form (per-owner) -----------------------------------------
+
+const WalkthroughForm = ({
+    owner,
+    onBack,
+    onSubmitted,
+}: {
+    owner: typeof OWNERS[number];
+    onBack: () => void;
+    onSubmitted: () => void;
+}) => {
     const [responses, setResponses] = useState<ResponseMap>({});
     const [overallRating, setOverallRating] = useState<number | null>(null);
     const [overallComment, setOverallComment] = useState("");
     const [commentOpen, setCommentOpen] = useState<Record<string, boolean>>({});
-    const [submitted, setSubmitted] = useState(false);
     const [submit, { isLoading: saving }] = useSubmitFeedbackMutation();
 
-    // Persist to localStorage as the user fills in — so they can close the
-    // tab and come back later without losing what they typed.
+    // Load this owner's draft on mount. Each owner has their own slot.
     useEffect(() => {
         try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) return;
+            const raw = localStorage.getItem(draftKey(owner.key));
+            if (!raw) {
+                // reset state if there's nothing saved — important when switching owners
+                setResponses({});
+                setOverallRating(null);
+                setOverallComment("");
+                return;
+            }
             const draft = JSON.parse(raw);
-            if (draft?.submittedBy) setSubmittedBy(draft.submittedBy);
-            if (draft?.responses) setResponses(draft.responses);
-            if (typeof draft?.overallRating === "number") setOverallRating(draft.overallRating);
-            if (draft?.overallComment) setOverallComment(draft.overallComment);
+            setResponses(draft?.responses ?? {});
+            setOverallRating(typeof draft?.overallRating === "number" ? draft.overallRating : null);
+            setOverallComment(draft?.overallComment ?? "");
         } catch {
-            // ignore — corrupted draft, start fresh
+            // ignore corrupted draft
         }
-    }, []);
+    }, [owner.key]);
 
+    // Persist on change to the owner-specific slot.
     useEffect(() => {
         try {
             localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify({ submittedBy, responses, overallRating, overallComment })
+                draftKey(owner.key),
+                JSON.stringify({ responses, overallRating, overallComment })
             );
         } catch {
-            // quota or disabled — fine, draft just won't persist
+            // quota or disabled — fine
         }
-    }, [submittedBy, responses, overallRating, overallComment]);
+    }, [owner.key, responses, overallRating, overallComment]);
 
     const ratedCount = useMemo(() => Object.keys(responses).length, [responses]);
     const progressPct = Math.round((ratedCount / TOTAL_FEATURES) * 100);
@@ -108,44 +303,42 @@ const FeedbackWalkthrough = () => {
     };
 
     const handleSubmit = async () => {
-        if (!submittedBy.trim()) {
-            toast.error("Please add your name so I know who this feedback is from.");
-            const nameInput = document.getElementById("submitter-name");
-            nameInput?.scrollIntoView({ behavior: "smooth", block: "center" });
-            nameInput?.focus();
-            return;
-        }
         try {
             await submit({
-                submittedBy: submittedBy.trim(),
+                submittedBy: owner.name,
                 overallRating,
                 overallComment: overallComment.trim() || null,
                 responses,
             }).unwrap();
             try {
-                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem(draftKey(owner.key));
             } catch {
                 // ignore
             }
-            setSubmitted(true);
+            onSubmitted();
             window.scrollTo({ top: 0, behavior: "smooth" });
         } catch (e: any) {
             toast.error(e?.data?.message || "Couldn't send feedback. Try again in a moment.");
         }
     };
 
-    if (submitted) {
-        return <ThankYouScreen onAnother={() => setSubmitted(false)} />;
-    }
-
     return (
         <div className="min-h-screen bg-millions-dark text-white selection:bg-millions-accent selection:text-millions-dark">
             {/* HERO ----------------------------------------------------- */}
-            <section className="relative px-6 sm:px-10 md:px-16 py-16 sm:py-20 md:py-24 overflow-hidden">
+            <section className="relative px-6 sm:px-10 md:px-16 py-12 sm:py-16 md:py-20 overflow-hidden">
                 <div className="absolute inset-0 bg-[url('/grid-subtle.svg')] bg-repeat opacity-[0.025] pointer-events-none" />
                 <div className="absolute -top-32 -right-32 w-[500px] h-[500px] bg-millions-accent/8 rounded-full blur-[140px] pointer-events-none" />
 
                 <div className="relative max-w-3xl mx-auto">
+                    <button
+                        type="button"
+                        onClick={onBack}
+                        className="inline-flex items-center gap-2 text-white/40 hover:text-millions-accent text-[0.65rem] font-jost uppercase tracking-[0.2em] mb-6 transition-colors"
+                    >
+                        <ChevronLeft className="w-3.5 h-3.5" />
+                        Switch person
+                    </button>
+
                     <div className="flex flex-col items-center mb-8 sm:mb-10">
                         <span className="font-cormorant text-[0.65rem] sm:text-[0.7rem] font-light tracking-[0.4em] text-white/40 uppercase">the</span>
                         <span className="font-cormorant text-2xl sm:text-3xl font-semibold text-white">MILLIONS.</span>
@@ -153,18 +346,17 @@ const FeedbackWalkthrough = () => {
 
                     <div className="inline-flex items-center gap-3 text-millions-accent text-[0.6rem] sm:text-[0.7rem] tracking-[0.3em] uppercase mb-5">
                         <div className="w-6 h-[1px] bg-millions-accent/40" />
-                        A short walkthrough
+                        Filling out as {owner.name.split(" ")[0]}
                         <div className="w-6 h-[1px] bg-millions-accent/40" />
                     </div>
 
                     <h1 className="font-cormorant text-[clamp(2rem,6vw,4rem)] font-light leading-[1] mb-5 sm:mb-6">
-                        How is the new admin <em className="italic text-millions-accent">working for you?</em>
+                        Hi {owner.name.split(" ")[0]} — how is the new admin <em className="italic text-millions-accent">working for you?</em>
                     </h1>
 
                     <p className="font-jost text-[0.9rem] sm:text-[0.95rem] leading-relaxed text-white/60 max-w-2xl">
                         Below is every feature we've built so far. For each one, tap whether it worked, was confusing, or broke —
-                        and drop a quick comment if anything needs attention. Your replies save automatically as you go, so you
-                        can come back later if you need to break this up over a couple of sessions.
+                        and drop a quick comment if anything needs attention. Your replies save automatically as you go.
                     </p>
                 </div>
             </section>
@@ -175,7 +367,7 @@ const FeedbackWalkthrough = () => {
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1.5">
                             <span className="text-[0.6rem] sm:text-[0.65rem] font-jost text-white/40 uppercase tracking-[0.2em]">
-                                Progress
+                                {owner.name.split(" ")[0]}'s progress
                             </span>
                             <span className="text-[0.6rem] sm:text-[0.65rem] font-jost text-millions-accent uppercase tracking-[0.2em] font-bold">
                                 {ratedCount} of {TOTAL_FEATURES}
@@ -229,7 +421,6 @@ const FeedbackWalkthrough = () => {
                                                     </div>
                                                 </div>
 
-                                                {/* Status pills */}
                                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                                     {STATUS_OPTIONS.map((opt) => {
                                                         const Icon = STATUS_ICON[opt.value];
@@ -251,7 +442,6 @@ const FeedbackWalkthrough = () => {
                                                     })}
                                                 </div>
 
-                                                {/* Comment toggle */}
                                                 <button
                                                     type="button"
                                                     onClick={() => toggleComment(feature.id)}
@@ -339,21 +529,22 @@ const FeedbackWalkthrough = () => {
                 </div>
             </section>
 
-            {/* SUBMITTER + SUBMIT ---------------------------------------- */}
+            {/* SUBMIT --------------------------------------------------- */}
             <section className="px-6 sm:px-10 md:px-16 py-12 sm:py-16">
                 <div className="max-w-3xl mx-auto space-y-6">
-                    <div className="space-y-2">
-                        <label htmlFor="submitter-name" className="text-[0.6rem] font-jost text-white/30 uppercase tracking-[0.2em] block">
-                            Your name *
-                        </label>
-                        <input
-                            id="submitter-name"
-                            value={submittedBy}
-                            onChange={(e) => setSubmittedBy(e.target.value)}
-                            placeholder="e.g. Mark Million"
-                            maxLength={120}
-                            className="w-full bg-white/5 border border-white/10 text-white font-cormorant text-lg sm:text-xl focus:outline-none focus:border-millions-accent/40 focus:bg-white/10 rounded-none p-4 transition-all placeholder:text-white/15"
-                        />
+                    <div className="bg-white/[0.02] border border-white/5 p-4 sm:p-5 flex items-center gap-3">
+                        <UserCheck className="w-5 h-5 text-millions-accent shrink-0" />
+                        <div className="text-[0.75rem] sm:text-[0.8rem] font-jost text-white/70 leading-relaxed">
+                            Submitting as <span className="text-white font-medium">{owner.name}</span>.
+                            {" "}
+                            <button
+                                type="button"
+                                onClick={onBack}
+                                className="text-millions-accent hover:text-white underline transition-colors"
+                            >
+                                Not you?
+                            </button>
+                        </div>
                     </div>
 
                     <Button
@@ -362,7 +553,7 @@ const FeedbackWalkthrough = () => {
                         className="w-full h-14 sm:h-16 rounded-none bg-millions-accent text-millions-dark hover:bg-white tracking-[0.25em] uppercase text-[0.75rem] sm:text-[0.8rem] font-bold transition-all shadow-lg"
                     >
                         {saving ? <Loader2 className="w-5 h-5 mr-3 animate-spin" /> : <Send className="w-5 h-5 mr-3" />}
-                        Send your feedback
+                        Send {owner.name.split(" ")[0]}'s feedback
                     </Button>
 
                     <p className="text-[0.65rem] sm:text-[0.7rem] font-jost text-white/30 text-center leading-relaxed">
@@ -374,28 +565,72 @@ const FeedbackWalkthrough = () => {
     );
 };
 
-const ThankYouScreen = ({ onAnother }: { onAnother: () => void }) => (
-    <div className="min-h-screen bg-millions-dark text-white flex items-center justify-center px-6 sm:px-10 md:px-16 py-16">
-        <div className="max-w-2xl text-center">
-            <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 bg-millions-accent/10 border border-millions-accent/30 mb-8 sm:mb-10">
-                <PartyPopper className="w-9 h-9 sm:w-11 sm:h-11 text-millions-accent" />
+// ----- Thank-you screen ------------------------------------------------------
+
+const ThankYouScreen = ({
+    owner,
+    otherOwnerPending,
+    onSwitchOwner,
+    onDone,
+}: {
+    owner: typeof OWNERS[number];
+    otherOwnerPending: boolean;
+    onSwitchOwner: (k: OwnerKey) => void;
+    onDone: () => void;
+}) => {
+    const otherOwner = OWNERS.find((o) => o.key !== owner.key);
+    return (
+        <div className="min-h-screen bg-millions-dark text-white flex items-center justify-center px-6 sm:px-10 md:px-16 py-16">
+            <div className="max-w-2xl text-center">
+                <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 bg-millions-accent/10 border border-millions-accent/30 mb-8 sm:mb-10">
+                    <PartyPopper className="w-9 h-9 sm:w-11 sm:h-11 text-millions-accent" />
+                </div>
+                <h1 className="font-cormorant text-[clamp(2rem,6vw,4rem)] font-light leading-[1.05] mb-6">
+                    Thank you, {owner.name.split(" ")[0]} — <em className="italic text-millions-accent">that's exactly what I needed.</em>
+                </h1>
+                <p className="font-jost text-[0.9rem] sm:text-[0.95rem] leading-relaxed text-white/60 max-w-xl mx-auto mb-10">
+                    Your feedback has been recorded. I'll review every comment, fix what's broken, and make the
+                    confusing bits clearer in the next pass.
+                </p>
+
+                {otherOwnerPending && otherOwner && (
+                    <div className="bg-millions-accent/5 border border-millions-accent/20 p-5 sm:p-6 mb-8 max-w-xl mx-auto">
+                        <p className="text-[0.7rem] font-jost text-millions-accent uppercase tracking-[0.25em] font-bold mb-2">
+                            Still waiting on {otherOwner.name.split(" ")[0]}
+                        </p>
+                        <p className="text-[0.8rem] font-jost text-white/60 leading-relaxed mb-4">
+                            If {otherOwner.name.split(" ")[0]} is here too, hand them the device — their slot is ready.
+                        </p>
+                        <button
+                            type="button"
+                            onClick={() => onSwitchOwner(otherOwner.key)}
+                            className="text-[0.65rem] font-jost text-millions-accent hover:text-white uppercase tracking-[0.25em] font-bold transition-colors"
+                        >
+                            Start {otherOwner.name.split(" ")[0]}'s walkthrough →
+                        </button>
+                    </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-5 justify-center items-center">
+                    <button
+                        type="button"
+                        onClick={onDone}
+                        className="text-[0.7rem] font-jost text-white/40 hover:text-white uppercase tracking-[0.3em] transition-colors"
+                    >
+                        Back to picker
+                    </button>
+                    <span className="text-white/20 hidden sm:inline">·</span>
+                    <button
+                        type="button"
+                        onClick={() => onSwitchOwner(owner.key)}
+                        className="text-[0.7rem] font-jost text-millions-accent hover:text-white uppercase tracking-[0.3em] font-bold transition-colors"
+                    >
+                        Send another round →
+                    </button>
+                </div>
             </div>
-            <h1 className="font-cormorant text-[clamp(2rem,6vw,4rem)] font-light leading-[1.05] mb-6">
-                Thank you — <em className="italic text-millions-accent">that's exactly what I needed.</em>
-            </h1>
-            <p className="font-jost text-[0.9rem] sm:text-[0.95rem] leading-relaxed text-white/60 max-w-xl mx-auto mb-10">
-                Your feedback has been recorded. I'll review every comment, fix what's broken, and make the
-                confusing bits clearer in the next pass. Feel free to come back here and submit again later if
-                anything else comes up while you're using the admin day to day.
-            </p>
-            <button
-                onClick={onAnother}
-                className="text-[0.7rem] font-jost text-millions-accent hover:text-white uppercase tracking-[0.3em] font-bold transition-colors"
-            >
-                Send another →
-            </button>
         </div>
-    </div>
-);
+    );
+};
 
 export default FeedbackWalkthrough;

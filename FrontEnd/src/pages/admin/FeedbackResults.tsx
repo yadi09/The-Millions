@@ -11,6 +11,8 @@ import {
     MessageSquare,
     ChevronLeft,
     Inbox as InboxIcon,
+    Users,
+    List,
 } from "lucide-react";
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
@@ -66,11 +68,24 @@ function relativeTime(iso: string): string {
     return new Date(iso).toLocaleDateString();
 }
 
+type View = "list" | "compare";
+
 const FeedbackResults = () => {
     const { data: submissions = [], isLoading } = useListFeedbackQuery();
     const [deleteFeedback] = useDeleteFeedbackMutation();
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [view, setView] = useState<View>("list");
+
+    // For the compare view, find the most recent submission per submitter name.
+    // submissions are already ordered desc, so the first match wins.
+    const latestPerOwner = useMemo(() => {
+        const seen = new Map<string, Submission>();
+        for (const s of submissions as Submission[]) {
+            if (!seen.has(s.submittedBy)) seen.set(s.submittedBy, s);
+        }
+        return [...seen.values()];
+    }, [submissions]);
 
     const selected = (submissions as Submission[]).find((s) => s.id === selectedId);
 
@@ -267,8 +282,43 @@ const FeedbackResults = () => {
                 </p>
             </div>
 
-            {/* Aggregate scoreboard — features that drew the most complaints */}
+            {/* View toggle — once both partners have submitted, Compare is the
+                most useful view; otherwise List is fine. */}
             {submissions.length > 0 && (
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={() => setView("list")}
+                        className={`flex items-center gap-2 h-10 px-4 text-[0.65rem] font-jost uppercase tracking-[0.2em] border transition-all ${view === "list"
+                                ? "bg-millions-accent text-millions-dark border-millions-accent font-bold"
+                                : "bg-white/5 text-white/50 border-white/5 hover:border-millions-accent/30 hover:text-white"
+                            }`}
+                    >
+                        <List className="w-3.5 h-3.5" />
+                        All submissions
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setView("compare")}
+                        disabled={latestPerOwner.length < 2}
+                        title={latestPerOwner.length < 2 ? "Need feedback from at least two people to compare" : ""}
+                        className={`flex items-center gap-2 h-10 px-4 text-[0.65rem] font-jost uppercase tracking-[0.2em] border transition-all disabled:opacity-40 disabled:cursor-not-allowed ${view === "compare"
+                                ? "bg-millions-accent text-millions-dark border-millions-accent font-bold"
+                                : "bg-white/5 text-white/50 border-white/5 hover:border-millions-accent/30 hover:text-white"
+                            }`}
+                    >
+                        <Users className="w-3.5 h-3.5" />
+                        Side-by-side compare
+                    </button>
+                </div>
+            )}
+
+            {view === "compare" && latestPerOwner.length >= 2 ? (
+                <CompareView submissions={latestPerOwner.slice(0, 2)} />
+            ) : null}
+
+            {/* Aggregate scoreboard — features that drew the most complaints */}
+            {view === "list" && submissions.length > 0 && (
                 <Card className="bg-white/5 border-white/5 rounded-none">
                     <CardContent className="p-5 sm:p-6">
                         <SectionLabel>At a glance — how many people had trouble with each feature</SectionLabel>
@@ -318,7 +368,8 @@ const FeedbackResults = () => {
                 </Card>
             )}
 
-            {/* Submission list */}
+            {/* Submission list — only when in list view */}
+            {view === "list" && (
             <Card className="bg-white/5 border-white/5 rounded-none">
                 <CardContent className="p-0">
                     {isLoading ? (
@@ -393,6 +444,149 @@ const FeedbackResults = () => {
                     )}
                 </CardContent>
             </Card>
+            )}
+        </div>
+    );
+};
+
+// ----- Compare view: two submissions side by side ---------------------------
+
+const COMPARE_STATUS_TONE: Record<ResponseStatus, string> = {
+    worked: "text-emerald-400 bg-emerald-500/10 border-emerald-400/30",
+    struggled: "text-amber-300 bg-amber-500/10 border-amber-400/30",
+    broken: "text-red-400 bg-red-500/10 border-red-400/30",
+    skipped: "text-white/40 bg-white/5 border-white/10",
+};
+
+const CompareView = ({ submissions }: { submissions: Submission[] }) => {
+    const [left, right] = submissions;
+    if (!left || !right) return null;
+
+    // For each feature, surface what each person said. A row gets a subtle
+    // amber tint when the two responses DISAGREE — that's where the action is.
+    const featuresToShow = FEATURE_CATALOGUE.flatMap((c) =>
+        c.features.map((f) => ({ category: c, feature: f }))
+    );
+
+    return (
+        <Card className="bg-white/5 border-white/5 rounded-none">
+            <CardContent className="p-0">
+                {/* Header */}
+                <div className="grid grid-cols-[1fr_120px_120px] sm:grid-cols-[1fr_180px_180px] gap-2 sm:gap-3 px-4 sm:px-5 md:px-6 py-4 border-b border-white/5 bg-black/20">
+                    <SectionLabel>Feature</SectionLabel>
+                    <div className="text-center">
+                        <p className="font-cormorant text-base sm:text-lg text-white font-light italic leading-none truncate">
+                            {left.submittedBy.split(" ")[0]}
+                        </p>
+                        {left.overallRating !== null && (
+                            <span className="inline-flex items-center gap-0.5 mt-1">
+                                {Array.from({ length: left.overallRating }).map((_, i) => (
+                                    <Star key={i} className="w-2.5 h-2.5 fill-millions-accent text-millions-accent" />
+                                ))}
+                            </span>
+                        )}
+                    </div>
+                    <div className="text-center">
+                        <p className="font-cormorant text-base sm:text-lg text-white font-light italic leading-none truncate">
+                            {right.submittedBy.split(" ")[0]}
+                        </p>
+                        {right.overallRating !== null && (
+                            <span className="inline-flex items-center gap-0.5 mt-1">
+                                {Array.from({ length: right.overallRating }).map((_, i) => (
+                                    <Star key={i} className="w-2.5 h-2.5 fill-millions-accent text-millions-accent" />
+                                ))}
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                {/* Per-category groups */}
+                {FEATURE_CATALOGUE.map((category) => {
+                    const categoryRows = featuresToShow.filter((x) => x.category.id === category.id);
+                    return (
+                        <div key={category.id}>
+                            <div className="px-4 sm:px-5 md:px-6 py-3 bg-millions-accent/5 border-b border-millions-accent/10">
+                                <p className="text-[0.55rem] sm:text-[0.6rem] font-jost text-millions-accent uppercase tracking-[0.25em] font-bold">
+                                    {category.label}
+                                </p>
+                            </div>
+                            <ul className="divide-y divide-white/5">
+                                {categoryRows.map(({ feature }) => {
+                                    const lr = left.responses?.[feature.id];
+                                    const rr = right.responses?.[feature.id];
+                                    const bothRated = lr?.status && rr?.status;
+                                    const disagree = bothRated && lr.status !== rr.status && (lr.status !== "skipped" && rr.status !== "skipped");
+                                    return (
+                                        <li
+                                            key={feature.id}
+                                            className={`grid grid-cols-[1fr_120px_120px] sm:grid-cols-[1fr_180px_180px] gap-2 sm:gap-3 px-4 sm:px-5 md:px-6 py-3 items-start transition-colors ${disagree ? "bg-amber-500/[0.04]" : ""}`}
+                                        >
+                                            <div className="min-w-0">
+                                                <p className="text-[0.7rem] sm:text-[0.75rem] font-jost text-white/80 leading-snug">
+                                                    {feature.label}
+                                                </p>
+                                                {disagree && (
+                                                    <span className="inline-flex items-center gap-1 mt-1 text-[0.55rem] font-jost text-amber-300 uppercase tracking-[0.2em] font-bold">
+                                                        <AlertTriangle className="w-2.5 h-2.5" />
+                                                        Disagreement
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <CompareCell response={lr} />
+                                            <CompareCell response={rr} />
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
+                    );
+                })}
+
+                {/* Overall comments */}
+                <div className="border-t border-white/5 px-4 sm:px-5 md:px-6 py-5 grid sm:grid-cols-2 gap-4 sm:gap-6 bg-black/10">
+                    {[left, right].map((s) => (
+                        <div key={s.id}>
+                            <SectionLabel>{s.submittedBy.split(" ")[0]}'s overall comment</SectionLabel>
+                            {s.overallComment ? (
+                                <p className="font-cormorant text-sm sm:text-base italic text-white/80 leading-relaxed whitespace-pre-wrap">
+                                    "{s.overallComment}"
+                                </p>
+                            ) : (
+                                <p className="text-[0.7rem] font-jost text-white/25 italic">No overall comment</p>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
+
+const CompareCell = ({ response }: { response?: { status: ResponseStatus; comment?: string | null } }) => {
+    if (!response?.status) {
+        return (
+            <div className="flex items-center justify-center">
+                <span className="text-[0.55rem] font-jost text-white/20 uppercase tracking-[0.15em]">—</span>
+            </div>
+        );
+    }
+    const Icon = STATUS_ICON[response.status];
+    const tone = COMPARE_STATUS_TONE[response.status];
+    const label = STATUS_OPTIONS.find((o) => o.value === response.status)?.short ?? response.status;
+    return (
+        <div className="flex flex-col items-center gap-1.5">
+            <span className={`inline-flex items-center justify-center gap-1 px-2 py-1 text-[0.55rem] sm:text-[0.6rem] font-jost uppercase tracking-[0.12em] font-bold border w-full ${tone}`}>
+                <Icon className="w-3 h-3" />
+                {label}
+            </span>
+            {response.comment && (
+                <p
+                    title={response.comment}
+                    className="text-[0.6rem] font-jost text-white/40 italic line-clamp-2 leading-snug text-center"
+                >
+                    "{response.comment}"
+                </p>
+            )}
         </div>
     );
 };
