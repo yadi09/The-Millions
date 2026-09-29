@@ -28,6 +28,11 @@ server {
         root /var/www/certbot;
     }
 
+    location = /healthz {
+        access_log off;
+        return 200 "ok\n";
+    }
+
     location / {
         return 301 https://$host$request_uri;
     }
@@ -96,6 +101,17 @@ server {
         proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
+
+    # ----- Leftovers from the hacked WordPress site -----
+    # 410 tells search engines these spam pages are gone for good, so they
+    # drop them from results instead of indexing the SPA shell under them.
+    location ^~ /shop/ { return 410; }
+    location ~ ^/sitemap[^/]*\.xml$ { return 410; }
+
+    # Bot scans for WordPress admin and secret files: plain 404, no SPA shell.
+    location ~ ^/(wp-admin|wp-content|wp-includes|wordpress|wp)(/|$) { return 404; }
+    location ~ ^/wp-[^/]*\.php$ { return 404; }
+    location ~ /\.(?!well-known/) { return 404; }
 
     # ----- Static SPA -----
     root /usr/share/nginx/html;
