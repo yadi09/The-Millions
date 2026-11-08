@@ -51,13 +51,13 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
     return (
         <aside
             className={`
-                fixed inset-y-0 left-0 z-50 w-64 bg-millions-dark text-white 
+                fixed inset-y-0 left-0 z-50 w-64 bg-millions-dark text-white flex flex-col
                 transform transition-transform duration-300 ease-in-out border-r border-white/10
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
                 lg:translate-x-0 lg:fixed lg:z-40
             `}
         >
-            <div className="p-8 border-b border-white/5 bg-white/5">
+            <div className="shrink-0 p-8 border-b border-white/5 bg-white/5">
                 <div className="flex items-center gap-4">
                     <div className="w-10 h-10 border border-millions-accent/40 rounded-none flex items-center justify-center text-millions-accent font-cormorant text-xl font-bold shadow-[0_0_15px_rgba(201,168,76,0.1)]">
                         M
@@ -71,7 +71,7 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                 </div>
             </div>
 
-            <div className="px-4 mt-6">
+            <div className="shrink-0 px-4 mt-6">
                 <a
                     href="/?edit=1"
                     target="_blank"
@@ -86,7 +86,7 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                 </a>
             </div>
 
-            <nav className="p-4 mt-4 space-y-2">
+            <nav className="flex-1 min-h-0 overflow-y-auto p-4 mt-4 space-y-1">
                 {navLinks.map((link) => {
                     const active = isActive(link.to);
                     const Icon = link.icon;
@@ -95,7 +95,7 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                             key={link.to}
                             to={link.to}
                             onClick={handleNavigation}
-                            className={`flex items-center gap-4 px-6 py-4 transition-all duration-300 group relative ${active
+                            className={`flex items-center gap-4 px-6 py-3.5 transition-all duration-300 group relative ${active
                                 ? 'text-millions-accent bg-white/5'
                                 : 'text-white/40 hover:text-white hover:bg-white/5'
                                 }`}
@@ -112,8 +112,8 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                 })}
             </nav>
 
-            <div className="absolute bottom-0 w-full p-6 border-t border-white/5 bg-white/5">
-                <div className="flex items-center gap-3 px-4 py-2 mb-4">
+            <div className="shrink-0 w-full px-6 py-4 border-t border-white/5 bg-white/5">
+                <div className="flex items-center gap-3 px-4 py-2 mb-2">
                     <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
                         <User size={12} className="text-white/40" />
                     </div>
