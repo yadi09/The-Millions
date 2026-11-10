@@ -3,6 +3,7 @@ import { Link, useLocation, useSearchParams } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { useGetPublicVisibilityQuery } from "../features/api/apiSlice"
 import type { RootState } from "../app/store"
+import { useSiteContact } from "../utils/useSiteContact"
 
 // Map nav-item names to the visibility key that gates the destination
 // page. Items without an entry here are always shown (e.g. in-page
@@ -45,6 +46,11 @@ export function Header() {
   ]
   const navigation = allNavigation.filter((n) => isLinkVisible(n.name))
   const showContact = isLinkVisible("Contact")
+
+  // "WhatsApp Us" opens the CMS WhatsApp link in a new tab; only if that
+  // setting is empty does it fall back to the contact page.
+  const { whatsapp } = useSiteContact()
+  const showWhatsApp = Boolean(whatsapp) || showContact
 
   useEffect(() => {
     const handleScroll = () => {
@@ -101,13 +107,11 @@ export function Header() {
 
         {/* Nav CTA / Burger */}
         <div className="flex items-center gap-4">
-          {showContact && (
-            <Link
-              to="/contact"
+          {showWhatsApp && (
+            <WhatsAppLink
+              href={whatsapp}
               className="hidden lg:block bg-transparent border border-millions-accent text-millions-accent px-[1.3rem] py-[0.5rem] text-[0.72rem] tracking-[0.1em] uppercase hover:bg-millions-accent hover:text-millions-dark transition-all duration-300 font-jost"
-            >
-              WhatsApp Us
-            </Link>
+            />
           )}
 
           {/* Burger Button */}
@@ -160,21 +164,29 @@ export function Header() {
           </nav>
 
           <div className="mt-auto pt-10">
-            {showContact && (
-              <Link
-                to="/contact"
+            {showWhatsApp && (
+              <WhatsAppLink
+                href={whatsapp}
                 onClick={() => setIsMenuOpen(false)}
                 className="w-full bg-millions-accent text-millions-dark px-6 py-4 text-[0.75rem] tracking-[0.15em] font-bold uppercase font-jost flex items-center justify-center transition-all hover:bg-white"
-              >
-                WhatsApp Us
-              </Link>
+              />
             )}
-            <p className="mt-6 text-[0.6rem] text-white/20 uppercase tracking-[0.2em] font-light text-center">
-              Professional Advisory Sync
-            </p>
           </div>
         </div>
       </div>
     </>
+  )
+}
+
+type WhatsAppLinkProps = { href: string; className: string; onClick?: () => void }
+
+function WhatsAppLink({ href, className, onClick }: WhatsAppLinkProps) {
+  if (!href) {
+    return <Link to="/contact" onClick={onClick} className={className}>WhatsApp Us</Link>
+  }
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" onClick={onClick} className={className}>
+      WhatsApp Us
+    </a>
   )
 }

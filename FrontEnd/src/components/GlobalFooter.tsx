@@ -1,4 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { formatPhone } from '../utils/phone';
+import { useGetPublicVisibilityQuery } from '../features/api/apiSlice';
 
 interface ContactContent {
   label: string;
@@ -23,6 +26,12 @@ interface GlobalFooterProps {
 }
 
 export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) => {
+  // The CTA goes to the contact form; if that page is toggled off in
+  // Site Visibility, fall back to email so the button never 404s.
+  const { data: visibility } = useGetPublicVisibilityQuery();
+  const contactPageVisible = visibility?.pages?.contact !== false;
+  const ctaClass = "inline-block bg-millions-accent text-millions-dark px-10 py-4 font-jost text-[0.85rem] tracking-[0.12em] uppercase font-medium transition-all hover:bg-[#e0bb60] hover:-translate-y-0.5";
+
   return (
     <>
       {/* Section 13: Get In Touch */}
@@ -47,11 +56,14 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
             <div className="flex flex-col items-center gap-1.5 text-center">
               <span className="text-millions-accent text-[0.63rem] tracking-[0.22em] uppercase font-normal">Phone</span>
               <div className="text-white/55 text-[0.85rem] hover:text-millions-accent transition-colors font-normal flex flex-wrap justify-center gap-x-3">
-                {contact.phones.map((phone, idx) => (
-                  <a key={idx} href={`tel:${phone}`}>
-                    {phone}
-                  </a>
-                ))}
+                {contact.phones.map((raw, idx) => {
+                  const phone = formatPhone(raw);
+                  return (
+                    <a key={idx} href={phone.href}>
+                      {phone.display}
+                    </a>
+                  );
+                })}
               </div>
             </div>
 
@@ -77,12 +89,15 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
             </div>
           </div>
 
-          <a
-            href={`mailto:${contact.email}`}
-            className="inline-block bg-millions-accent text-millions-dark px-10 py-4 font-jost text-[0.85rem] tracking-[0.12em] uppercase font-medium transition-all hover:bg-[#e0bb60] hover:-translate-y-0.5"
-          >
-            {contact.buttonText}
-          </a>
+          {contactPageVisible ? (
+            <Link to="/contact" className={ctaClass}>
+              {contact.buttonText}
+            </Link>
+          ) : (
+            <a href={`mailto:${contact.email}`} className={ctaClass}>
+              {contact.buttonText}
+            </a>
+          )}
         </div>
       </section>
 

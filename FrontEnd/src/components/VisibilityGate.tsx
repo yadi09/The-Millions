@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import ComingSoonPage from "../pages/comingSoon/page";
+import NotFoundPage from "../pages/notFound/page";
 import { useGetPublicVisibilityQuery } from "../features/api/apiSlice";
 import type { RootState } from "../app/store";
 
@@ -12,7 +12,8 @@ type Props = {
 };
 
 // Gates a public route behind the page-visibility toggle. If the page is
-// hidden, falls back to the existing ComingSoon screen. Authenticated
+// hidden, it renders the noindex Not Found page, so draft pages are
+// indistinguishable from URLs that don't exist. Authenticated
 // admins with ?preview=1 in the URL bypass the gate entirely so they can
 // verify content before flipping it live.
 const VisibilityGate = ({ pageKey, children }: Props) => {
@@ -28,7 +29,7 @@ const VisibilityGate = ({ pageKey, children }: Props) => {
 
     const visible = data.pages?.[pageKey] !== false;
     if (visible || previewMode) return <>{children}</>;
-    return <ComingSoonPage />;
+    return <NotFoundPage />;
 };
 
 export default VisibilityGate;

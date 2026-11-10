@@ -18,7 +18,7 @@ const ComingSoon = ({
     return (
         <main className="min-h-[80vh] bg-millions-light px-[5%] flex items-center justify-center">
             <div className="mx-auto max-w-[1200px] w-full text-center">
-                <p className="text-[0.68rem] font-bold uppercase tracking-[0.3em] text-millions-accent animate-fade-in-up">Status: Reserved</p>
+                <p className="text-[0.68rem] font-bold uppercase tracking-[0.3em] text-millions-accent animate-fade-in-up">The Millions</p>
                 <h1 className="mt-6 font-cormorant text-[clamp(2rem,4vw,3.2rem)] font-light text-millions-dark italic animate-fade-in-up md:animation-delay-200">{title}</h1>
                 <p className="mt-6 text-[0.95rem] text-millions-body font-light max-w-sm mx-auto leading-relaxed animate-fade-in-up md:animation-delay-300">{message}</p>
                 <div className="mt-10 flex justify-center animate-fade-in-up md:animation-delay-500">

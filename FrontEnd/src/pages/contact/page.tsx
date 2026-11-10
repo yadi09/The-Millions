@@ -3,7 +3,9 @@ import { useState } from "react"
 import { SubPageHero } from "../../components/SubPageHero"
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle } from "lucide-react"
 import { useGetContactServicesQuery, useSubmitContactMutation } from "../../features/api/apiSlice"
-import { landingContent } from "../../data/landingContent"
+import { useSiteContact } from "../../utils/useSiteContact"
+import { formatPhone } from "../../utils/phone"
+import { BUSINESS_HOURS, hoursLabel, openHoursSummary } from "../../data/businessHours"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState<{
@@ -20,6 +22,7 @@ export default function ContactPage() {
     message: "",
   })
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const contact = useSiteContact()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   // API Hooks
@@ -86,6 +89,7 @@ export default function ContactPage() {
                       onChange={(e) => handleInputChange("name", e.target.value)}
                       placeholder="e.g. Abebe Kebede"
                       required
+                      minLength={3}
                     />
                   </div>
                   <div className="flex flex-col gap-2">
@@ -150,6 +154,7 @@ export default function ContactPage() {
                     placeholder="Tell us about your requirements..."
                     rows={6}
                     required
+                    minLength={10}
                   />
                 </div>
 
@@ -179,10 +184,15 @@ export default function ContactPage() {
                   <Phone className="w-5 h-5 text-millions-accent mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="text-[0.6rem] tracking-[0.15em] text-white/40 uppercase mb-1">Call Us</h4>
-                    {landingContent.contact.phones.map((phone, i) => (
-                      <p key={i} className="text-white text-sm font-light">{phone}</p>
-                    ))}
-                    <p className="text-white/30 text-[0.65rem] italic">Available Mon-Fri 9AM-6PM</p>
+                    {contact.phones.map((raw, i) => {
+                      const phone = formatPhone(raw)
+                      return (
+                        <p key={i} className="text-white text-sm font-light">
+                          <a href={phone.href} className="hover:text-millions-accent transition-colors">{phone.display}</a>
+                        </p>
+                      )
+                    })}
+                    <p className="text-white/30 text-[0.65rem] italic">Available {openHoursSummary()}</p>
                   </div>
                 </div>
 
@@ -190,7 +200,9 @@ export default function ContactPage() {
                   <Mail className="w-5 h-5 text-millions-accent mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="text-[0.6rem] tracking-[0.15em] text-white/40 uppercase mb-1">Email Our Office</h4>
-                    <p className="text-white text-sm font-light">{landingContent.contact.email}</p>
+                    <p className="text-white text-sm font-light">
+                      <a href={`mailto:${contact.email}`} className="hover:text-millions-accent transition-colors">{contact.email}</a>
+                    </p>
                   </div>
                 </div>
 
@@ -198,7 +210,7 @@ export default function ContactPage() {
                   <MapPin className="w-5 h-5 text-millions-accent mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="text-[0.6rem] tracking-[0.15em] text-white/40 uppercase mb-1">Headquarters</h4>
-                    <p className="text-white text-sm font-light">{landingContent.contact.address.join(", ")}</p>
+                    <p className="text-white text-sm font-light">{contact.address.join(", ")}</p>
                   </div>
                 </div>
               </div>
@@ -211,11 +223,7 @@ export default function ContactPage() {
                 <h3 className="font-cormorant text-millions-dark text-[1.4rem] font-light">Business Hours</h3>
               </div>
               <div className="space-y-4">
-                {[
-                  { day: "Mon - Fri", hours: "9:00 AM - 6:00 PM" },
-                  { day: "Saturday", hours: "10:00 AM - 2:00 PM" },
-                  { day: "Sunday", hours: "Closed" }
-                ].map((item, idx) => (
+                {BUSINESS_HOURS.map((row) => ({ day: row.day, hours: hoursLabel(row) })).map((item, idx) => (
                   <div key={idx} className="flex justify-between items-center text-[0.85rem] font-light border-b border-millions-dark/5 pb-3">
                     <span className="text-millions-body italic tracking-wide">{item.day}</span>
                     <span className="text-millions-dark font-medium">{item.hours}</span>

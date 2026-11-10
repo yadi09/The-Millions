@@ -65,14 +65,21 @@ const ScrollingGeographySlider = ({ regions }: { regions: any[] }) => {
         className="flex w-fit gap-8 animate-marquee hover:pause-marquee"
         style={{ animationDuration: `${duration}s` }}
       >
-        {duplicatedItems.map((region, idx) => (
+        {duplicatedItems.map((region, idx) => {
+          // The second copy only exists to make the marquee loop seamlessly;
+          // hide it from screen readers, text extraction and keyboard focus.
+          const isClone = idx >= (regions?.length || 0);
+          return (
           <div 
             key={`${region?.title || idx}-${idx}`} 
             className="w-[94vw] md:w-[47vw] lg:w-[660.8px] shrink-0"
+            aria-hidden={isClone || undefined}
+            inert={isClone || undefined}
           >
             <RegionCard region={region} />
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

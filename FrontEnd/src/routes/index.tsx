@@ -3,7 +3,7 @@ import ContactPage from "../pages/contact/page";
 import Layout from "../components/Layout";
 import BlogPage from "../pages/blog/page";
 import BlogPost from "../pages/blog/BlogPost";
-import ComingSoonPage from "../pages/comingSoon/page";
+import NotFoundPage from "../pages/notFound/page";
 import AdminLayout from "../components/AdminLayout";
 import AdminLogin from "../pages/admin/Login";
 import BlogManagement from "../pages/admin/BlogManagement";
@@ -52,7 +52,7 @@ export const AppRoutes = () => (
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/testimonials" element={<VisibilityGate pageKey="testimonials"><TestimonialsPage /></VisibilityGate>} />
             <Route path="/submit-testimonial" element={<VisibilityGate pageKey="submit-testimonial"><SubmitTestimonial /></VisibilityGate>} />
-            <Route path="*" element={<ComingSoonPage />} />
+            <Route path="*" element={<NotFoundPage />} />
         </Route>
 
         {/* Admin Login Route (Public) */}
@@ -61,7 +61,7 @@ export const AppRoutes = () => (
         {/* Non-public feedback walkthrough — share this URL with the firm
             owners; not linked from anywhere on the public site. Renders
             standalone (no nav/footer chrome, no maintenance gate). */}
-        <Route path="/feedback/walkthrough" element={<FeedbackWalkthrough />} />
+        <Route path="/feedback/walkthrough" element={<><meta name="robots" content="noindex" /><FeedbackWalkthrough /></>} />
 
         {/* Protected Admin Routes */}
         <Route path="/admin" element={
