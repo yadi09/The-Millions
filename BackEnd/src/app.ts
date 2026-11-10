@@ -19,6 +19,7 @@ import businessCardRoutes from "./modules/business-card/business-card.routes.js"
 import socialPostRoutes from "./modules/social-post/social-post.routes.js";
 import { publicVisibilityRouter, adminVisibilityRouter } from "./modules/visibility/visibility.routes.js";
 import { publicFeedbackRouter, adminFeedbackRouter } from "./modules/feedback/feedback.routes.js";
+import { publicOpeningHoursRouter, adminOpeningHoursRouter } from "./modules/opening-hours/opening-hours.routes.js";
 import swaggerRoutes from "./routes/swagger.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { notFoundHandler } from "./middlewares/notFound.middleware.js";
@@ -73,6 +74,8 @@ app.use("/api/visibility", publicVisibilityRouter);
 app.use("/api/admin/visibility", adminVisibilityRouter);
 app.use("/api/feedback", publicFeedbackRouter);
 app.use("/api/admin/feedback", adminFeedbackRouter);
+app.use("/api/opening-hours", publicOpeningHoursRouter);
+app.use("/api/admin/opening-hours", adminOpeningHoursRouter);
 app.use("/api-docs", swaggerRoutes);
 
 app.use(notFoundHandler);

@@ -10,7 +10,11 @@ import {
   useUploadImageMutation,
   useGetFooterQuery,
   useUpdateFooterMutation,
+  useGetOpeningHoursQuery,
+  useUpdateOpeningHoursMutation,
 } from "../api/apiSlice";
+import { WhatsAppFieldEditor, WeeklyHoursEditor } from "./specialEditors";
+import { prepareOpeningHours, type DayHours } from "../../data/businessHours";
 import type { Page, Section } from "../../types";
 import {
   DndContext,
@@ -68,11 +72,15 @@ export function EditPanel() {
 
   const schema = selectedSection ? getSchemaForType(selectedSection) : undefined;
   const isGlobalFooter = schema?.kind === "global" && schema?.globalResource === "footer";
+  const isOpeningHours = schema?.kind === "global" && schema?.globalResource === "opening-hours";
+  const isGlobal = isGlobalFooter || isOpeningHours;
 
   const { data: footerData } = useGetFooterQuery(undefined, { skip: !isGlobalFooter });
   const [updateFooter] = useUpdateFooterMutation();
+  const { data: hoursData } = useGetOpeningHoursQuery(undefined, { skip: !isOpeningHours });
+  const [updateOpeningHours] = useUpdateOpeningHoursMutation();
 
-  const section = !isGlobalFooter ? findSection(pageData, selectedSection) : undefined;
+  const section = !isGlobal ? findSection(pageData, selectedSection) : undefined;
 
   // The draft is the FULL content (deep clone), edited by path.
   const [draft, setDraft] = useState<Record<string, unknown>>({});
@@ -84,7 +92,16 @@ export function EditPanel() {
 
   // Hydration: when section or footer changes, copy into draft.
   useEffect(() => {
-    if (isGlobalFooter) {
+    if (isOpeningHours) {
+      if (hoursData) {
+        const raw = structuredClone(hoursData) as unknown as Record<string, unknown>;
+        sourceRef.current = raw;
+        setDraft(raw);
+      } else {
+        sourceRef.current = null;
+        setDraft({});
+      }
+    } else if (isGlobalFooter) {
       if (footerData) {
         const raw = footerResponseToRaw(footerData);
         sourceRef.current = raw;
@@ -101,7 +118,7 @@ export function EditPanel() {
       setDraft({});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [section?.id, isGlobalFooter, footerData]);
+  }, [section?.id, isGlobalFooter, footerData, isOpeningHours, hoursData, selectedSection]);
 
   // Auto-save: every draft change schedules a debounced PUT.
   useEffect(() => {
@@ -115,11 +132,22 @@ export function EditPanel() {
     );
     if (unchanged) return;
 
+    // Opening hours: only save once every row is valid. Problems are shown
+    // in the panel; the site keeps the last saved hours meanwhile.
+    const preparedHours = isOpeningHours ? prepareOpeningHours(draft) : null;
+    if (preparedHours && preparedHours.problems.length > 0) {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+      setSaveStatus("idle");
+      return;
+    }
+
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(async () => {
       setSaveStatus("saving");
       try {
-        if (isGlobalFooter) {
+        if (preparedHours) {
+          await updateOpeningHours(preparedHours.hours).unwrap();
+        } else if (isGlobalFooter) {
           await updateFooter(draft).unwrap();
         } else if (section && pageData) {
           const nextSections: Section[] = pageData.sections.map((s) =>
@@ -156,7 +184,7 @@ export function EditPanel() {
 
   // Global resources (footer) don't have a `section` — they pull their data
   // from a different endpoint. Section-kind schemas still need a section.
-  if (!isGlobalFooter && !section) {
+  if (!isGlobal && !section) {
     return (
       <PanelShell onClose={() => selectSection(null)} title={schema.displayName}>
         <p className="text-white/50 text-sm">Section not found in current page data.</p>
@@ -170,6 +198,9 @@ export function EditPanel() {
         <div className="mb-6 px-4 py-3 bg-millions-accent/10 border-l-2 border-millions-accent text-white/60 text-[0.7rem] font-jost leading-relaxed">
           {schema.helper}
         </div>
+      )}
+      {isOpeningHours && Object.keys(draft).length > 0 && (
+        <HoursProblems draft={draft} />
       )}
       <div className="space-y-6">
         {schema.fields.map((field) => (
@@ -234,7 +265,7 @@ function ScalarFieldEditor({
         />
       ) : (
         <input
-          type="text"
+          type={field.type === "date" || field.type === "time" ? field.type : "text"}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={field.placeholder}
@@ -274,6 +305,36 @@ function FieldDispatcher({
   if (field.type === "string-list") {
     return <StringListFieldEditor field={field} keyPath={keyPath} draft={draft} setDraft={setDraft} />;
   }
+  if (field.type === "whatsapp") {
+    return (
+      <WhatsAppFieldEditor
+        value={(getPath(draft, keyPath) as string) ?? ""}
+        onChange={(v) => setDraft((prev) => setPath(prev, keyPath, v))}
+      />
+    );
+  }
+  if (field.type === "weekly-hours") {
+    return (
+      <WeeklyHoursEditor
+        value={(getPath(draft, keyPath) as DayHours[]) ?? []}
+        onChange={(v) => setDraft((prev) => setPath(prev, keyPath, v))}
+      />
+    );
+  }
+  if (field.type === "boolean") {
+    const checked = Boolean(getPath(draft, keyPath));
+    return (
+      <label className="flex items-center gap-2 cursor-pointer text-[0.65rem] font-jost uppercase tracking-[0.2em] text-white/60">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => setDraft((prev) => setPath(prev, keyPath, e.target.checked))}
+          className="accent-[#C9A84C]"
+        />
+        {field.label}
+      </label>
+    );
+  }
   if (field.type === "image") {
     return (
       <ImageFieldEditor
@@ -295,6 +356,7 @@ function FieldDispatcher({
 // Picks a sensible blank value for a freshly-added list item's sub-field.
 function defaultForFieldType(type: FieldSchema["type"]): unknown {
   if (type === "list" || type === "string-list") return [];
+  if (type === "boolean") return false;
   return "";
 }
 
@@ -329,7 +391,7 @@ function ListFieldEditor({
   const addItem = () => {
     const blank: Record<string, unknown> = {};
     for (const f of itemFields) {
-      Object.assign(blank, setPath(blank, f.key, defaultForFieldType(f.type)));
+      Object.assign(blank, setPath(blank, f.key, f.defaultValue ?? defaultForFieldType(f.type)));
     }
     setDraft((prev) => setPath(prev, keyPath, [...items, blank]));
   };
@@ -375,7 +437,9 @@ function ListFieldEditor({
                   index={index}
                   onRemove={() => removeItem(index)}
                 >
-                  {itemFields.map((subField) => (
+                  {itemFields
+                    .filter((subField) => !subField.hideWhen || getPath(items[index], subField.hideWhen.key) !== subField.hideWhen.equals)
+                    .map((subField) => (
                     <FieldDispatcher
                       key={subField.key}
                       field={subField}
@@ -725,5 +789,20 @@ function PanelShell({
       </header>
       <div className="flex-1 overflow-y-auto p-6">{children}</div>
     </aside>
+  );
+}
+
+// Lists what's stopping the opening hours from saving (bad times, special
+// dates without a date). Nothing is saved until this list is empty.
+function HoursProblems({ draft }: { draft: Record<string, unknown> }) {
+  const { problems } = prepareOpeningHours(draft);
+  if (problems.length === 0) return null;
+  return (
+    <div className="mb-6 px-4 py-3 bg-red-500/10 border-l-2 border-red-400 text-[0.7rem] font-jost leading-relaxed text-red-200">
+      <p className="uppercase tracking-[0.15em] text-[0.6rem] mb-1.5 text-red-300">Not saved yet — fix these first</p>
+      <ul className="list-disc pl-4 space-y-0.5">
+        {problems.map((p) => <li key={p}>{p}</li>)}
+      </ul>
+    </div>
   );
 }

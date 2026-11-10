@@ -4,6 +4,7 @@ import { useSelector } from "react-redux"
 import { useGetPublicVisibilityQuery } from "../features/api/apiSlice"
 import type { RootState } from "../app/store"
 import { useSiteContact } from "../utils/useSiteContact"
+import { useEditMode } from "../features/edit/EditModeContext"
 
 // Map nav-item names to the visibility key that gates the destination
 // page. Items without an entry here are always shown (e.g. in-page
@@ -59,6 +60,13 @@ export function Header() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  // Site editor: clicking the drawer's WhatsApp button opens the edit panel,
+  // which sits below the drawer — so close the drawer when a panel opens.
+  const { selectedSection } = useEditMode()
+  useEffect(() => {
+    if (selectedSection) setIsMenuOpen(false)
+  }, [selectedSection])
 
   // Prevent scroll when menu is open
   useEffect(() => {
@@ -180,12 +188,14 @@ export function Header() {
 
 type WhatsAppLinkProps = { href: string; className: string; onClick?: () => void }
 
+// data-editable-section lets admins click the button in site-editor mode
+// (/?edit=1) to change the WhatsApp number and pre-filled message.
 function WhatsAppLink({ href, className, onClick }: WhatsAppLinkProps) {
   if (!href) {
-    return <Link to="/contact" onClick={onClick} className={className}>WhatsApp Us</Link>
+    return <Link to="/contact" onClick={onClick} className={className} data-editable-section="whatsapp">WhatsApp Us</Link>
   }
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" onClick={onClick} className={className}>
+    <a href={href} target="_blank" rel="noopener noreferrer" onClick={onClick} className={className} data-editable-section="whatsapp">
       WhatsApp Us
     </a>
   )

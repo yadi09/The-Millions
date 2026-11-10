@@ -1,8 +1,10 @@
 import { Pencil, Check, Loader2, AlertCircle, X } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { useEditMode } from "./EditModeContext";
 
 export function EditChrome() {
-  const { isEditing, selectedSection, saveStatus, lastSavedAt, exitEditMode } = useEditMode();
+  const { isEditing, selectedSection, saveStatus, lastSavedAt, exitEditMode, selectSection } = useEditMode();
+  const { pathname } = useLocation();
 
   if (!isEditing) return null;
 
@@ -29,6 +31,23 @@ export function EditChrome() {
 
         <SaveStatusIndicator status={saveStatus} lastSavedAt={lastSavedAt} />
 
+        {/* Page switcher — keeps ?edit=1 so admins stay in edit mode. The
+            contact page holds the editable opening hours. */}
+        <nav className="flex items-center gap-2 ml-2 pl-3 border-l border-white/10" aria-label="Edit another page">
+          {EDITABLE_PAGES.map((p) => (
+            <Link
+              key={p.to}
+              to={`${p.to}?edit=1`}
+              onClick={() => selectSection(null)}
+              className={`font-jost text-[0.65rem] uppercase tracking-[0.2em] transition-colors ${
+                pathname === p.to ? "text-millions-accent" : "text-white/40 hover:text-white"
+              }`}
+            >
+              {p.label}
+            </Link>
+          ))}
+        </nav>
+
         <button
           onClick={exitEditMode}
           className="flex items-center gap-2 ml-2 pl-3 border-l border-white/10 text-white/50 hover:text-white transition-colors"
@@ -41,6 +60,11 @@ export function EditChrome() {
     </>
   );
 }
+
+const EDITABLE_PAGES = [
+  { to: "/", label: "Home" },
+  { to: "/contact", label: "Contact" },
+];
 
 function SaveStatusIndicator({ status, lastSavedAt }: { status: ReturnType<typeof useEditMode>["saveStatus"]; lastSavedAt: number | null }) {
   if (status === "saving") {

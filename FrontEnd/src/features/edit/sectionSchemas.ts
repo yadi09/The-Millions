@@ -8,7 +8,12 @@
 // at the same source of truth. Using a different name here creates a phantom
 // key in the DB that the public site never reads.
 
-export type FieldType = "text" | "long-text" | "rich-text" | "list" | "string-list" | "image";
+export type FieldType =
+  | "text" | "long-text" | "rich-text" | "list" | "string-list" | "image"
+  | "date" | "time" | "boolean"
+  // Purpose-built editors:
+  | "whatsapp"      // phone number + pre-filled message → wa.me URL string
+  | "weekly-hours"; // the 7-day opening-hours table
 
 export interface FieldSchema {
   key: string;            // dot-path into content, e.g. "badge" or "ctas.0.label"
@@ -28,6 +33,12 @@ export interface FieldSchema {
   // For type === "string-list" only: declares an array of plain values
   // (strings). Each item is one input of `itemType`. Defaults to "text".
   itemType?: "text" | "long-text" | "rich-text";
+
+  // Initial value when a new list item is added (defaults by type otherwise).
+  defaultValue?: unknown;
+  // Inside list items: hide this field while a sibling field has this value
+  // (e.g. hide the times while "Closed all day" is ticked).
+  hideWhen?: { key: string; equals: unknown };
 }
 
 export interface SectionSchema {
@@ -39,7 +50,7 @@ export interface SectionSchema {
   // For schemas that target a non-section resource (e.g. the global footer).
   // The EditPanel switches its read/save data path based on `kind`.
   kind?: "section" | "global";
-  globalResource?: "footer";
+  globalResource?: "footer" | "opening-hours";
 }
 
 // Schemas declare the editable surface for each section. Field keys are
@@ -338,12 +349,52 @@ export const SECTION_SCHEMAS: Record<string, SectionSchema> = {
         itemLabel: "Line",
         itemType: "text",
       },
-      { key: "socialMedia.whatsapp", label: "WhatsApp URL", type: "text", placeholder: "https://wa.me/..." },
+      { key: "socialMedia.whatsapp", label: "WhatsApp Button", type: "whatsapp" },
       { key: "logoText",  label: "Logo Text",   type: "text" },
       { key: "copyright", label: "Copyright",   type: "text" },
       { key: "location",  label: "Location",    type: "text" },
     ],
   },
+};
+
+// The header "WhatsApp Us" buttons. Stored on the footer row
+// (socialMedia.whatsapp) as a wa.me link, which the header reads.
+SECTION_SCHEMAS["whatsapp"] = {
+  type: "whatsapp",
+  displayName: "WhatsApp Button",
+  kind: "global",
+  globalResource: "footer",
+  helper: "Sets where every \"WhatsApp Us\" button on the site sends visitors. Changes save automatically and apply site-wide.",
+  fields: [
+    { key: "socialMedia.whatsapp", label: "WhatsApp Button", type: "whatsapp" },
+  ],
+};
+
+// Contact page → Business Hours box. Stored as one settings record
+// (GET /api/opening-hours, PUT /api/admin/opening-hours).
+SECTION_SCHEMAS["opening-hours"] = {
+  type: "opening-hours",
+  displayName: "Opening Hours",
+  kind: "global",
+  globalResource: "opening-hours",
+  helper: "Days with the same hours are grouped automatically on the site (e.g. \"Mon – Fri\"). Special dates show on the contact page until they've passed.",
+  fields: [
+    { key: "weekly", label: "Weekly Hours", type: "weekly-hours" },
+    { key: "note", label: "Note (optional)", type: "text", placeholder: "e.g. Evening appointments available on request" },
+    {
+      key: "exceptions",
+      label: "Special Dates (holidays, closures)",
+      type: "list",
+      itemLabel: "Special Date",
+      itemFields: [
+        { key: "date", label: "Date", type: "date" },
+        { key: "label", label: "Name", type: "text", placeholder: "e.g. Christmas Day" },
+        { key: "closed", label: "Closed all day", type: "boolean", defaultValue: true },
+        { key: "opens", label: "Opens", type: "time", hideWhen: { key: "closed", equals: true } },
+        { key: "closes", label: "Closes", type: "time", hideWhen: { key: "closed", equals: true } },
+      ],
+    },
+  ],
 };
 
 export function getSchemaForType(type: string): SectionSchema | undefined {

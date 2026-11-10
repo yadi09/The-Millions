@@ -5,7 +5,8 @@ import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle } from "luci
 import { useGetContactServicesQuery, useSubmitContactMutation } from "../../features/api/apiSlice"
 import { useSiteContact } from "../../utils/useSiteContact"
 import { formatPhone } from "../../utils/phone"
-import { BUSINESS_HOURS, hoursLabel, openHoursSummary } from "../../data/businessHours"
+import { groupWeekly, openHoursSummary, upcomingExceptions, hoursText, formatExceptionDate } from "../../data/businessHours"
+import { useOpeningHours } from "../../utils/useOpeningHours"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState<{
@@ -23,6 +24,8 @@ export default function ContactPage() {
   })
   const [isSubmitted, setIsSubmitted] = useState(false)
   const contact = useSiteContact()
+  const openingHours = useOpeningHours()
+  const specialDates = upcomingExceptions(openingHours.exceptions)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   // API Hooks
@@ -192,7 +195,7 @@ export default function ContactPage() {
                         </p>
                       )
                     })}
-                    <p className="text-white/30 text-[0.65rem] italic">Available {openHoursSummary()}</p>
+                    <p className="text-white/30 text-[0.65rem] italic">Available {openHoursSummary(openingHours.weekly)}</p>
                   </div>
                 </div>
 
@@ -217,19 +220,38 @@ export default function ContactPage() {
             </div>
 
             {/* Business Hours Block */}
-            <div className="bg-white/60 backdrop-blur-sm p-10 border border-millions-dark/5 border-t-2 border-t-millions-mid shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
+            <div data-editable-section="opening-hours" className="bg-white/60 backdrop-blur-sm p-10 border border-millions-dark/5 border-t-2 border-t-millions-mid shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
               <div className="flex items-center gap-4 mb-8">
                 <Clock className="w-6 h-6 text-millions-mid" />
                 <h3 className="font-cormorant text-millions-dark text-[1.4rem] font-light">Business Hours</h3>
               </div>
               <div className="space-y-4">
-                {BUSINESS_HOURS.map((row) => ({ day: row.day, hours: hoursLabel(row) })).map((item, idx) => (
+                {groupWeekly(openingHours.weekly).map((item, idx) => (
                   <div key={idx} className="flex justify-between items-center text-[0.85rem] font-light border-b border-millions-dark/5 pb-3">
-                    <span className="text-millions-body italic tracking-wide">{item.day}</span>
+                    <span className="text-millions-body italic tracking-wide">{item.label}</span>
                     <span className="text-millions-dark font-medium">{item.hours}</span>
                   </div>
                 ))}
               </div>
+              {openingHours.note && (
+                <p className="mt-6 text-[0.8rem] text-millions-body font-light italic leading-relaxed">{openingHours.note}</p>
+              )}
+              {specialDates.length > 0 && (
+                <div className="mt-8">
+                  <h4 className="text-[0.6rem] tracking-[0.2em] uppercase text-millions-accent mb-3">Special Dates</h4>
+                  <div className="space-y-3">
+                    {specialDates.map((ex) => (
+                      <div key={ex.date} className="flex justify-between items-start gap-4 text-[0.8rem] font-light border-b border-millions-dark/5 pb-2">
+                        <span className="text-millions-body">
+                          {formatExceptionDate(ex.date)}
+                          {ex.label && <span className="block text-[0.7rem] text-millions-muted italic">{ex.label}</span>}
+                        </span>
+                        <span className="text-millions-dark font-medium text-right whitespace-nowrap">{hoursText(ex)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
           </div>

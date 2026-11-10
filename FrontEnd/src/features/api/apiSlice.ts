@@ -3,6 +3,7 @@ import { getToken, clearAuth } from '../../utils/authUtils';
 import type { Page, UpdatePageRequest } from '../../types';
 import { type Testimonial, type SubmitTestimonialRequest, type TestimonialStatus } from '../../types/testimonial';
 import type { Service } from '../../types/service';
+import type { OpeningHours } from '../../data/businessHours';
 import type { ContactMessage, GetContactMessagesResponse, ContactStatus, ContactSource } from '../../types/contact';
 
 const rawBaseQuery = fetchBaseQuery({
@@ -37,7 +38,7 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage', 'BusinessCard', 'SocialPost', 'Visibility', 'Feedback'],
+  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage', 'BusinessCard', 'SocialPost', 'Visibility', 'Feedback', 'OpeningHours'],
   baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
     // Accepts a bare slug string for the simple public case, OR an object
@@ -263,6 +264,21 @@ export const apiSlice = createApi({
       query: () => '/footer',
       providesTags: ['Footer'],
     }),
+
+    // Opening hours — public read, admin write (edited inline on /contact).
+    getOpeningHours: builder.query<OpeningHours, void>({
+      query: () => '/opening-hours',
+      providesTags: ['OpeningHours'],
+    }),
+
+    updateOpeningHours: builder.mutation<OpeningHours, OpeningHours>({
+      query: (data) => ({
+        url: '/admin/opening-hours',
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: ['OpeningHours'],
+    }),
     
     updateFooter: builder.mutation<any, any>({
       query: (data) => ({
@@ -459,6 +475,8 @@ export const {
   useDeleteContactMessageMutation,
   useGetFooterQuery,
   useUpdateFooterMutation,
+  useGetOpeningHoursQuery,
+  useUpdateOpeningHoursMutation,
   useGetMyBusinessCardQuery,
   useUpsertMyBusinessCardMutation,
   useGetMySocialPostsQuery,
