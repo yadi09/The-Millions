@@ -20,6 +20,7 @@ import socialPostRoutes from "./modules/social-post/social-post.routes.js";
 import { publicVisibilityRouter, adminVisibilityRouter } from "./modules/visibility/visibility.routes.js";
 import { publicFeedbackRouter, adminFeedbackRouter } from "./modules/feedback/feedback.routes.js";
 import { publicOpeningHoursRouter, adminOpeningHoursRouter } from "./modules/opening-hours/opening-hours.routes.js";
+import sitemapRoutes from "./modules/sitemap/sitemap.routes.js";
 import swaggerRoutes from "./routes/swagger.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { notFoundHandler } from "./middlewares/notFound.middleware.js";
@@ -76,6 +77,7 @@ app.use("/api/feedback", publicFeedbackRouter);
 app.use("/api/admin/feedback", adminFeedbackRouter);
 app.use("/api/opening-hours", publicOpeningHoursRouter);
 app.use("/api/admin/opening-hours", adminOpeningHoursRouter);
+app.use("/api/sitemap.xml", sitemapRoutes);
 app.use("/api-docs", swaggerRoutes);
 
 app.use(notFoundHandler);

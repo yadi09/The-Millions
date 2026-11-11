@@ -1,17 +1,16 @@
 import { Link } from "react-router-dom"
 import { useSiteContact } from "../../utils/useSiteContact"
 import { formatPhone } from "../../utils/phone"
+import { Seo } from "../../components/Seo"
 
 // Shown for unknown URLs and for public pages toggled off in
-// Admin → Site Visibility. React 19 hoists <title>/<meta> into <head>,
-// so the noindex tag applies while this page is rendered.
+// Admin → Site Visibility. Marked noindex so search engines drop it.
 const NotFoundPage = () => {
     const contact = useSiteContact()
 
     return (
         <main className="min-h-[80vh] bg-millions-light px-[5%] pt-32 pb-20 flex items-center justify-center">
-            <title>Page not found | The Millions</title>
-            <meta name="robots" content="noindex" />
+            <Seo title="Page not found | The Millions" description="This page doesn't exist." noindex />
 
             <div className="mx-auto max-w-[1200px] w-full text-center">
                 <p className="text-[0.68rem] font-bold uppercase tracking-[0.3em] text-millions-accent animate-fade-in-up">Error 404</p>

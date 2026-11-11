@@ -5,6 +5,7 @@ import { useGetPublicVisibilityQuery } from "../features/api/apiSlice"
 import type { RootState } from "../app/store"
 import { useSiteContact } from "../utils/useSiteContact"
 import { useEditMode } from "../features/edit/EditModeContext"
+import { BrandLogo } from "./BrandLogo"
 
 // Map nav-item names to the visibility key that gates the destination
 // page. Items without an entry here are always shown (e.g. in-page
@@ -83,9 +84,8 @@ export function Header() {
         } py-4 md:py-5 px-[5%] flex items-center justify-between`}>
 
         {/* Logo */}
-        <Link to="/" className="flex flex-col line-none group z-[999]">
-          <span className="font-cormorant text-[0.6rem] font-light tracking-[0.25em] text-millions-muted uppercase">the</span>
-          <span className="font-cormorant text-[1.5rem] font-semibold text-white group-hover:text-millions-accent transition-colors">MILLIONS.</span>
+        <Link to="/" aria-label="The Millions — home" className="flex items-center z-[999] transition-opacity hover:opacity-85">
+          <BrandLogo className="h-8 lg:h-10" />
         </Link>
 
         {/* Desktop Links */}
@@ -144,9 +144,8 @@ export function Header() {
       {/* Mobile Menu Side Drawer */}
       <div className={`fixed top-0 left-0 h-full w-[280px] bg-millions-dark z-[998] flex flex-col transition-transform duration-500 ease-in-out lg:hidden shadow-2xl ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex flex-col h-full pt-24 px-8 pb-12 overflow-y-auto">
-          <div className="flex flex-col gap-2 mb-12">
-            <span className="font-cormorant text-[0.6rem] font-light tracking-[0.25em] text-millions-muted uppercase">the</span>
-            <span className="font-cormorant text-2xl font-semibold text-white">MILLIONS.</span>
+          <div className="mb-12">
+            <BrandLogo className="h-8" />
           </div>
 
           <nav className="flex flex-col space-y-4">

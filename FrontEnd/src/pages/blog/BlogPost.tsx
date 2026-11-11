@@ -23,6 +23,8 @@ import {
 } from "../../features/api/apiSlice"
 import { sanitizeHtml } from "../../utils/sanitize"
 import { hasToken } from "../../utils/authUtils"
+import { Seo } from "../../components/Seo"
+import NotFoundPage from "../notFound/page"
 import {
     injectHeadingIds,
     extractHeadings,
@@ -187,18 +189,9 @@ export default function BlogPost() {
         )
     }
 
+    // Unknown or unpublished slug → the standard noindex 404 page.
     if (isError || !blogPost) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-millions-light text-center p-4">
-                <h2 className="font-cormorant text-[clamp(2rem,4vw,3rem)] text-millions-dark font-light mb-4">Article Not Found</h2>
-                <p className="text-millions-body font-light text-[0.9rem] mb-10 max-w-sm">The article you are looking for doesn't exist or has been removed from our archive.</p>
-                <Link to="/blog">
-                    <button className="bg-millions-dark text-white px-10 py-4 font-jost text-[0.7rem] tracking-[0.2em] uppercase font-bold hover:bg-millions-accent hover:text-millions-dark transition-all">
-                        Back to Archive
-                    </button>
-                </Link>
-            </div>
-        )
+        return <NotFoundPage />
     }
 
     const isAdmin = hasToken();
@@ -218,6 +211,11 @@ export default function BlogPost() {
 
     return (
         <div className="bg-millions-light text-millions-dark font-jost">
+            <Seo
+                title={`${blogPost.title} | The Millions`}
+                description={blogPost.excerpt || undefined}
+                path={`/blog/${blogPost.slug ?? slug}`}
+            />
             <ScrollProgressBar />
 
             {/* Admin-only floating action: jump to the post's admin editor. */}

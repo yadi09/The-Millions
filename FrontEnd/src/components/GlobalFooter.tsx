@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { formatPhone } from '../utils/phone';
+import { BrandLogo } from './BrandLogo';
 import { useGetPublicVisibilityQuery } from '../features/api/apiSlice';
 
 interface ContactContent {
@@ -104,7 +105,10 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
       {/* Main Footer */}
       <footer data-editable-section="global-footer" className="bg-[#080f0e] py-[1.8rem] px-[5%] text-white/25 flex flex-wrap gap-4 items-center justify-between border-t border-white/5">
         <div className="font-cormorant text-[1rem]">
-          {footer.logo === '/logo.svg' ? 'the MILLIONS.' : footer.logo}
+          <BrandLogo
+            className="h-7 opacity-80"
+            fallbackText={footer.logo && footer.logo !== '/logo.svg' ? footer.logo : 'The Millions'}
+          />
         </div>
         <div className="text-[0.7rem] font-light text-white/20 text-center flex-1 md:flex-none">
           {footer.copyright?.includes('©') ? '' : `© ${new Date().getFullYear()} `}{footer.copyright}

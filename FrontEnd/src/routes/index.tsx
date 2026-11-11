@@ -4,6 +4,8 @@ import Layout from "../components/Layout";
 import BlogPage from "../pages/blog/page";
 import BlogPost from "../pages/blog/BlogPost";
 import NotFoundPage from "../pages/notFound/page";
+import { Seo } from "../components/Seo";
+import { StructuredData } from "../components/StructuredData";
 import AdminLayout from "../components/AdminLayout";
 import AdminLogin from "../pages/admin/Login";
 import BlogManagement from "../pages/admin/BlogManagement";
@@ -46,26 +48,27 @@ export const AppRoutes = () => (
             via the blog key because they have their own DRAFT / PUBLISHED
             status; gating them here would double-filter. */}
         <Route element={<PublicLayout />}>
-            <Route path="/" element={<VisibilityGate pageKey="home"><Landing /></VisibilityGate>} />
-            <Route path="/contact" element={<VisibilityGate pageKey="contact"><ContactPage /></VisibilityGate>} />
-            <Route path="/blog" element={<VisibilityGate pageKey="blog"><BlogPage /></VisibilityGate>} />
+            <Route path="/" element={<VisibilityGate pageKey="home"><Seo path="/" /><StructuredData /><Landing /></VisibilityGate>} />
+            <Route path="/contact" element={<VisibilityGate pageKey="contact"><Seo title="Contact The Millions | Southampton Accountants & Advisors" description="Get in touch with The Millions — FCCA-led accountancy, tax and business advisory in Southampton and London. Call, WhatsApp or send us a message." /><ContactPage /></VisibilityGate>} />
+            <Route path="/blog" element={<VisibilityGate pageKey="blog"><Seo title="Insights & Articles | The Millions" description="Accountancy, tax and business insights from The Millions' FCCA-qualified team." /><BlogPage /></VisibilityGate>} />
             <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/testimonials" element={<VisibilityGate pageKey="testimonials"><TestimonialsPage /></VisibilityGate>} />
-            <Route path="/submit-testimonial" element={<VisibilityGate pageKey="submit-testimonial"><SubmitTestimonial /></VisibilityGate>} />
+            <Route path="/testimonials" element={<VisibilityGate pageKey="testimonials"><Seo title="Client Testimonials | The Millions" description="What clients say about working with The Millions." /><TestimonialsPage /></VisibilityGate>} />
+            <Route path="/submit-testimonial" element={<VisibilityGate pageKey="submit-testimonial"><Seo title="Share Your Experience | The Millions" noindex /><SubmitTestimonial /></VisibilityGate>} />
             <Route path="*" element={<NotFoundPage />} />
         </Route>
 
         {/* Admin Login Route (Public) */}
-        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<><Seo title="Admin Login | The Millions" noindex /><AdminLogin /></>} />
 
         {/* Non-public feedback walkthrough — share this URL with the firm
             owners; not linked from anywhere on the public site. Renders
             standalone (no nav/footer chrome, no maintenance gate). */}
-        <Route path="/feedback/walkthrough" element={<><meta name="robots" content="noindex" /><FeedbackWalkthrough /></>} />
+        <Route path="/feedback/walkthrough" element={<><Seo title="Website Feedback | The Millions" noindex /><FeedbackWalkthrough /></>} />
 
         {/* Protected Admin Routes */}
         <Route path="/admin" element={
             <ProtectedRoute>
+                <Seo title="Admin | The Millions" noindex />
                 <AdminLayout>
                     <Outlet />
                 </AdminLayout>

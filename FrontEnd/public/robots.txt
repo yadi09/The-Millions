@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin
+Disallow: /feedback/
+Disallow: /api/
+
+Sitemap: https://www.the-millions.co.uk/sitemap.xml
