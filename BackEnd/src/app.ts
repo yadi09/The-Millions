@@ -21,6 +21,7 @@ import { publicVisibilityRouter, adminVisibilityRouter } from "./modules/visibil
 import { publicFeedbackRouter, adminFeedbackRouter } from "./modules/feedback/feedback.routes.js";
 import { publicOpeningHoursRouter, adminOpeningHoursRouter } from "./modules/opening-hours/opening-hours.routes.js";
 import sitemapRoutes from "./modules/sitemap/sitemap.routes.js";
+import { publicSiteSettingsRouter, adminSiteSettingsRouter } from "./modules/site-settings/site-settings.routes.js";
 import swaggerRoutes from "./routes/swagger.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { notFoundHandler } from "./middlewares/notFound.middleware.js";
@@ -78,6 +79,8 @@ app.use("/api/admin/feedback", adminFeedbackRouter);
 app.use("/api/opening-hours", publicOpeningHoursRouter);
 app.use("/api/admin/opening-hours", adminOpeningHoursRouter);
 app.use("/api/sitemap.xml", sitemapRoutes);
+app.use("/api/settings", publicSiteSettingsRouter);
+app.use("/api/admin/settings", adminSiteSettingsRouter);
 app.use("/api-docs", swaggerRoutes);
 
 app.use(notFoundHandler);

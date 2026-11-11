@@ -64,6 +64,9 @@ export function EditChrome() {
 const EDITABLE_PAGES = [
   { to: "/", label: "Home" },
   { to: "/contact", label: "Contact" },
+  { to: "/privacy", label: "Privacy" },
+  { to: "/cookies", label: "Cookies" },
+  { to: "/terms", label: "Terms" },
 ];
 
 function SaveStatusIndicator({ status, lastSavedAt }: { status: ReturnType<typeof useEditMode>["saveStatus"]; lastSavedAt: number | null }) {

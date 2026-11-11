@@ -4,6 +4,7 @@ import type { Page, UpdatePageRequest } from '../../types';
 import { type Testimonial, type SubmitTestimonialRequest, type TestimonialStatus } from '../../types/testimonial';
 import type { Service } from '../../types/service';
 import type { OpeningHours } from '../../data/businessHours';
+import type { SiteSettingKey } from '../../data/siteSettings';
 import type { ContactMessage, GetContactMessagesResponse, ContactStatus, ContactSource } from '../../types/contact';
 
 const rawBaseQuery = fetchBaseQuery({
@@ -38,7 +39,7 @@ const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage', 'BusinessCard', 'SocialPost', 'Visibility', 'Feedback', 'OpeningHours'],
+  tagTypes: ['Page', 'BlogPost', 'BlogCategory', 'Testimonial', 'Service', 'Footer', 'ContactMessage', 'BusinessCard', 'SocialPost', 'Visibility', 'Feedback', 'OpeningHours', 'SiteSetting'],
   baseQuery: baseQueryWithAuth,
   endpoints: (builder) => ({
     // Accepts a bare slug string for the simple public case, OR an object
@@ -271,6 +272,21 @@ export const apiSlice = createApi({
       providesTags: ['OpeningHours'],
     }),
 
+    // Generic admin-editable settings (legal details, policy pages).
+    getSiteSetting: builder.query<unknown, SiteSettingKey>({
+      query: (key) => `/settings/${key}`,
+      providesTags: (_r, _e, key) => [{ type: 'SiteSetting', id: key }],
+    }),
+
+    updateSiteSetting: builder.mutation<unknown, { key: SiteSettingKey; data: unknown }>({
+      query: ({ key, data }) => ({
+        url: `/admin/settings/${key}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (_r, _e, { key }) => [{ type: 'SiteSetting', id: key }],
+    }),
+
     updateOpeningHours: builder.mutation<OpeningHours, OpeningHours>({
       query: (data) => ({
         url: '/admin/opening-hours',
@@ -477,6 +493,8 @@ export const {
   useUpdateFooterMutation,
   useGetOpeningHoursQuery,
   useUpdateOpeningHoursMutation,
+  useGetSiteSettingQuery,
+  useUpdateSiteSettingMutation,
   useGetMyBusinessCardQuery,
   useUpsertMyBusinessCardMutation,
   useGetMySocialPostsQuery,

@@ -13,7 +13,7 @@ const NotFoundPage = () => {
             <Seo title="Page not found | The Millions" description="This page doesn't exist." noindex />
 
             <div className="mx-auto max-w-[1200px] w-full text-center">
-                <p className="text-[0.68rem] font-bold uppercase tracking-[0.3em] text-millions-accent animate-fade-in-up">Error 404</p>
+                <p className="text-[0.68rem] font-bold uppercase tracking-[0.3em] text-millions-accent-ink animate-fade-in-up">Error 404</p>
                 <h1 className="mt-6 font-cormorant text-[clamp(2rem,4vw,3.2rem)] font-light text-millions-dark italic animate-fade-in-up md:animation-delay-200">
                     Page not found
                 </h1>

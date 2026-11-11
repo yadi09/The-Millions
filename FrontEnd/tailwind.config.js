@@ -14,7 +14,14 @@ export default {
         'millions-mid': '#163a33',
         'millions-accent': '#c9a84c',
         'millions-light': '#f4f0e8',
-        'millions-muted': '#8a9e97',
+        // Secondary text on light backgrounds (was #8a9e97, 2.5:1 on light;
+        // now ≥4.8:1 for WCAG AA).
+        'millions-muted': '#576d66',
+        // Secondary body text on dark greens — sage, ≥5:1 on every dark panel.
+        'millions-sage': '#a3b8ae',
+        // Heritage Gold for small TEXT on light backgrounds (#c9a84c is
+        // ~2:1 there). Lines, borders, icons and large type stay #c9a84c.
+        'millions-accent-ink': '#85661a',
         'millions-body': '#4a6260',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

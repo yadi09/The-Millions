@@ -24,6 +24,8 @@ export async function buildSitemapEntries(): Promise<Entry[]> {
     if (pages.home) entries.push({ path: "/" });
     if (pages.contact) entries.push({ path: "/contact" });
     if (pages.testimonials) entries.push({ path: "/testimonials" });
+    // Legal pages are always public.
+    entries.push({ path: "/privacy" }, { path: "/cookies" }, { path: "/terms" });
 
     if (pages.blog) {
         entries.push({ path: "/blog" });

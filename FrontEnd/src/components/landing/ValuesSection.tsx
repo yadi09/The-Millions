@@ -36,7 +36,7 @@ export const ValuesSection: React.FC<ValuesProps> = ({ content }) => {
           <h2 className="font-cormorant text-white text-[clamp(2rem,4vw,3rem)] font-light leading-tight">
             {title}
           </h2>
-          <p className="text-white/50 text-[0.9rem] leading-[1.9] font-light mt-2 italic">
+          <p className="text-millions-sage text-[0.9rem] leading-[1.9] font-light mt-2 italic">
             {subTitle}
           </p>
         </div>
@@ -128,7 +128,7 @@ const ValueCard = ({ name, text, className = "" }: { name: string, text: string,
       {name}
     </h4>
     <div
-      className="text-white/40 text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white/70 [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+      className="text-millions-sage text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white/70 [&_strong]:font-medium [&_em]:italic [&_u]:underline"
       dangerouslySetInnerHTML={{ __html: sanitizeHtml(text) }}
     />
   </div>

@@ -19,7 +19,7 @@ export const GeographySection: React.FC<GeographyProps> = ({ content }) => {
     <section id="geography" data-editable-section="geography" className="bg-millions-light py-[7rem] px-[5%] overflow-hidden">
       <div className="max-w-[1200px] w-[90%] mx-auto">
         <div className="animate-fade-in-up mb-12">
-          <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
+          <div className="flex items-center gap-4 text-millions-accent-ink text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
             {label}
           </div>
           <h2 className="font-cormorant text-millions-dark text-[clamp(2rem,4vw,3rem)] font-light leading-tight">
@@ -87,7 +87,7 @@ const ScrollingGeographySlider = ({ regions }: { regions: any[] }) => {
 
 const RegionCard = ({ region }: { region: any }) => (
   <div className="bg-white p-10 border-l-[3px] border-l-millions-accent/30 hover:border-l-millions-accent transition-all duration-350 h-full">
-    <div className="text-millions-accent text-[0.68rem] tracking-[0.2em] uppercase mb-1 font-light">
+    <div className="text-millions-accent-ink text-[0.68rem] tracking-[0.2em] uppercase mb-1 font-light">
       {region?.label}
     </div>
     <h3 className="font-cormorant text-millions-dark text-[1.6rem] font-light mb-1">

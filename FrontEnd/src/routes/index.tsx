@@ -6,6 +6,7 @@ import BlogPost from "../pages/blog/BlogPost";
 import NotFoundPage from "../pages/notFound/page";
 import { Seo } from "../components/Seo";
 import { StructuredData } from "../components/StructuredData";
+import LegalPage from "../pages/legal/LegalPage";
 import AdminLayout from "../components/AdminLayout";
 import AdminLogin from "../pages/admin/Login";
 import BlogManagement from "../pages/admin/BlogManagement";
@@ -54,6 +55,10 @@ export const AppRoutes = () => (
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/testimonials" element={<VisibilityGate pageKey="testimonials"><Seo title="Client Testimonials | The Millions" description="What clients say about working with The Millions." /><TestimonialsPage /></VisibilityGate>} />
             <Route path="/submit-testimonial" element={<VisibilityGate pageKey="submit-testimonial"><Seo title="Share Your Experience | The Millions" noindex /><SubmitTestimonial /></VisibilityGate>} />
+            {/* Policy pages — always public (not behind a visibility toggle). */}
+            <Route path="/privacy" element={<LegalPage pageKey="privacy-page" />} />
+            <Route path="/cookies" element={<LegalPage pageKey="cookies-page" />} />
+            <Route path="/terms" element={<LegalPage pageKey="terms-page" />} />
             <Route path="*" element={<NotFoundPage />} />
         </Route>
 

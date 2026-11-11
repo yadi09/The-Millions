@@ -28,7 +28,7 @@ export const ImpactModelSection: React.FC<ImpactModelProps> = ({ content }) => {
       <div className="max-w-[1200px] w-[90%] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end mb-16 animate-fade-in-up">
           <div>
-            <div className="flex items-center gap-4 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
+            <div className="flex items-center gap-4 text-millions-accent-ink text-[0.68rem] tracking-[0.3em] uppercase mb-4 sec-label-before">
               {label}
             </div>
             <h2 className="font-cormorant text-millions-dark text-[clamp(2rem,4vw,3rem)] font-light leading-tight">

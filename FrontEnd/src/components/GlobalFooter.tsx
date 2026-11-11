@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { formatPhone } from '../utils/phone';
 import { BrandLogo } from './BrandLogo';
+import { LegalFooterRow } from './LegalFooterRow';
 import { useGetPublicVisibilityQuery } from '../features/api/apiSlice';
 
 interface ContactContent {
@@ -38,7 +39,7 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
       {/* Section 13: Get In Touch */}
       <section id="contact" data-editable-section="global-footer" className="bg-millions-dark py-[7rem] text-center relative overflow-hidden">
         {/* Background Text Effect */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-cormorant text-[clamp(6rem,15vw,14rem)] font-semibold text-white/5 whitespace-nowrap pointer-events-none z-0">
+        <div aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-cormorant text-[clamp(6rem,15vw,14rem)] font-semibold text-white/5 whitespace-nowrap pointer-events-none z-0">
           MILLIONS
         </div>
 
@@ -49,14 +50,14 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
           <h2 className="font-cormorant text-white text-[clamp(2rem,4vw,3rem)] font-light leading-tight mb-8">
             Ready to Work<br />Together?
           </h2>
-          <p className="text-white/55 text-[0.85rem] leading-[1.8] font-normal mb-12 max-w-sm mx-auto">
+          <p className="text-millions-sage text-[0.85rem] leading-[1.8] font-normal mb-12 max-w-sm mx-auto">
             {contact.subTitle}
           </p>
 
           <div className="grid grid-cols-2 gap-y-12 gap-x-8 md:gap-x-20 mb-12">
             <div className="flex flex-col items-center gap-1.5 text-center">
               <span className="text-millions-accent text-[0.63rem] tracking-[0.22em] uppercase font-normal">Phone</span>
-              <div className="text-white/55 text-[0.85rem] hover:text-millions-accent transition-colors font-normal flex flex-wrap justify-center gap-x-3">
+              <div className="text-millions-sage text-[0.85rem] hover:text-millions-accent transition-colors font-normal flex flex-wrap justify-center gap-x-3">
                 {contact.phones.map((raw, idx) => {
                   const phone = formatPhone(raw);
                   return (
@@ -70,21 +71,21 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
 
             <div className="flex flex-col items-center gap-1.5 text-center">
               <span className="text-millions-accent text-[0.63rem] tracking-[0.22em] uppercase font-normal">Email</span>
-              <a href={`mailto:${contact.email}`} className="text-white/55 text-[0.85rem] hover:text-millions-accent transition-colors font-normal">
+              <a href={`mailto:${contact.email}`} className="text-millions-sage text-[0.85rem] hover:text-millions-accent transition-colors font-normal">
                 {contact.email}
               </a>
             </div>
 
             <div className="flex flex-col items-center gap-1.5 text-center">
               <span className="text-millions-accent text-[0.63rem] tracking-[0.22em] uppercase font-normal">Website</span>
-              <a href={`https://${contact.website}`} target="_blank" rel="noopener noreferrer" className="text-white/55 text-[0.85rem] hover:text-millions-accent transition-colors font-normal">
+              <a href={`https://${contact.website}`} target="_blank" rel="noopener noreferrer" className="text-millions-sage text-[0.85rem] hover:text-millions-accent transition-colors font-normal">
                 {contact.website}
               </a>
             </div>
 
             <div className="flex flex-col items-center gap-1.5 text-center">
               <span className="text-millions-accent text-[0.63rem] tracking-[0.22em] uppercase font-normal">Address</span>
-              <div className="text-white/55 text-[0.85rem] font-normal flex flex-wrap justify-center gap-x-2">
+              <div className="text-millions-sage text-[0.85rem] font-normal flex flex-wrap justify-center gap-x-2">
                 {contact.address.join(" · ")}
               </div>
             </div>
@@ -102,20 +103,23 @@ export const GlobalFooter: React.FC<GlobalFooterProps> = ({ contact, footer }) =
         </div>
       </section>
 
-      {/* Main Footer */}
-      <footer data-editable-section="global-footer" className="bg-[#080f0e] py-[1.8rem] px-[5%] text-white/25 flex flex-wrap gap-4 items-center justify-between border-t border-white/5">
+      {/* Main Footer: brand bar + legal row */}
+      <footer>
+      <div data-editable-section="global-footer" className="bg-[#080f0e] py-[1.8rem] px-[5%] text-white/60 flex flex-wrap gap-4 items-center justify-between border-t border-white/5">
         <div className="font-cormorant text-[1rem]">
           <BrandLogo
             className="h-7 opacity-80"
             fallbackText={footer.logo && footer.logo !== '/logo.svg' ? footer.logo : 'The Millions'}
           />
         </div>
-        <div className="text-[0.7rem] font-light text-white/20 text-center flex-1 md:flex-none">
+        <div className="text-[0.7rem] font-light text-white/60 text-center flex-1 md:flex-none">
           {footer.copyright?.includes('©') ? '' : `© ${new Date().getFullYear()} `}{footer.copyright}
         </div>
-        <div className="text-[0.7rem] font-light text-white/20 uppercase tracking-[0.15em]">
+        <div className="text-[0.7rem] font-light text-white/60 uppercase tracking-[0.15em]">
           {footer.location}
         </div>
+      </div>
+      <LegalFooterRow />
       </footer>
     </>
   );

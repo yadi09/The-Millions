@@ -8,6 +8,8 @@
 // at the same source of truth. Using a different name here creates a phantom
 // key in the DB that the public site never reads.
 
+import type { SiteSettingKey } from "../../data/siteSettings";
+
 export type FieldType =
   | "text" | "long-text" | "rich-text" | "list" | "string-list" | "image"
   | "date" | "time" | "boolean"
@@ -50,7 +52,9 @@ export interface SectionSchema {
   // For schemas that target a non-section resource (e.g. the global footer).
   // The EditPanel switches its read/save data path based on `kind`.
   kind?: "section" | "global";
-  globalResource?: "footer" | "opening-hours";
+  globalResource?: "footer" | "opening-hours" | "setting";
+  // For globalResource === "setting": which /api/settings/:key record.
+  settingKey?: SiteSettingKey;
 }
 
 // Schemas declare the editable surface for each section. Field keys are
@@ -395,6 +399,69 @@ SECTION_SCHEMAS["opening-hours"] = {
       ],
     },
   ],
+};
+
+// Footer legal row — company/charity registration details. Empty values
+// are hidden on the site, so nothing is published until it's filled in.
+SECTION_SCHEMAS["legal-details"] = {
+  type: "legal-details",
+  displayName: "Company & Legal Details",
+  kind: "global",
+  globalResource: "setting",
+  settingKey: "legal-details",
+  helper: "Shown in the footer on every page. UK limited companies must show their registered name, company number, place of registration and registered office on their website. Leave a field empty to hide it.",
+  fields: [
+    { key: "companyName", label: "Registered company name", type: "text", placeholder: "e.g. The Millions Ltd" },
+    { key: "companyNumber", label: "Company number", type: "text", placeholder: "8 characters, e.g. 12345678" },
+    { key: "registeredIn", label: "Registered in", type: "text", placeholder: "e.g. England and Wales" },
+    { key: "registeredOffice", label: "Registered office address", type: "text", placeholder: "Full address as on Companies House" },
+    { key: "accaStatement", label: "ACCA statement (if applicable)", type: "long-text", placeholder: "Wording as required by ACCA, if the firm holds a practising certificate" },
+    { key: "charityName", label: "Charity name", type: "text", placeholder: "e.g. YeMillions Charity" },
+    { key: "charityNumber", label: "Registered charity number", type: "text", placeholder: "Digits only, e.g. 1234567" },
+  ],
+};
+
+const LEGAL_PAGE_FIELDS: FieldSchema[] = [
+  { key: "lastUpdated", label: "Last updated", type: "date" },
+  { key: "intro", label: "Introduction (optional)", type: "rich-text" },
+  {
+    key: "sections",
+    label: "Sections",
+    type: "list",
+    itemLabel: "Section",
+    itemFields: [
+      { key: "heading", label: "Heading", type: "text" },
+      { key: "body", label: "Text", type: "rich-text" },
+    ],
+  },
+];
+
+SECTION_SCHEMAS["privacy-page"] = {
+  type: "privacy-page",
+  displayName: "Privacy Policy",
+  kind: "global",
+  globalResource: "setting",
+  settingKey: "privacy-page",
+  helper: "Paste the final wording from your solicitor or adviser into each section. Sections left empty show \"This section is being finalised\" on the site. Every section needs a heading.",
+  fields: LEGAL_PAGE_FIELDS,
+};
+SECTION_SCHEMAS["cookies-page"] = {
+  type: "cookies-page",
+  displayName: "Cookie Policy",
+  kind: "global",
+  globalResource: "setting",
+  settingKey: "cookies-page",
+  helper: "Paste the final wording from your solicitor or adviser into each section. Sections left empty show \"This section is being finalised\" on the site. Every section needs a heading.",
+  fields: LEGAL_PAGE_FIELDS,
+};
+SECTION_SCHEMAS["terms-page"] = {
+  type: "terms-page",
+  displayName: "Terms of Use",
+  kind: "global",
+  globalResource: "setting",
+  settingKey: "terms-page",
+  helper: "Paste the final wording from your solicitor or adviser into each section. Sections left empty show \"This section is being finalised\" on the site. Every section needs a heading.",
+  fields: LEGAL_PAGE_FIELDS,
 };
 
 export function getSchemaForType(type: string): SectionSchema | undefined {

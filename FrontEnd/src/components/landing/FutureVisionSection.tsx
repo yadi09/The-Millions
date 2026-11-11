@@ -36,7 +36,7 @@ export const FutureVisionSection: React.FC<FutureVisionProps> = ({ content }) =>
             {title}
           </h2>
           <div
-            className="text-white/50 text-[0.9rem] leading-[1.9] font-light mt-4 lg:max-w-2xl [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+            className="text-millions-sage text-[0.9rem] leading-[1.9] font-light mt-4 lg:max-w-2xl [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(subTitle) }}
           />
         </div>
@@ -48,7 +48,7 @@ export const FutureVisionSection: React.FC<FutureVisionProps> = ({ content }) =>
                 {String(idx + 1).padStart(2, '0')}
               </div>
               <div
-                className="text-white/55 text-[0.9rem] leading-[1.9] font-light pt-1 [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+                className="text-millions-sage text-[0.9rem] leading-[1.9] font-light pt-1 [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
                 dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderText(goal)) }}
               />
             </div>
@@ -56,7 +56,7 @@ export const FutureVisionSection: React.FC<FutureVisionProps> = ({ content }) =>
         </div>
 
         <div
-          className="text-white/45 text-[0.9rem] leading-[1.9] font-light mt-12 lg:max-w-xl animate-fade-in-up md:animation-delay-300 [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+          className="text-millions-sage text-[0.9rem] leading-[1.9] font-light mt-12 lg:max-w-xl animate-fade-in-up md:animation-delay-300 [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(footer) }}
         />
       </div>

@@ -25,7 +25,7 @@ export const SubPageHero: React.FC<SubPageHeroProps> = ({ label, title, titleEm,
           {title} {titleEm && <em className="text-millions-accent italic">{titleEm}</em>}
         </h1>
 
-        <p className="text-white/50 font-light text-[0.9rem] leading-[1.9] max-w-2xl mx-auto animate-fade-in-up md:animation-delay-300">
+        <p className="text-millions-sage font-light text-[0.9rem] leading-[1.9] max-w-2xl mx-auto animate-fade-in-up md:animation-delay-300">
           {subText}
         </p>
       </div>

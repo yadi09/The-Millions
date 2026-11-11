@@ -47,7 +47,7 @@ export const ServicesSection: React.FC<ServicesProps> = ({ content }) => {
             {footer.title}
           </h3>
           <div
-            className="text-white/50 text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+            className="text-millions-sage text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(footer.text) }}
           />
         </div>
@@ -111,7 +111,7 @@ const ServiceCard = ({ item }: { item: ServiceItem }) => (
       {item.title}
     </h3>
     <div
-      className="text-white/45 text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+      className="text-millions-sage text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
       dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.text) }}
     />
   </div>

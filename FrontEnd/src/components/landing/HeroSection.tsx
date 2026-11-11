@@ -44,7 +44,7 @@ export const HeroSection: React.FC<HeroProps> = ({ content }) => {
           </h1>
 
           <div
-            className="text-white/50 font-light text-[0.88rem] leading-[1.8] max-w-md mb-10 [&_p]:my-0 [&_p+p]:mt-3 [&_strong]:text-white/70 [&_u]:underline [&_a]:underline [&_a]:text-millions-accent"
+            className="text-millions-sage font-light text-[0.88rem] leading-[1.8] max-w-md mb-10 [&_p]:my-0 [&_p+p]:mt-3 [&_strong]:text-white/70 [&_u]:underline [&_a]:underline [&_a]:text-millions-accent"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(subText) }}
           />
 
@@ -57,7 +57,7 @@ export const HeroSection: React.FC<HeroProps> = ({ content }) => {
             </a>
             <a 
               href="#philosophy" 
-              className="text-white/55 hover:text-white flex items-center gap-2 font-jost text-[0.78rem] tracking-[0.12em] uppercase transition-colors group"
+              className="text-millions-sage hover:text-white flex items-center gap-2 font-jost text-[0.78rem] tracking-[0.12em] uppercase transition-colors group"
             >
               {ghostCta}
               <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -76,7 +76,7 @@ export const HeroSection: React.FC<HeroProps> = ({ content }) => {
               <div className="font-cormorant text-millions-accent text-4xl font-light">
                 {stat.num}
               </div>
-              <div className="text-white/40 text-[0.72rem] tracking-[0.1em] uppercase mt-2">
+              <div className="text-millions-sage text-[0.72rem] tracking-[0.1em] uppercase mt-2">
                 {stat.label}
               </div>
             </div>

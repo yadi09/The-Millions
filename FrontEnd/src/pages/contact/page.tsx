@@ -7,6 +7,9 @@ import { useSiteContact } from "../../utils/useSiteContact"
 import { formatPhone } from "../../utils/phone"
 import { groupWeekly, openHoursSummary, upcomingExceptions, hoursText, formatExceptionDate } from "../../data/businessHours"
 import { useOpeningHours } from "../../utils/useOpeningHours"
+import { PRIMARY_OFFICE } from "../../data/offices"
+import { Link } from "react-router-dom"
+import { ClickToLoadMap } from "../../components/ClickToLoadMap"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState<{
@@ -85,8 +88,11 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit} className="space-y-10 animate-fade-in-up bg-white/60 backdrop-blur-sm p-10 shadow-[0_20px_50px_rgba(0,0,0,0.04)] border border-millions-dark/5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="flex flex-col gap-2">
-                    <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Full Name *</label>
+                    <label htmlFor="contact-name" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent-ink">Full Name *</label>
                     <input
+                      id="contact-name"
+                      autoComplete="name"
+                      name="name"
                       className="bg-white border border-millions-dark/10 p-3 text-sm focus:border-millions-accent outline-none font-jost"
                       value={formData.name}
                       onChange={(e) => handleInputChange("name", e.target.value)}
@@ -96,8 +102,11 @@ export default function ContactPage() {
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Email Address *</label>
+                    <label htmlFor="contact-email" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent-ink">Email Address *</label>
                     <input
+                      id="contact-email"
+                      autoComplete="email"
+                      name="email"
                       type="email"
                       className="bg-white border border-millions-dark/10 p-3 text-sm focus:border-millions-accent outline-none font-jost"
                       value={formData.email}
@@ -110,8 +119,11 @@ export default function ContactPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="flex flex-col gap-2">
-                    <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Phone Number</label>
+                    <label htmlFor="contact-phone" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent-ink">Phone Number</label>
                     <input
+                      id="contact-phone"
+                      autoComplete="tel"
+                      name="phone"
                       type="tel"
                       className="bg-white border border-millions-dark/10 p-3 text-sm focus:border-millions-accent outline-none font-jost"
                       value={formData.phone}
@@ -120,8 +132,10 @@ export default function ContactPage() {
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Service Interested In *</label>
+                    <label htmlFor="contact-service" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent-ink">Service Interested In *</label>
                     <select
+                      id="contact-service"
+                      name="service"
                       className="bg-white border border-millions-dark/10 p-3 text-sm focus:border-millions-accent outline-none font-jost appearance-none disabled:opacity-50"
                       onChange={(e) => handleInputChange("serviceId", e.target.value)}
                       value={formData.serviceId}
@@ -149,8 +163,10 @@ export default function ContactPage() {
                 )}
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent">Message *</label>
+                  <label htmlFor="contact-message" className="text-[0.65rem] tracking-[0.2em] uppercase text-millions-accent-ink">Message *</label>
                   <textarea
+                    id="contact-message"
+                    name="message"
                     className="bg-white border border-millions-dark/10 p-3 text-sm focus:border-millions-accent outline-none font-jost"
                     value={formData.message}
                     onChange={(e) => handleInputChange("message", e.target.value)}
@@ -173,6 +189,10 @@ export default function ContactPage() {
                   )}
                   {isSubmitting ? "Sending..." : "Send Message"}
                 </button>
+                <p className="text-[0.75rem] text-millions-body font-light leading-relaxed">
+                  By sending this message you agree to our{" "}
+                  <Link to="/privacy" className="text-millions-dark underline underline-offset-4 hover:text-millions-accent">Privacy Policy</Link>.
+                </p>
               </form>
             )}
           </div>
@@ -186,7 +206,7 @@ export default function ContactPage() {
                 <div className="flex items-start gap-4 group">
                   <Phone className="w-5 h-5 text-millions-accent mt-1 flex-shrink-0" />
                   <div>
-                    <h4 className="text-[0.6rem] tracking-[0.15em] text-white/40 uppercase mb-1">Call Us</h4>
+                    <h4 className="text-[0.6rem] tracking-[0.15em] text-millions-sage uppercase mb-1">Call Us</h4>
                     {contact.phones.map((raw, i) => {
                       const phone = formatPhone(raw)
                       return (
@@ -195,14 +215,14 @@ export default function ContactPage() {
                         </p>
                       )
                     })}
-                    <p className="text-white/30 text-[0.65rem] italic">Available {openHoursSummary(openingHours.weekly)}</p>
+                    <p className="text-millions-sage text-[0.65rem] italic">Available {openHoursSummary(openingHours.weekly)}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-4 group">
                   <Mail className="w-5 h-5 text-millions-accent mt-1 flex-shrink-0" />
                   <div>
-                    <h4 className="text-[0.6rem] tracking-[0.15em] text-white/40 uppercase mb-1">Email Our Office</h4>
+                    <h4 className="text-[0.6rem] tracking-[0.15em] text-millions-sage uppercase mb-1">Email Our Office</h4>
                     <p className="text-white text-sm font-light">
                       <a href={`mailto:${contact.email}`} className="hover:text-millions-accent transition-colors">{contact.email}</a>
                     </p>
@@ -212,7 +232,7 @@ export default function ContactPage() {
                 <div className="flex items-start gap-4 group">
                   <MapPin className="w-5 h-5 text-millions-accent mt-1 flex-shrink-0" />
                   <div>
-                    <h4 className="text-[0.6rem] tracking-[0.15em] text-white/40 uppercase mb-1">Headquarters</h4>
+                    <h4 className="text-[0.6rem] tracking-[0.15em] text-millions-sage uppercase mb-1">{PRIMARY_OFFICE.label}</h4>
                     <p className="text-white text-sm font-light">{contact.address.join(", ")}</p>
                   </div>
                 </div>
@@ -238,7 +258,7 @@ export default function ContactPage() {
               )}
               {specialDates.length > 0 && (
                 <div className="mt-8">
-                  <h4 className="text-[0.6rem] tracking-[0.2em] uppercase text-millions-accent mb-3">Special Dates</h4>
+                  <h4 className="text-[0.6rem] tracking-[0.2em] uppercase text-millions-accent-ink mb-3">Special Dates</h4>
                   <div className="space-y-3">
                     {specialDates.map((ex) => (
                       <div key={ex.date} className="flex justify-between items-start gap-4 text-[0.8rem] font-light border-b border-millions-dark/5 pb-2">
@@ -262,27 +282,17 @@ export default function ContactPage() {
       <section className="bg-white py-20 border-t border-millions-dark/5">
         <div className="max-w-7xl mx-auto px-4 md:px-20">
           <div className="text-center mb-12">
-            <h2 className="font-cormorant text-millions-dark text-3xl font-light mb-4 uppercase tracking-widest">Our Global Headquarters</h2>
+            <h2 className="font-cormorant text-millions-dark text-3xl font-light mb-4 uppercase tracking-widest">{PRIMARY_OFFICE.mapHeading}</h2>
             <p className="text-millions-body font-light text-sm max-w-2xl mx-auto italic">
-              Strategically positioned in Southampton, United Kingdom, serving as the central hub for our international advisory operations and regional market integrations.
+              {PRIMARY_OFFICE.mapSubText}
             </p>
           </div>
           
-          <div className="h-[500px] bg-millions-dark/5 border border-millions-dark/10 overflow-hidden relative group shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)]">
-            <iframe
-              title="The Millions Southampton Office"
-              src="https://maps.google.com/maps?q=Terminus+Terrace,+Southampton+SO14+3FD,+UK&t=&z=15&ie=UTF8&iwloc=&output=embed"
-              className="w-full h-full grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000"
-              frameBorder="0"
-              scrolling="no"
-              marginHeight={0}
-              marginWidth={0}
-              loading="lazy"
-            />
-            {/* Decorative Corner Overlays */}
-            <div className="absolute top-0 left-0 w-20 h-20 border-l border-t border-millions-accent/20 m-6 pointer-events-none" />
-            <div className="absolute bottom-0 right-0 w-20 h-20 border-r border-b border-millions-accent/20 m-6 pointer-events-none" />
-          </div>
+          <ClickToLoadMap
+            query={PRIMARY_OFFICE.mapQuery}
+            title="Map of The Millions Southampton office"
+            address={contact.address.join(", ") || PRIMARY_OFFICE.mapQuery}
+          />
         </div>
       </section>
     </main>

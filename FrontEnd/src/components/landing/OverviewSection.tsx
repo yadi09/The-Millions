@@ -25,7 +25,7 @@ export const OverviewSection: React.FC<OverviewProps> = ({ content }) => {
           </h2>
         </div>
         <div className="animate-fade-in-up md:animation-delay-300">
-          <div className="space-y-6 text-white/55 text-[0.9rem] leading-[1.9] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline">
+          <div className="space-y-6 text-millions-sage text-[0.9rem] leading-[1.9] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline">
             {(paragraphs || []).map((p, idx) => {
               const html = typeof p === 'string' ? p : (p?.text || p?.title || p?.label || "");
               return (

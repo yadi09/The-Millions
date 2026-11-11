@@ -54,7 +54,7 @@ export const SocialImpactSection: React.FC<SocialImpactProps> = ({ content }) =>
           <h2 className="font-cormorant text-white text-[clamp(2rem,4vw,3rem)] font-light leading-tight">
             {title}
           </h2>
-          <p className="text-white/50 text-[0.9rem] leading-[1.9] font-light mt-4 italic">
+          <p className="text-millions-sage text-[0.9rem] leading-[1.9] font-light mt-4 italic">
             {subTitle}
           </p>
         </div>
@@ -70,7 +70,7 @@ export const SocialImpactSection: React.FC<SocialImpactProps> = ({ content }) =>
           <h3 className="font-cormorant text-white text-[1.5rem] font-light mb-6">
             {governance?.title}
           </h3>
-          <div className="space-y-4 mb-6 text-white/45 text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline">
+          <div className="space-y-4 mb-6 text-millions-sage text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline">
             {(governance?.paragraphs || []).map((p, idx) => (
               <div
                 key={idx}
@@ -80,13 +80,13 @@ export const SocialImpactSection: React.FC<SocialImpactProps> = ({ content }) =>
           </div>
           <ul className="space-y-3 mb-6">
             {(governance?.list || []).map((item, idx) => (
-              <li key={idx} className="flex gap-3 text-white/45 text-[0.95rem] font-light">
+              <li key={idx} className="flex gap-3 text-millions-sage text-[0.95rem] font-light">
                 <span className="text-millions-accent">—</span> {renderText(item)}
               </li>
             ))}
           </ul>
           <div
-            className="text-white/45 text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+            className="text-millions-sage text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderText(governance?.footer)) }}
           />
         </div>
@@ -140,7 +140,7 @@ const TierCard = ({ tier }: { tier: Tier }) => (
       {tier?.title}
     </h3>
     <div
-      className="text-white/45 text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
+      className="text-millions-sage text-[0.83rem] leading-[1.8] font-light [&_p]:my-0 [&_strong]:text-white [&_strong]:font-medium [&_em]:italic [&_u]:underline"
       dangerouslySetInnerHTML={{ __html: sanitizeHtml(tier?.text || '') }}
     />
   </div>

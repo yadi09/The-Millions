@@ -4,6 +4,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Keyboard focus: a visible Heritage Gold ring on every interactive element
+   (mouse clicks don't trigger :focus-visible, so the look is unchanged for
+   pointer users). Form fields keep their own gold border focus style. */
+@layer base {
+  :where(a, button, [role="button"], summary, input[type="checkbox"], input[type="radio"], [tabindex]:not([tabindex="-1"])):focus-visible {
+    outline: 2px solid #c9a84c;
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -208,3 +219,17 @@ html {
 [data-size="lg"] {
   font-size: 1.25em;
 }
+/* Policy pages (/privacy, /cookies, /terms): admin-supplied rich text. */
+.legal-prose {
+  font-size: 0.95rem;
+  line-height: 1.85;
+}
+.legal-prose p + p,
+.legal-prose ul,
+.legal-prose ol {
+  margin-top: 0.9rem;
+}
+.legal-prose ul { list-style: disc; padding-left: 1.25rem; }
+.legal-prose ol { list-style: decimal; padding-left: 1.25rem; }
+.legal-prose a { color: #0d2420; text-decoration: underline; text-underline-offset: 3px; }
+.legal-prose strong { color: #0d2420; font-weight: 600; }

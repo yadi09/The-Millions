@@ -27,7 +27,7 @@ export const PhilosophySection: React.FC<PhilosophyProps> = ({ content }) => {
       <div className="max-w-[1200px] w-[90%] mx-auto grid grid-cols-1 md:grid-cols-2 gap-20 items-center">
         {/* Text Content */}
         <div className="animate-fade-in-up">
-          <div className="flex items-center gap-3 text-millions-accent text-[0.68rem] tracking-[0.3em] uppercase mb-3 sec-label-before">
+          <div className="flex items-center gap-3 text-millions-accent-ink text-[0.68rem] tracking-[0.3em] uppercase mb-3 sec-label-before">
             {label}
           </div>
           <h2 className="font-cormorant text-millions-dark text-[clamp(2rem,4vw,3rem)] font-light leading-tight mb-8">

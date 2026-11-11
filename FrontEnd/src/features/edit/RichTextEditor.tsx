@@ -1,6 +1,5 @@
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
 import { Bold, Italic, Underline as UnderlineIcon } from "lucide-react";
 import { useEffect } from "react";
 import { FontSize } from "./FontSize";
@@ -29,8 +28,9 @@ export function RichTextEditor({ value, onChange, placeholder, disabled }: RichT
         blockquote: false,
         codeBlock: false,
         horizontalRule: false,
+        // Underline ships with StarterKit in tiptap v3; adding the separate
+        // extension too registered it twice ("Duplicate extension names").
       }),
-      Underline,
       FontSize,
     ],
     content: value || "",

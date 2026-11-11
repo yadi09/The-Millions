@@ -12,6 +12,8 @@ import {
   useUpdateFooterMutation,
   useGetOpeningHoursQuery,
   useUpdateOpeningHoursMutation,
+  useGetSiteSettingQuery,
+  useUpdateSiteSettingMutation,
 } from "../api/apiSlice";
 import { WhatsAppFieldEditor, WeeklyHoursEditor } from "./specialEditors";
 import { prepareOpeningHours, type DayHours } from "../../data/businessHours";
@@ -73,18 +75,26 @@ export function EditPanel() {
   const schema = selectedSection ? getSchemaForType(selectedSection) : undefined;
   const isGlobalFooter = schema?.kind === "global" && schema?.globalResource === "footer";
   const isOpeningHours = schema?.kind === "global" && schema?.globalResource === "opening-hours";
-  const isGlobal = isGlobalFooter || isOpeningHours;
+  const settingKey = schema?.kind === "global" && schema?.globalResource === "setting" ? schema.settingKey : undefined;
+  const isSetting = Boolean(settingKey);
+  const isGlobal = isGlobalFooter || isOpeningHours || isSetting;
 
   const { data: footerData } = useGetFooterQuery(undefined, { skip: !isGlobalFooter });
   const [updateFooter] = useUpdateFooterMutation();
   const { data: hoursData } = useGetOpeningHoursQuery(undefined, { skip: !isOpeningHours });
   const [updateOpeningHours] = useUpdateOpeningHoursMutation();
+  const { data: settingData } = useGetSiteSettingQuery(settingKey!, { skip: !settingKey });
+  const [updateSiteSetting] = useUpdateSiteSettingMutation();
 
   const section = !isGlobal ? findSection(pageData, selectedSection) : undefined;
 
   // The draft is the FULL content (deep clone), edited by path.
   const [draft, setDraft] = useState<Record<string, unknown>>({});
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Server validation message from the last failed save (e.g. a company
+  // number in the wrong format), shown at the top of the panel.
+  const [saveError, setSaveError] = useState<string | null>(null);
+  useEffect(() => setSaveError(null), [selectedSection]);
   // Mirrors the most recently hydrated/saved state — used as the comparison
   // baseline for the unchanged check, so post-save cache refetches don't
   // trigger phantom saves.
@@ -92,7 +102,16 @@ export function EditPanel() {
 
   // Hydration: when section or footer changes, copy into draft.
   useEffect(() => {
-    if (isOpeningHours) {
+    if (settingKey) {
+      if (settingData) {
+        const raw = structuredClone(settingData) as Record<string, unknown>;
+        sourceRef.current = raw;
+        setDraft(raw);
+      } else {
+        sourceRef.current = null;
+        setDraft({});
+      }
+    } else if (isOpeningHours) {
       if (hoursData) {
         const raw = structuredClone(hoursData) as unknown as Record<string, unknown>;
         sourceRef.current = raw;
@@ -118,7 +137,7 @@ export function EditPanel() {
       setDraft({});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [section?.id, isGlobalFooter, footerData, isOpeningHours, hoursData, selectedSection]);
+  }, [section?.id, isGlobalFooter, footerData, isOpeningHours, hoursData, settingKey, settingData, selectedSection]);
 
   // Auto-save: every draft change schedules a debounced PUT.
   useEffect(() => {
@@ -145,7 +164,9 @@ export function EditPanel() {
     debounceTimer.current = setTimeout(async () => {
       setSaveStatus("saving");
       try {
-        if (preparedHours) {
+        if (settingKey) {
+          await updateSiteSetting({ key: settingKey, data: draft }).unwrap();
+        } else if (preparedHours) {
           await updateOpeningHours(preparedHours.hours).unwrap();
         } else if (isGlobalFooter) {
           await updateFooter(draft).unwrap();
@@ -157,8 +178,11 @@ export function EditPanel() {
         }
         // Update the baseline so the next compare reflects what's now persisted.
         sourceRef.current = draft;
+        setSaveError(null);
         setSaveStatus("saved");
-      } catch {
+      } catch (err) {
+        const message = (err as { data?: { error?: string } })?.data?.error;
+        setSaveError(message ?? "Couldn't save. Check your connection and try again.");
         setSaveStatus("error");
       }
     }, AUTOSAVE_DEBOUNCE_MS);
@@ -197,6 +221,12 @@ export function EditPanel() {
       {schema.helper && (
         <div className="mb-6 px-4 py-3 bg-millions-accent/10 border-l-2 border-millions-accent text-white/60 text-[0.7rem] font-jost leading-relaxed">
           {schema.helper}
+        </div>
+      )}
+      {saveError && (
+        <div role="alert" className="mb-6 px-4 py-3 bg-red-500/10 border-l-2 border-red-400 text-[0.7rem] font-jost leading-relaxed text-red-200">
+          <p className="uppercase tracking-[0.15em] text-[0.6rem] mb-1 text-red-300">Not saved</p>
+          {saveError}
         </div>
       )}
       {isOpeningHours && Object.keys(draft).length > 0 && (
