@@ -59,8 +59,8 @@ export const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
         >
             <div className="shrink-0 p-8 border-b border-white/5 bg-white/5">
                 <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 border border-millions-accent/40 rounded-none flex items-center justify-center text-millions-accent font-cormorant text-xl font-bold shadow-[0_0_15px_rgba(201,168,76,0.1)]">
-                        M
+                    <div className="w-10 h-10 shrink-0 border border-millions-accent/40 rounded-none flex items-center justify-center shadow-[0_0_15px_rgba(201,168,76,0.1)]">
+                        <img src="/brand/the-millions_icon_reversed-transparent.svg" alt="The Millions" width={28} height={26} className="w-7 h-auto" />
                     </div>
                     <div className="min-w-0">
                         <h1 className="font-cormorant font-light text-[1.1rem] leading-none mb-1 text-white">Admin <em className="italic text-millions-accent not-italic">Sync</em></h1>

@@ -1,6 +1,7 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { AdminSidebar } from './AdminSidebar';
 import { MobileHeader } from './MobileHeader';
+import { useDarkScrollbars } from '../utils/useDarkScrollbars';
 
 type AdminLayoutProps = {
     children: ReactNode;
@@ -8,6 +9,10 @@ type AdminLayoutProps = {
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    // Dark scrollbars across the whole admin instead of the site's default
+    // light-grey ones.
+    useDarkScrollbars();
 
     // Lock body scroll while the mobile drawer is open so the underlying
     // content doesn't shift behind the overlay. Reverts on unmount or close.
@@ -19,7 +24,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     }, [isSidebarOpen]);
 
     return (
-        <div className="min-h-screen bg-millions-dark flex flex-col selection:bg-millions-accent selection:text-millions-dark">
+        <div className="dark-scroll min-h-screen bg-millions-dark flex flex-col selection:bg-millions-accent selection:text-millions-dark">
             {/* Mobile Header */}
             <MobileHeader onMenuClick={() => setIsSidebarOpen(true)} />
 

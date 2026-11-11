@@ -148,6 +148,22 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Thin, dark scrollbars for the admin area (applied to <html> and the admin
+   layout). scrollbar-color is inherited, so every scroll box inside gets it;
+   the ::-webkit-* rules cover Safari, which ignores scrollbar-color. */
+.dark-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.16) #0d2420;
+}
+.dark-scroll::-webkit-scrollbar,
+.dark-scroll ::-webkit-scrollbar { width: 8px; height: 8px; }
+.dark-scroll::-webkit-scrollbar-track,
+.dark-scroll ::-webkit-scrollbar-track { background: #0d2420; }
+.dark-scroll::-webkit-scrollbar-thumb,
+.dark-scroll ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.16); border-radius: 4px; }
+.dark-scroll::-webkit-scrollbar-thumb:hover,
+.dark-scroll ::-webkit-scrollbar-thumb:hover { background: rgba(201, 168, 76, 0.5); }
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

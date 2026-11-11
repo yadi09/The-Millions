@@ -4,6 +4,7 @@ import { useLoginMutation } from '../../features/auth/authSlice';
 import { Card, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Loader2, ShieldCheck, Lock } from 'lucide-react';
+import { useDarkScrollbars } from '../../utils/useDarkScrollbars';
 
 // Set of deprecated admin routes — if the user was bounced from one of
 // these, send them to the default admin landing instead of looping back.
@@ -28,6 +29,7 @@ function resolveRedirect(from: unknown): string {
 const AdminLogin = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    useDarkScrollbars();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [login, { isLoading, error }] = useLoginMutation();
@@ -55,7 +57,7 @@ const AdminLogin = () => {
                 <div className="text-center mb-8 sm:mb-12">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 border border-millions-accent/20 rounded-none flex items-center justify-center mx-auto mb-6 sm:mb-8 relative group">
                         <div className="absolute inset-0 bg-millions-accent/5 group-hover:bg-millions-accent/10 transition-colors" />
-                        <span className="font-cormorant text-3xl sm:text-4xl font-bold text-millions-accent relative">M</span>
+                        <img src="/brand/the-millions_icon_reversed-transparent.svg" alt="The Millions" width={56} height={53} className="relative w-11 sm:w-14 h-auto" />
                     </div>
                     <h1 className="font-cormorant text-[clamp(2rem,7vw,4rem)] font-light text-white leading-none mb-4 sm:mb-6">
                         Millions <em className="italic text-millions-accent not-italic">Sync</em>
