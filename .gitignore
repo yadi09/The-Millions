@@ -7,10 +7,12 @@
 *.swp
 *~
 
-# Stray Node artifacts at the repo root (the real ones live in BackEnd/ and FrontEnd/)
+# Dependencies
 /node_modules/
-/package.json
-/package-lock.json
+
+# Secrets & test artifacts
+.env
+.testdriver/
 
 # TypeScript incremental build cache (anywhere in the tree)
 *.tsbuildinfo
